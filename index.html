@@ -1246,13 +1246,13 @@ a, button, [role='button'], input, select {
 
       <!-- Workflow summary -->
       <div class="section-heading" data-es="Flujo de Trabajo CoCM" data-en="CoCM Workflow">Flujo de Trabajo CoCM</div>
-      <div style="background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius-xl); padding:var(--space-5) var(--space-6); margin-bottom:var(--space-8); overflow-x:auto;">
-        <table style="width:100%; font-size:var(--text-sm); border-collapse:collapse;">
+      <div style="background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius-xl); padding:var(--space-5) var(--space-6); margin-bottom:var(--space-3); overflow-x:auto;">
+        <table style="width:100%; font-size:var(--text-sm); border-collapse:collapse; min-width:540px;">
           <thead>
             <tr style="border-bottom:2px solid var(--color-border);">
-              <th style="text-align:left; padding:var(--space-3) var(--space-4); color:var(--color-text-muted); font-weight:600;" data-es="Condición" data-en="Condition">Condición</th>
-              <th style="text-align:left; padding:var(--space-3) var(--space-4); color:var(--color-primary); font-weight:600;" data-es="Jóvenes ≤11" data-en="Youth ≤11">Jóvenes ≤11</th>
-              <th style="text-align:left; padding:var(--space-3) var(--space-4); color:var(--color-text-muted); font-weight:600; border-left:1px solid var(--color-border);" data-es="Adolescentes ≥12" data-en="Adolescents ≥12">Adolescentes ≥12</th>
+              <th style="text-align:left; padding:var(--space-3) var(--space-4); color:var(--color-text-muted); font-weight:600; width:22%;" data-es="Condición" data-en="Condition">Condición</th>
+              <th style="text-align:left; padding:var(--space-3) var(--space-4); color:var(--color-primary); font-weight:600; width:39%;" data-es="Jóvenes ≤11" data-en="Youth ≤11">Jóvenes ≤11</th>
+              <th style="text-align:left; padding:var(--space-3) var(--space-4); color:var(--color-primary); font-weight:600; border-left:1px solid var(--color-border); width:39%;" data-es="Adolescentes ≥12" data-en="Adolescents ≥12">Adolescentes ≥12</th>
             </tr>
           </thead>
           <tbody>
@@ -1262,27 +1262,50 @@ a, button, [role='button'], input, select {
             </tr>
             <tr style="border-bottom:1px solid var(--color-divider);">
               <td style="padding:var(--space-3) var(--space-4); font-weight:500;" data-es="Depresión" data-en="Depression">Depresión</td>
-              <td style="padding:var(--space-3) var(--space-4);"><a href="mfq.html" class="workflow-link">MFQ-C</a> + <a href="mfq-parent.html" class="workflow-link">MFQ-P</a></td>
-              <td style="padding:var(--space-3) var(--space-4); border-left:1px solid var(--color-border);"><a href="phqa.html" class="workflow-link">PHQ-A</a></td>
+              <td style="padding:var(--space-3) var(--space-4);">
+                <a href="mfq.html" class="workflow-link">MFQ-C</a> + <a href="mfq-parent.html" class="workflow-link">MFQ-P</a>
+                <div style="font-size:var(--text-xs); color:var(--color-text-faint); margin-top:2px;" data-es="Monitoreo: MFQ (breve)" data-en="Monitoring: MFQ (brief)">Monitoreo: MFQ (breve)</div>
+              </td>
+              <td style="padding:var(--space-3) var(--space-4); border-left:1px solid var(--color-border);">
+                <a href="phqa.html" class="workflow-link">PHQ-A</a>
+                <div style="font-size:var(--text-xs); color:var(--color-text-faint); margin-top:2px;" data-es="Monitoreo: PHQ-A" data-en="Monitoring: PHQ-A">Monitoreo: PHQ-A</div>
+              </td>
             </tr>
             <tr style="border-bottom:1px solid var(--color-divider);">
               <td style="padding:var(--space-3) var(--space-4); font-weight:500;">TDAH</td>
-              <td style="padding:var(--space-3) var(--space-4);"><a href="vanderbilt-parent.html" class="workflow-link">Vanderbilt-P</a> + <a href="vanderbilt-teacher.html" class="workflow-link">Vanderbilt-T</a></td>
-              <td style="padding:var(--space-3) var(--space-4); border-left:1px solid var(--color-border);"><a href="snapiv.html" class="workflow-link">SNAP-IV</a></td>
+              <td style="padding:var(--space-3) var(--space-4);">
+                <span style="font-size:var(--text-xs); color:var(--color-text-faint); display:block; margin-bottom:3px;" data-es="Detección:" data-en="Screening:">Detección:</span>
+                <span style="color:var(--color-text-muted);" data-es="CAP Scale (Prioridad) — próximamente" data-en="CAP Scale (Priority) — coming soon">CAP Scale (Prioridad) — próximamente</span><br>
+                <a href="vanderbilt-parent.html" class="workflow-link">Vanderbilt-P</a> + <a href="vanderbilt-teacher.html" class="workflow-link">Vanderbilt-T</a>
+                <div style="font-size:var(--text-xs); color:var(--color-text-faint); margin-top:2px;" data-es="Monitoreo: CAP Scale / Vanderbilt" data-en="Monitoring: CAP Scale / Vanderbilt">Monitoreo: CAP Scale / Vanderbilt</div>
+              </td>
+              <td style="padding:var(--space-3) var(--space-4); border-left:1px solid var(--color-border);">
+                <a href="snapiv.html" class="workflow-link">SNAP-IV</a> + <span style="color:var(--color-text-muted);" data-es="ASRS (próx.)" data-en="ASRS (soon)">ASRS (próx.)</span>
+                <div style="font-size:var(--text-xs); color:var(--color-text-faint); margin-top:2px;" data-es="Monitoreo: SNAP-IV + ASRS" data-en="Monitoring: SNAP-IV + ASRS">Monitoreo: SNAP-IV + ASRS</div>
+              </td>
             </tr>
             <tr style="border-bottom:1px solid var(--color-divider);">
               <td style="padding:var(--space-3) var(--space-4); font-weight:500;" data-es="Ansiedad" data-en="Anxiety">Ansiedad</td>
-              <td style="padding:var(--space-3) var(--space-4);"><a href="scared.html" class="workflow-link">SCARED-N</a> + <a href="scared-parent.html" class="workflow-link">SCARED-P</a></td>
-              <td style="padding:var(--space-3) var(--space-4); border-left:1px solid var(--color-border);"><a href="gad7.html" class="workflow-link">GAD-7</a></td>
+              <td style="padding:var(--space-3) var(--space-4);">
+                <a href="scared.html" class="workflow-link">SCARED-N</a> + <a href="scared-parent.html" class="workflow-link">SCARED-P</a>
+                <div style="font-size:var(--text-xs); color:var(--color-text-faint); margin-top:2px;" data-es="Monitoreo: SCARED" data-en="Monitoring: SCARED">Monitoreo: SCARED</div>
+              </td>
+              <td style="padding:var(--space-3) var(--space-4); border-left:1px solid var(--color-border);">
+                <a href="gad7.html" class="workflow-link">GAD-7</a>
+                <div style="font-size:var(--text-xs); color:var(--color-text-faint); margin-top:2px;" data-es="Monitoreo: GAD-7" data-en="Monitoring: GAD-7">Monitoreo: GAD-7</div>
+              </td>
             </tr>
             <tr>
               <td style="padding:var(--space-3) var(--space-4); font-weight:500;" data-es="Riesgo / SUD" data-en="Risk / SUD">Riesgo / SUD</td>
               <td style="padding:var(--space-3) var(--space-4); color:var(--color-text-faint);" data-es="— No aplica —" data-en="— Not applicable —">— No aplica —</td>
-              <td style="padding:var(--space-3) var(--space-4); border-left:1px solid var(--color-border);"><a href="crafft.html" class="workflow-link">CRAFFT</a> / <a href="dast10.html" class="workflow-link">DAST-10</a></td>
+              <td style="padding:var(--space-3) var(--space-4); border-left:1px solid var(--color-border);">
+                <a href="crafft.html" class="workflow-link">CRAFFT</a> + <a href="dast10.html" class="workflow-link">DAST-10</a>
+              </td>
             </tr>
           </tbody>
         </table>
       </div>
+      <p style="font-size:var(--text-xs); color:var(--color-text-faint); margin-bottom:var(--space-8); padding:0 var(--space-2);" data-es="CAP Scale y ASRS en desarrollo. Ver flujo visual completo →" data-en="CAP Scale and ASRS in development. See full visual flowchart →">CAP Scale y ASRS en desarrollo. <a href="flowsheet.html" style="color:var(--color-primary); text-decoration:none;" data-es="Ver flujo visual →" data-en="See visual flowchart →">Ver flujo visual →</a></p>
 
       <!-- Tool cards -->
       <div class="section-heading" data-es="Todas las Herramientas" data-en="All Tools">Todas las Herramientas</div>

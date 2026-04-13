@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark" data-lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Flujo CoCM Pediátrico — Visual</title>
+  <style>
+    :root {
+      --teal:        #4F98A3;
+      --teal-dim:    rgba(79,152,163,0.14);
+      --teal-border: rgba(79,152,163,0.4);
+      --gold:        #c89b3c;
+      --gold-dim:    rgba(200,155,60,0.12);
+      --gold-border: rgba(200,155,60,0.5);
+      --green:       #4a9e6b;
+      --green-dim:   rgba(74,158,107,0.13);
+      --green-border:rgba(74,158,107,0.4);
+      --soon:        #5a5955;
+      --soon-dim:    rgba(90,89,85,0.18);
+
+      --bg:          #0e0d0c;
+      --surface:     #171614;
+      --surface-2:   #1e1d1b;
+      --border:      #2a2927;
+      --text:        #d0cfc9;
+      --muted:       #78766e;
+      --faint:       #3e3d3a;
+
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+      font-size: 13px;
+    }
+    [data-theme="light"] {
+      --bg:       #f2f1ee;
+      --surface:  #ffffff;
+      --surface-2:#ebebea;
+      --border:   #d8d7d3;
+      --text:     #1a1917;
+      --muted:    #6b6960;
+      --faint:    #c0bfba;
+      --teal-dim: rgba(79,152,163,0.09);
+      --gold-dim: rgba(200,155,60,0.08);
+      --green-dim:rgba(74,158,107,0.09);
+      --soon-dim: rgba(0,0,0,0.05);
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); min-height: 100vh; }
+
+    /* ── Top bar ── */
+    .topbar {
+      position: sticky; top: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 16px; height: 50px;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      gap: 12px;
+    }
+    .topbar-left { display: flex; align-items: center; gap: 10px; min-width: 0; }
+    .back-btn {
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      width: 30px; height: 30px; border-radius: 6px;
+      border: 1px solid var(--border); background: none;
+      color: var(--muted); cursor: pointer; text-decoration: none;
+      transition: all .15s;
+    }
+    .back-btn:hover { border-color: var(--teal); color: var(--text); }
+    .topbar-title { font-weight: 700; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .topbar-sub   { font-size: 10px; color: var(--muted); margin-top: 1px; }
+    .topbar-right { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+    .lang-grp { display: flex; gap: 2px; background: var(--surface-2); border-radius: 6px; padding: 2px; }
+    .lang-btn {
+      background: none; border: none; cursor: pointer;
+      font-size: 11px; font-weight: 600; color: var(--muted);
+      padding: 3px 7px; border-radius: 4px; transition: all .15s;
+    }
+    .lang-btn.active { background: var(--teal); color: #fff; }
+    .icon-btn {
+      width: 30px; height: 30px; border-radius: 6px;
+      border: 1px solid var(--border); background: none;
+      color: var(--muted); cursor: pointer; font-size: 13px;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ── Proto badge ── */
+    .proto-badge {
+      margin: 12px 16px 0;
+      padding: 7px 12px;
+      background: var(--gold-dim);
+      border: 1px solid var(--gold-border);
+      border-radius: 8px;
+      font-size: 11px; color: var(--gold);
+      display: flex; align-items: center; gap: 8px;
+    }
+
+    /* ── Scroll container ── */
+    .scroll-wrap {
+      overflow-x: auto;
+      padding: 20px 16px 40px;
+    }
+
+    /* ── Main flow grid ── */
+    .flow-grid {
+      display: grid;
+      grid-template-columns:
+        /* col 1: entry/enroll */  160px
+        /* col 2: condition */      110px
+        /* col 3: age diamond */    100px
+        /* col 4: screening tool */ 170px
+        /* col 5: monitor q */       80px
+        /* col 6: monitor tools */  150px;
+      grid-template-rows: auto;
+      column-gap: 0;
+      row-gap: 0;
+      min-width: 780px;
+      align-items: center;
+    }
+
+    /* ── Node types ── */
+
+    /* Rounded rect — process */
+    .node {
+      display: flex; align-items: center; justify-content: center;
+      text-align: center;
+      border-radius: 8px;
+      padding: 8px 10px;
+      font-weight: 600;
+      font-size: 12px;
+      line-height: 1.35;
+      position: relative;
+    }
+    .node-entry {
+      background: var(--surface-2);
+      border: 2px solid var(--border);
+      border-radius: 20px;
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .node-psc {
+      background: var(--green-dim);
+      border: 2px solid var(--green-border);
+      color: var(--green);
+    }
+    .node-review {
+      background: var(--surface-2);
+      border: 2px solid var(--border);
+      font-size: 11px;
+      color: var(--muted);
+    }
+    .node-enroll {
+      background: var(--gold-dim);
+      border: 2px dashed var(--gold-border);
+      border-radius: 20px;
+      font-size: 11px;
+      color: var(--gold);
+    }
+
+    /* Diamond — decision */
+    .diamond-wrap {
+      display: flex; align-items: center; justify-content: center;
+    }
+    .diamond {
+      width: 84px; height: 84px;
+      transform: rotate(45deg);
+      border: 2px solid var(--gold-border);
+      background: var(--gold-dim);
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 6px;
+    }
+    .diamond-inner {
+      transform: rotate(-45deg);
+      font-size: 10px;
+      font-weight: 600;
+      color: var(--gold);
+      text-align: center;
+      padding: 4px;
+      line-height: 1.3;
+      max-width: 70px;
+    }
+    .diamond-sm {
+      width: 68px; height: 68px;
+      transform: rotate(45deg);
+      border: 2px solid var(--teal-border);
+      background: var(--teal-dim);
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 5px;
+    }
+    .diamond-sm-inner {
+      transform: rotate(-45deg);
+      font-size: 9px; font-weight: 600;
+      color: var(--teal); text-align: center;
+      padding: 2px; line-height: 1.3;
+      max-width: 56px;
+    }
+
+    /* Condition label */
+    .cond-label {
+      display: flex; align-items: center; justify-content: center;
+      text-align: center;
+      padding: 8px 12px;
+      font-weight: 700;
+      font-size: 13px;
+      border: 2px solid var(--border);
+      border-radius: 8px;
+      background: var(--surface);
+      color: var(--text);
+    }
+
+    /* Tool box */
+    .tool-box {
+      display: flex; flex-direction: column; gap: 5px;
+      padding: 10px 12px;
+      border-radius: 8px;
+    }
+    .tool-box.teal {
+      background: var(--teal-dim);
+      border: 1px solid var(--teal-border);
+    }
+    .tool-box.soon-box {
+      background: var(--soon-dim);
+      border: 1px dashed var(--soon);
+    }
+    .tool-link {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-weight: 700; font-size: 12px;
+      color: var(--teal); text-decoration: none;
+      transition: opacity .15s;
+    }
+    .tool-link:hover { opacity: 0.75; text-decoration: underline; }
+    .tool-link .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--teal); flex-shrink: 0; }
+    .tool-soon {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-weight: 600; font-size: 11px;
+      color: var(--soon);
+    }
+    .tool-soon .dot { width: 5px; height: 5px; border-radius: 50%; background: var(--soon); flex-shrink: 0; }
+    .tool-sub {
+      font-size: 10px; color: var(--muted); line-height: 1.3;
+    }
+
+    /* Monitor box */
+    .monitor-box {
+      display: flex; flex-direction: column; gap: 4px;
+      padding: 8px 10px;
+      border-radius: 8px;
+      background: var(--teal-dim);
+      border: 1px solid var(--teal-border);
+    }
+    .monitor-label {
+      font-size: 10px; color: var(--muted); font-weight: 600;
+      text-transform: uppercase; letter-spacing: .04em;
+    }
+
+    /* Age labels (within diamond rows) */
+    .age-tag {
+      font-size: 11px; font-weight: 700;
+      color: var(--teal);
+      text-align: center;
+    }
+
+    /* ── Connector arrows (SVG) ── */
+    .connector {
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ── Section headers (left to right row spanning) ── */
+    .col-header {
+      font-size: 10px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .06em;
+      color: var(--muted);
+      text-align: center;
+      padding: 4px 0 10px;
+    }
+    .col-header.accent { color: var(--teal); }
+
+    /* ── Spacer rows ── */
+    .spacer { height: 10px; }
+    .spacer-lg { height: 24px; }
+
+    /* ── Right panel (screening + monitoring) ── */
+    .right-panel {
+      display: flex;
+      gap: 10px;
+      margin-top: 12px;
+      padding: 0 16px 40px;
+      min-width: 780px;
+      /* mirrors the grid width */
+    }
+    .panel-col {
+      flex: 1;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .panel-header {
+      text-align: center;
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .06em;
+      color: var(--teal);
+      padding: 8px 12px;
+      background: var(--teal-dim);
+      border: 1px solid var(--teal-border);
+      border-radius: 8px;
+    }
+
+    /* ── Responsive table fallback (small screens) ── */
+    .table-fallback { display: none; }
+    @media (max-width: 600px) {
+      .flow-diagram { display: none; }
+      .table-fallback { display: block; }
+    }
+
+    /* Language */
+    [data-lang="es"] .en { display: none !important; }
+    [data-lang="en"] .es { display: none !important; }
+    [data-lang="both"] .en {
+      display: block !important;
+      font-size: 9px; font-style: italic;
+      color: var(--faint); margin-top: 1px;
+    }
+    [data-lang="both"] .en.inline { display: inline !important; }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <div class="topbar-left">
+    <a href="index.html" class="back-btn" aria-label="Dashboard">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </a>
+    <div>
+      <div class="topbar-title">
+        <span class="es">Flujo de Trabajo CoCM Pediátrico</span>
+        <span class="en">Pediatric CoCM Screening Workflow</span>
+      </div>
+      <div class="topbar-sub">
+        <span class="es">Prototipo visual — basado en v1.2</span>
+        <span class="en">Visual prototype — based on v1.2</span>
+      </div>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <div class="lang-grp">
+      <button id="btn-es"   class="lang-btn active">ES</button>
+      <button id="btn-en"   class="lang-btn">EN</button>
+      <button id="btn-both" class="lang-btn">ES+EN</button>
+    </div>
+    <button id="theme-btn" class="icon-btn"><span id="theme-lbl">☀️</span></button>
+  </div>
+</header>
+
+<!-- PROTOTYPE NOTICE -->
+<div class="proto-badge">
+  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+  <span class="es">Prototipo — basado en Flujo de Trabajo v1.2. Las píldoras verdes son enlaces funcionales a herramientas.</span>
+  <span class="en">Prototype — based on Workflow v1.2. Teal pills are live links to tools.</span>
+</div>
+
+<div class="scroll-wrap flow-diagram">
+
+  <!-- ═══════════════ COLUMN HEADERS ═══════════════ -->
+  <div style="display:grid; grid-template-columns:160px 110px 100px 170px 80px 150px; min-width:780px; padding:0 0 6px; column-gap:0;">
+    <div class="col-header"></div>
+    <div class="col-header"></div>
+    <div class="col-header"></div>
+    <div class="col-header accent">
+      <span class="es">Herramientas de Detección</span>
+      <span class="en">Focused Screening Tools</span>
+    </div>
+    <div class="col-header"></div>
+    <div class="col-header accent">
+      <span class="es">Monitoreo</span>
+      <span class="en">Monitoring Tools</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════ ENTRY / PSC ROW ═══════════════ -->
+  <div class="flow-grid" style="row-gap:8px;">
+
+    <!-- Row 1: Referencia → PSC -->
+    <div style="grid-column:1; grid-row:1; padding:4px 8px 4px 0;">
+      <div class="node node-entry" style="height:40px;">
+        <span class="es">Referencia del programa</span>
+        <span class="en">Program Reference</span>
+      </div>
+    </div>
+    <div style="grid-column:2; grid-row:1; display:flex; align-items:center; justify-content:center; padding:4px;">
+      <!-- Arrow right -->
+      <svg width="100%" height="40" viewBox="0 0 110 40" fill="none" xmlns="http://www.w3.org/2000/svg" style="overflow:visible;">
+        <line x1="0" y1="20" x2="95" y2="20" stroke="#4a4945" stroke-width="1.5"/>
+        <polygon points="95,14 110,20 95,26" fill="#4a4945"/>
+      </svg>
+    </div>
+    <!-- PSC box spans cols 3-4 -->
+    <div style="grid-column:3/5; grid-row:1; padding:4px 8px;">
+      <div class="tool-box teal" style="align-items:center; text-align:center;">
+        <a href="psc17.html" class="tool-link" style="font-size:14px; font-weight:800;">
+          <span class="dot"></span>PSC-17
+        </a>
+        <span class="tool-sub">
+          <span class="es">Lista de Síntomas Pediátricos · 17 ítems · Corte ≥15</span>
+          <span class="en">Pediatric Symptom Checklist · 17 items · Cutoff ≥15</span>
+        </span>
+      </div>
+    </div>
+    <!-- empty cols 5-6 -->
+    <div style="grid-column:5; grid-row:1;"></div>
+    <div style="grid-column:6; grid-row:1;"></div>
+
+    <!-- Row 2: spacer -->
+    <div style="grid-column:1/7; grid-row:2; height:6px;"></div>
+
+    <!-- Row 3: Care Manager + arrow down -->
+    <div style="grid-column:1; grid-row:3;">
+      <div class="node node-review" style="height:52px; font-size:11px;">
+        <div>
+          <div style="font-weight:700;">
+            <span class="es">Cuidado Gerente/<br>Caso Psiquiátrico</span>
+            <span class="en">Care Manager/<br>Psychiatric Case</span>
+          </div>
+          <div style="color:var(--muted); font-size:10px; margin-top:2px;">
+            <span class="es">Revisión</span>
+            <span class="en">Review</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="grid-column:2/7; grid-row:3;"></div>
+
+    <!-- Row 4: Programa inscripción -->
+    <div style="grid-column:1; grid-row:4; padding:4px 0;">
+      <div class="node node-enroll" style="height:40px; font-size:11px;">
+        <span class="es">Programa Inscripción</span>
+        <span class="en">Program Enrollment</span>
+      </div>
+    </div>
+    <div style="grid-column:2/7; grid-row:4;"></div>
+
+    <!-- Row 5: Main decision diamond -->
+    <div style="grid-column:1; grid-row:5; display:flex; align-items:center; justify-content:center; padding:8px 0;">
+      <div class="diamond-wrap">
+        <div class="diamond">
+          <div class="diamond-inner">
+            <span class="es">¿Qué paciente cribado positivo ¿para qué?</span>
+            <span class="en">What did patient screen positive for?</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- spacer col 2 row 5 -->
+    <div style="grid-column:2; grid-row:5;"></div>
+
+    <!-- ═══ DEPRESSION ROW (rows 5-6) ═══ -->
+    <div style="grid-column:2; grid-row:5; display:flex; align-items:center;">
+      <!-- horizontal connector from diamond to condition label -->
+    </div>
+    <div style="grid-column:2; grid-row:5; display:flex; align-items:flex-start; padding-top:0;">
+    </div>
+
+  </div><!-- /flow-grid -->
+
+  <!-- ═══════════════ CONDITION ROWS ═══════════════ -->
+
+  <div style="display:grid; grid-template-columns:160px 110px 100px 170px 80px 150px; min-width:780px; row-gap:10px; column-gap:0; align-items:start; margin-top:4px;">
+
+    <!-- ─── DEPRESSION ─── -->
+    <!-- Condition label -->
+    <div style="grid-column:2; grid-row:1; padding:4px 6px; display:flex; align-items:center; justify-content:center;">
+      <div class="cond-label" style="width:100%;">
+        <span class="es">Depresión</span>
+        <span class="en">Depression</span>
+      </div>
+    </div>
+    <!-- Age diamond -->
+    <div style="grid-column:3; grid-row:1; display:flex; flex-direction:column; align-items:center; gap:6px; padding:4px;">
+      <div style="font-size:10px; color:var(--teal); font-weight:700; text-align:center;">
+        <span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span>
+      </div>
+      <div style="font-size:10px; color:var(--teal); font-weight:700; text-align:center; margin-top:30px;">
+        <span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span>
+      </div>
+    </div>
+    <!-- Tools -->
+    <div style="grid-column:4; grid-row:1; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+      <div class="tool-box teal">
+        <a href="mfq.html" class="tool-link"><span class="dot"></span>MFQ-C</a>
+        <a href="mfq-parent.html" class="tool-link"><span class="dot"></span>MFQ-P</a>
+        <span class="tool-sub"><span class="es">Estado de breve</span><span class="en">Brief mood screen</span></span>
+      </div>
+      <div class="tool-box teal">
+        <a href="phqa.html" class="tool-link"><span class="dot"></span>PHQ-A (PHQ-9)</a>
+      </div>
+    </div>
+    <!-- Monitor question -->
+    <div style="grid-column:5; grid-row:1; display:flex; align-items:center; justify-content:center; padding:4px;">
+      <div class="diamond-sm">
+        <div class="diamond-sm-inner">
+          <span class="es">¿Qué herramienta monitorear?</span>
+          <span class="en">Which tool to monitor?</span>
+        </div>
+      </div>
+    </div>
+    <!-- Monitor tools -->
+    <div style="grid-column:6; grid-row:1; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+      <div class="monitor-box">
+        <span class="monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span>
+        <span class="tool-sub" style="font-size:11px; font-weight:600; color:var(--teal);">
+          <span class="es">Estado de breve MFQ</span><span class="en">MFQ Brief</span>
+        </span>
+      </div>
+      <div class="monitor-box">
+        <span class="monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span>
+        <a href="phqa.html" class="tool-link" style="font-size:11px;">
+          <span class="dot"></span>PHQ-A (PHQ-9)
+        </a>
+      </div>
+    </div>
+
+    <!-- spacer col 1 rows 1-5 — the left-column entry flow -->
+    <div style="grid-column:1; grid-row:1/6;"></div>
+
+    <!-- ─── TDAH ─── -->
+    <div style="grid-column:2; grid-row:2; padding:4px 6px; display:flex; align-items:center; justify-content:center;">
+      <div class="cond-label" style="width:100%;">TDAH</div>
+    </div>
+    <div style="grid-column:3; grid-row:2; display:flex; flex-direction:column; align-items:center; gap:6px; padding:4px;">
+      <div style="font-size:10px; color:var(--teal); font-weight:700; text-align:center;">
+        <span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span>
+      </div>
+      <div style="font-size:10px; color:var(--teal); font-weight:700; text-align:center; margin-top:40px;">
+        <span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span>
+      </div>
+    </div>
+    <div style="grid-column:4; grid-row:2; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+      <!-- Youth tools -->
+      <div class="tool-box teal">
+        <div class="tool-soon"><span class="dot"></span>
+          <span class="es">CAP Scale (Prioridad)</span><span class="en">CAP Scale (Priority)</span>
+        </div>
+        <span class="tool-sub" style="color:var(--soon);">
+          <span class="es">Próximamente</span><span class="en">Coming soon</span>
+        </span>
+        <a href="vanderbilt-parent.html" class="tool-link" style="margin-top:4px;"><span class="dot"></span>Vanderbilt-P</a>
+        <a href="vanderbilt-teacher.html" class="tool-link"><span class="dot"></span>Vanderbilt-T</a>
+        <span class="tool-sub">
+          <span class="es">(si CAP no es viable)</span><span class="en">(if CAP not viable)</span>
+        </span>
+      </div>
+      <!-- Adolescent tools -->
+      <div class="tool-box teal">
+        <a href="snapiv.html" class="tool-link"><span class="dot"></span>SNAP-IV</a>
+        <span style="font-size:11px; color:var(--muted);">+</span>
+        <div class="tool-soon"><span class="dot"></span>ASRS
+          <span class="tool-sub" style="color:var(--soon); margin-left:4px;">
+            <span class="es">(autoinformes — próx.)</span><span class="en">(self-report — soon)</span>
+          </span>
+        </div>
+      </div>
+    </div>
+    <div style="grid-column:5; grid-row:2; display:flex; align-items:center; justify-content:center; padding:4px;">
+      <div class="diamond-sm">
+        <div class="diamond-sm-inner">
+          <span class="es">¿Qué herramienta monitorear?</span>
+          <span class="en">Which tool to monitor?</span>
+        </div>
+      </div>
+    </div>
+    <div style="grid-column:6; grid-row:2; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+      <div class="monitor-box">
+        <span class="monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span>
+        <span class="tool-sub" style="font-size:11px; font-weight:600; color:var(--teal);">
+          <span class="es">CAP Scale (Prioridad)</span><span class="en">CAP Scale (Priority)</span>
+        </span>
+        <a href="vanderbilt-parent.html" class="tool-link" style="font-size:11px;"><span class="dot"></span>Vanderbilt</a>
+        <span class="tool-sub"><span class="es">(si CAP no es viable)</span><span class="en">(if CAP not viable)</span></span>
+      </div>
+      <div class="monitor-box">
+        <span class="monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span>
+        <a href="snapiv.html" class="tool-link" style="font-size:11px;"><span class="dot"></span>SNAP-IV</a>
+        <span style="font-size:11px; color:var(--muted);">+</span>
+        <span class="tool-sub" style="font-size:11px; font-weight:600; color:var(--soon);">ASRS</span>
+      </div>
+    </div>
+
+    <!-- ─── ANSIEDAD ─── -->
+    <div style="grid-column:2; grid-row:3; padding:4px 6px; display:flex; align-items:center; justify-content:center;">
+      <div class="cond-label" style="width:100%;">
+        <span class="es">Ansiedad</span><span class="en">Anxiety</span>
+      </div>
+    </div>
+    <div style="grid-column:3; grid-row:3; display:flex; flex-direction:column; align-items:center; gap:6px; padding:4px;">
+      <div style="font-size:10px; color:var(--teal); font-weight:700; text-align:center;">
+        <span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span>
+      </div>
+      <div style="font-size:10px; color:var(--teal); font-weight:700; text-align:center; margin-top:22px;">
+        <span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span>
+      </div>
+    </div>
+    <div style="grid-column:4; grid-row:3; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+      <div class="tool-box teal">
+        <a href="scared.html" class="tool-link"><span class="dot"></span>SCARED-N</a>
+        <a href="scared-parent.html" class="tool-link"><span class="dot"></span>SCARED-P</a>
+      </div>
+      <div class="tool-box teal">
+        <a href="gad7.html" class="tool-link"><span class="dot"></span>GAD-7</a>
+      </div>
+    </div>
+    <div style="grid-column:5; grid-row:3; display:flex; align-items:center; justify-content:center; padding:4px;">
+      <div class="diamond-sm">
+        <div class="diamond-sm-inner">
+          <span class="es">¿Qué herramienta monitorear?</span>
+          <span class="en">Which tool to monitor?</span>
+        </div>
+      </div>
+    </div>
+    <div style="grid-column:6; grid-row:3; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+      <div class="monitor-box">
+        <span class="monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span>
+        <a href="scared.html" class="tool-link" style="font-size:11px;"><span class="dot"></span>SCARED</a>
+      </div>
+      <div class="monitor-box">
+        <span class="monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span>
+        <a href="gad7.html" class="tool-link" style="font-size:11px;"><span class="dot"></span>GAD-7</a>
+      </div>
+    </div>
+
+    <!-- ─── RIESGO / SUD ─── -->
+    <div style="grid-column:2; grid-row:4; padding:4px 6px; display:flex; align-items:center; justify-content:center;">
+      <div class="cond-label" style="width:100%;">
+        <span class="es">Riesgo / SUD</span><span class="en">Risk / SUD</span>
+      </div>
+    </div>
+    <div style="grid-column:3; grid-row:4; display:flex; flex-direction:column; align-items:center; gap:6px; padding:4px;">
+      <div style="font-size:10px; color:var(--teal); font-weight:700; text-align:center;">
+        <span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span>
+      </div>
+      <div style="font-size:10px; color:var(--teal); font-weight:700; text-align:center; margin-top:22px;">
+        <span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span>
+      </div>
+    </div>
+    <div style="grid-column:4; grid-row:4; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+      <div class="tool-box" style="background:var(--surface-2); border:1px dashed var(--border); align-items:center; justify-content:center;">
+        <span style="font-size:11px; color:var(--faint);">
+          <span class="es">— Ninguno —</span><span class="en">— None —</span>
+        </span>
+      </div>
+      <div class="tool-box teal">
+        <a href="crafft.html" class="tool-link"><span class="dot"></span>CRAFFT</a>
+        <a href="dast10.html" class="tool-link"><span class="dot"></span>DAST-10</a>
+      </div>
+    </div>
+    <div style="grid-column:5; grid-row:4; display:flex; align-items:center; justify-content:center; padding:4px;">
+      <div class="diamond-sm">
+        <div class="diamond-sm-inner">
+          <span class="es">¿Qué herramienta monitorear?</span>
+          <span class="en">Which tool to monitor?</span>
+        </div>
+      </div>
+    </div>
+    <div style="grid-column:6; grid-row:4; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+      <div style="background:var(--surface-2); border:1px dashed var(--border); border-radius:8px; padding:8px 10px; display:flex; align-items:center; justify-content:center;">
+        <span style="font-size:10px; color:var(--faint);">
+          <span class="es">— Ninguno —</span><span class="en">— None —</span>
+        </span>
+      </div>
+      <div class="monitor-box">
+        <span class="monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span>
+        <a href="dast10.html" class="tool-link" style="font-size:11px;"><span class="dot"></span>DAST-10</a>
+      </div>
+    </div>
+
+  </div><!-- /condition rows grid -->
+
+  <!-- ─── Siglas / Legend ─── -->
+  <div style="margin:24px 0 0; padding:14px 16px; background:var(--surface); border:1px solid var(--border); border-radius:10px; min-width:780px;">
+    <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:10px;">
+      <span class="es">Siglas</span><span class="en">Abbreviations</span>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:4px 16px; font-size:11px; color:var(--muted); line-height:1.6;">
+      <div><b style="color:var(--text)">PSC</b> — <span class="es">Lista de Verificación de Síntomas Pediátricos</span><span class="en">Pediatric Symptom Checklist</span></div>
+      <div><b style="color:var(--text)">PHQ-A</b> — <span class="es">Cuestionario de Salud del Paciente (Adolescente)</span><span class="en">Patient Health Questionnaire (Adolescent)</span></div>
+      <div><b style="color:var(--text)">MFQ</b> — <span class="es">Cuestionario de Estado de Ánimo y Sentimientos</span><span class="en">Mood and Feelings Questionnaire</span></div>
+      <div><b style="color:var(--text)">CAP</b> — <span class="es">Escala de Problemas de Atención Clínica</span><span class="en">Child Attention Problems Scale</span></div>
+      <div><b style="color:var(--text)">SNAP-IV</b> — Swanson, Nolan and Pelham</div>
+      <div><b style="color:var(--text)">ASRS</b> — <span class="es">Escala de Autoinforme de TDAH en Adultos</span><span class="en">Adult ADHD Self-Report Scale</span></div>
+      <div><b style="color:var(--text)">SCARED</b> — <span class="es">Prueba de Detección de Trastornos de Ansiedad Infantil</span><span class="en">Screen for Child Anxiety Related Emotional Disorders</span></div>
+      <div><b style="color:var(--text)">GAD-7</b> — <span class="es">Trastorno de Ansiedad Generalizada</span><span class="en">Generalized Anxiety Disorder</span></div>
+      <div><b style="color:var(--text)">CRAFFT</b> — Car, Relax, Alone, Forget, Friends, Trouble</div>
+      <div><b style="color:var(--text)">DAST-10</b> — <span class="es">Prueba de Detección del Abuso de Drogas</span><span class="en">Drug Abuse Screening Test</span></div>
+    </div>
+  </div>
+
+</div><!-- /scroll-wrap -->
+
+<!-- Mobile fallback table -->
+<div class="table-fallback" style="padding:16px;">
+  <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">
+    <span class="es">Gira el dispositivo horizontalmente para ver el flujo completo.</span>
+    <span class="en">Rotate device horizontally to view full flowchart.</span>
+  </p>
+  <a href="index.html" style="color:var(--teal); font-size:13px;">← Dashboard</a>
+</div>
+
+<script>
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  document.getElementById('theme-lbl').textContent = t === 'dark' ? '☀️' : '🌙';
+}
+document.getElementById('theme-btn').addEventListener('click', () => {
+  applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+});
+function applyLang(l) {
+  document.documentElement.setAttribute('data-lang', l);
+  const p = new URLSearchParams(location.search);
+  p.set('lang', l);
+  history.replaceState(null, '', '?' + p.toString());
+  ['btn-es','btn-en','btn-both'].forEach(id =>
+    document.getElementById(id).classList.toggle('active', id === 'btn-' + l)
+  );
+}
+document.getElementById('btn-es').addEventListener('click',   () => applyLang('es'));
+document.getElementById('btn-en').addEventListener('click',   () => applyLang('en'));
+document.getElementById('btn-both').addEventListener('click', () => applyLang('both'));
+applyTheme('dark');
+applyLang(new URLSearchParams(location.search).get('lang') || 'es');
+</script>
+</body>
+</html>
