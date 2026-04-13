@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="es" data-lang="es">
+<html lang="es" data-lang="es" data-theme="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CoCM Pediátrico — Herramientas de Evaluación</title>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ASRS v1.1 — CoCM Pediátrico</title>
   <style>
+<style>
 /* ============================================================
    CoCM Pediátrico — Shared Stylesheet
    ============================================================ */
@@ -1185,396 +1186,462 @@ a, button, [role='button'], input, select {
 .no-sidebar .sidebar {
   display: none !important;
 }
-  
-/* ===== Dashboard Disclaimer ===== */
-.dashboard-disclaimer {
-  margin: var(--space-4) 0 var(--space-5);
-  padding: var(--space-3) var(--space-4);
-  background: rgba(245,158,11,0.07);
-  border: 1px solid rgba(245,158,11,0.3);
-  border-radius: var(--radius-md);
-  font-size: var(--text-xs);
-  color: var(--color-text-muted);
-  line-height: 1.6;
+  </style>
+/* ASRS Part colors */
+.question-number.subscale-A { background: var(--color-primary-bg); color: var(--color-primary); }
+.question-number.subscale-B { background: var(--color-surface-offset-2); color: var(--color-text-muted); }
+.subscale-tag.subscale-A { background: var(--color-primary-bg); color: var(--color-primary); }
+.subscale-tag.subscale-B { background: var(--color-surface-offset-2); color: var(--color-text-muted); }
+/* Part divider */
+.part-divider {
+  margin: var(--space-6) 0 var(--space-4);
+  padding: var(--space-3) var(--space-5);
+  background: var(--color-primary-bg);
+  border-left: 4px solid var(--color-primary);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  font-weight: 700;
+  font-size: var(--text-base);
+  color: var(--color-primary);
 }
-.dashboard-disclaimer strong { color: var(--color-text); }
-
+.part-b-note {
+  margin-bottom: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface-offset);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+/* Positive (shaded) answer highlight */
+.radio-option.positive-threshold input[type="radio"]:checked + label {
+  border-color: var(--color-warning);
+  background: var(--color-warning-highlight);
+  box-shadow: 0 0 0 3px var(--color-warning-highlight);
+}
+/* No sidebar */
+.no-sidebar .main-content { margin-left: 0; width: 100%; }
 </style>
 </head>
-<body>
+<body class="no-sidebar">
+<div class="app-layout">
+  <div class="main-content">
 
-<div class="app-layout no-sidebar">
-
-  <!-- Sidebar -->
-<!-- Overlay for mobile -->
-<!-- Main -->
-  <main class="main-content">
+    <!-- TOPBAR -->
     <div class="topbar">
-      <div style="display:flex; align-items:center; gap:var(--space-3);">
+      <div style="display:flex;align-items:center;gap:var(--space-3);">
+        <a href="index.html" class="btn-ghost" style="padding:var(--space-2) var(--space-3);font-size:var(--text-sm);">← <span data-es="Inicio" data-en="Home">Inicio</span></a>
         <div>
-          <div class="topbar-title" data-es="Panel Principal" data-en="Dashboard">Panel Principal</div>
-          <div class="topbar-subtitle" data-es="Herramientas de Evaluación CoCM" data-en="CoCM Screening Tools">Herramientas de Evaluación CoCM</div>
+          <div class="topbar-title">ASRS v1.1</div>
+          <div class="topbar-subtitle" data-es="Escala de Autorreporte de TDAH del Adulto (≥18 años)" data-en="Adult ADHD Self-Report Scale (≥18 years)">Escala de Autorreporte de TDAH del Adulto (≥18 años)</div>
         </div>
       </div>
       <div class="topbar-actions">
         <div class="lang-toggle">
-          <button class="lang-btn active" id="btnES" onclick="setLang('es')">ES</button>
-          <button class="lang-btn" id="btnEN" onclick="setLang('en')">EN</button>
+          <button class="lang-btn active" onclick="setLang('es')" id="btnES">ES</button>
+          <button class="lang-btn" onclick="setLang('bi')" id="btnBI">ES+EN</button>
+          <button class="lang-btn" onclick="setLang('en')" id="btnEN">EN</button>
         </div>
-        <button class="theme-toggle" data-theme-toggle aria-label="Cambiar tema">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-          </svg>
+        <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
         </button>
       </div>
     </div>
 
-    <div class="page-content">
+    <!-- PAGE CONTENT -->
+    <div class="page-content" style="max-width:800px;margin:0 auto;">
 
-      <!-- Welcome banner -->
-      <div class="tool-header-card" style="margin-bottom:var(--space-8);">
-        <h1 data-es="Herramientas de Evaluación Pediátrica" data-en="Pediatric Screening Tools">Herramientas de Evaluación Pediátrica</h1>
-        <p data-es="Modelo de Atención Colaborativa (CoCM) — Honduras. Seleccione una herramienta para iniciar la evaluación." data-en="Collaborative Care Model (CoCM) — Honduras. Select a tool to begin the assessment.">Modelo de Atención Colaborativa (CoCM) — Honduras. Seleccione una herramienta para iniciar la evaluación.</p>
-
-      </div>
       <!-- Medical Disclaimer -->
-      <div class="dashboard-disclaimer">
-        <strong data-es="Aviso médico:" data-en="Medical Disclaimer:">Aviso médico:</strong>
-        <span data-es="Todas las herramientas en este sitio son solo para fines de detección clínica. No reemplazan el juicio clínico ni constituyen un diagnóstico. Los resultados deben ser interpretados por un profesional de salud calificado." data-en="All tools on this site are for clinical screening purposes only. They do not replace clinical judgment and do not constitute a diagnosis. Results must be interpreted by a qualified health professional.">Todas las herramientas en este sitio son solo para fines de detección clínica. No reemplazan el juicio clínico ni constituyen un diagnóstico. Los resultados deben ser interpretados por un profesional de salud calificado.</span>
+      <div class="disclaimer-banner">
+        <strong data-es="Aviso Médico:" data-en="Medical Disclaimer:">Aviso Médico:</strong>
+        <span data-es=" Esta herramienta es solo para uso clínico de apoyo. No reemplaza el juicio clínico, el diagnóstico médico ni la evaluación profesional. Los resultados deben interpretarse en el contexto clínico completo del paciente." data-en=" This tool is for clinical support use only. It does not replace clinical judgment, medical diagnosis, or professional evaluation. Results must be interpreted within the full clinical context of the patient."> Esta herramienta es solo para uso clínico de apoyo. No reemplaza el juicio clínico, el diagnóstico médico ni la evaluación profesional. Los resultados deben interpretarse en el contexto clínico completo del paciente.</span>
       </div>
 
-
-      <!-- Workflow summary -->
-      <div class="section-heading" data-es="Flujo de Trabajo CoCM" data-en="CoCM Workflow">Flujo de Trabajo CoCM</div>
-      <div style="background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius-xl); padding:var(--space-5) var(--space-6); margin-bottom:var(--space-3); overflow-x:auto;">
-        <table style="width:100%; font-size:var(--text-sm); border-collapse:collapse; min-width:540px;">
-          <thead>
-            <tr style="border-bottom:2px solid var(--color-border);">
-              <th style="text-align:left; padding:var(--space-3) var(--space-4); color:var(--color-text-muted); font-weight:600; width:22%;" data-es="Condición" data-en="Condition">Condición</th>
-              <th style="text-align:left; padding:var(--space-3) var(--space-4); color:var(--color-primary); font-weight:600; width:39%;" data-es="Jóvenes ≤11" data-en="Youth ≤11">Jóvenes ≤11</th>
-              <th style="text-align:left; padding:var(--space-3) var(--space-4); color:var(--color-primary); font-weight:600; border-left:1px solid var(--color-border); width:39%;" data-es="Adolescentes ≥12" data-en="Adolescents ≥12">Adolescentes ≥12</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr style="border-bottom:1px solid var(--color-divider);">
-              <td style="padding:var(--space-3) var(--space-4); font-weight:600;" data-es="Tamizaje universal" data-en="Universal screening">Tamizaje universal</td>
-              <td style="padding:var(--space-3) var(--space-4);" colspan="2"><a href="psc17.html" class="workflow-link">PSC-17</a></td>
-            </tr>
-            <tr style="border-bottom:1px solid var(--color-divider);">
-              <td style="padding:var(--space-3) var(--space-4); font-weight:500;" data-es="Depresión" data-en="Depression">Depresión</td>
-              <td style="padding:var(--space-3) var(--space-4);">
-                <a href="mfq.html" class="workflow-link">MFQ-C</a> + <a href="mfq-parent.html" class="workflow-link">MFQ-P</a>
-                <div style="font-size:var(--text-xs); color:var(--color-text-faint); margin-top:2px;" data-es="Monitoreo: MFQ (breve)" data-en="Monitoring: MFQ (brief)">Monitoreo: MFQ (breve)</div>
-              </td>
-              <td style="padding:var(--space-3) var(--space-4); border-left:1px solid var(--color-border);">
-                <a href="phqa.html" class="workflow-link">PHQ-A</a>
-                <div style="font-size:var(--text-xs); color:var(--color-text-faint); margin-top:2px;" data-es="Monitoreo: PHQ-A" data-en="Monitoring: PHQ-A">Monitoreo: PHQ-A</div>
-              </td>
-            </tr>
-            <tr style="border-bottom:1px solid var(--color-divider);">
-              <td style="padding:var(--space-3) var(--space-4); font-weight:500;">TDAH</td>
-              <td style="padding:var(--space-3) var(--space-4);">
-                <span style="font-size:var(--text-xs); color:var(--color-text-faint); display:block; margin-bottom:3px;" data-es="Detección:" data-en="Screening:">Detección:</span>
-                <a href="cap.html" class="workflow-link">CAP Scale</a><br>
-                <a href="vanderbilt-parent.html" class="workflow-link">Vanderbilt-P</a> + <a href="vanderbilt-teacher.html" class="workflow-link">Vanderbilt-T</a>
-                <div style="font-size:var(--text-xs); color:var(--color-text-faint); margin-top:2px;" data-es="Monitoreo: CAP Scale / Vanderbilt" data-en="Monitoring: CAP Scale / Vanderbilt">Monitoreo: CAP Scale / Vanderbilt</div>
-              </td>
-              <td style="padding:var(--space-3) var(--space-4); border-left:1px solid var(--color-border);">
-                <a href="snapiv.html" class="workflow-link">SNAP-IV</a> + <a href="asrs.html" class="workflow-link">ASRS</a>
-                <div style="font-size:var(--text-xs); color:var(--color-text-faint); margin-top:2px;" data-es="Monitoreo: SNAP-IV + ASRS" data-en="Monitoring: SNAP-IV + ASRS">Monitoreo: SNAP-IV + ASRS</div>
-              </td>
-            </tr>
-            <tr style="border-bottom:1px solid var(--color-divider);">
-              <td style="padding:var(--space-3) var(--space-4); font-weight:500;" data-es="Ansiedad" data-en="Anxiety">Ansiedad</td>
-              <td style="padding:var(--space-3) var(--space-4);">
-                <a href="scared.html" class="workflow-link">SCARED-N</a> + <a href="scared-parent.html" class="workflow-link">SCARED-P</a>
-                <div style="font-size:var(--text-xs); color:var(--color-text-faint); margin-top:2px;" data-es="Monitoreo: SCARED" data-en="Monitoring: SCARED">Monitoreo: SCARED</div>
-              </td>
-              <td style="padding:var(--space-3) var(--space-4); border-left:1px solid var(--color-border);">
-                <a href="gad7.html" class="workflow-link">GAD-7</a>
-                <div style="font-size:var(--text-xs); color:var(--color-text-faint); margin-top:2px;" data-es="Monitoreo: GAD-7" data-en="Monitoring: GAD-7">Monitoreo: GAD-7</div>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:var(--space-3) var(--space-4); font-weight:500;" data-es="Riesgo / SUD" data-en="Risk / SUD">Riesgo / SUD</td>
-              <td style="padding:var(--space-3) var(--space-4); color:var(--color-text-faint);" data-es="— No aplica —" data-en="— Not applicable —">— No aplica —</td>
-              <td style="padding:var(--space-3) var(--space-4); border-left:1px solid var(--color-border);">
-                <a href="crafft.html" class="workflow-link">CRAFFT</a> + <a href="dast10.html" class="workflow-link">DAST-10</a>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p style="font-size:var(--text-xs); color:var(--color-text-faint); margin-bottom:var(--space-8); padding:0 var(--space-2);"><a href="flowsheet.html" style="color:var(--color-primary); text-decoration:none;" data-es="Ver flujo visual →" data-en="See visual flowchart →">Ver flujo visual →</a></p>
-
-      <!-- Tool cards -->
-      <div class="section-heading" data-es="Todas las Herramientas" data-en="All Tools">Todas las Herramientas</div>
-      <div class="tool-grid">
-
-        <!-- PSC-17 — READY -->
-        <a href="psc17.html" class="tool-card ready">
-          <div class="tool-card-header">
-            <div class="tool-card-icon">📋</div>
-            <span class="tool-status ready" data-es="Disponible" data-en="Available">Disponible</span>
-          </div>
-          <div class="tool-card-name">PSC-17</div>
-          <div class="tool-card-desc" data-es="Lista de Síntomas Pediátricos — tamizaje universal de salud mental conductual." data-en="Pediatric Symptom Checklist — universal behavioral health screening.">Lista de Síntomas Pediátricos — tamizaje universal de salud mental conductual.</div>
-          <div class="tool-card-meta">
-            <span class="meta-tag age" data-es="Todas las edades" data-en="All ages">Todas las edades</span>
-            <span class="meta-tag" data-es="17 ítems" data-en="17 items">17 ítems</span>
-            <span class="meta-tag" data-es="Corte: 15" data-en="Cutoff: 15">Corte: 15</span>
-          </div>
-        </a>
-
-        <!-- MFQ-C — READY -->
-        <a href="mfq.html" class="tool-card ready">
-          <div class="tool-card-header">
-            <div class="tool-card-icon">😔</div>
-            <span class="tool-status ready" data-es="Disponible" data-en="Available">Disponible</span>
-          </div>
-          <div class="tool-card-name">MFQ-C <span style="font-weight:400; font-size:var(--text-sm);" data-es="Niño/a — Corta" data-en="Child — Short">Niño/a — Corta</span></div>
-          <div class="tool-card-desc" data-es="Estado de Ánimo y Sentimientos — autoinforme del niño/a. Cribado de depresión." data-en="Mood &amp; Feelings Questionnaire — child self-report. Depression screening.">Estado de Ánimo y Sentimientos — autoinforme del niño/a. Cribado de depresión.</div>
-          <div class="tool-card-meta">
-            <span class="meta-tag age" data-es="Jóvenes ≤11" data-en="Youth ≤11">Jóvenes ≤11</span>
-            <span class="meta-tag" data-es="13 ítems" data-en="13 items">13 ítems</span>
-            <span class="meta-tag" data-es="Corte: ≥8" data-en="Cutoff: ≥8">Corte: ≥8</span>
-          </div>
-        </a>
-
-        <!-- MFQ-P — READY -->
-        <a href="mfq-parent.html" class="tool-card ready">
-          <div class="tool-card-header">
-            <div class="tool-card-icon">👨‍👩‍👦</div>
-            <span class="tool-status ready" data-es="Disponible" data-en="Available">Disponible</span>
-          </div>
-          <div class="tool-card-name">MFQ-P <span style="font-weight:400; font-size:var(--text-sm);" data-es="Padres — Larga" data-en="Parent — Long">Padres — Larga</span></div>
-          <div class="tool-card-desc" data-es="Estado de Ánimo y Sentimientos — versión larga para padres/madres. Cribado de depresión infantil." data-en="Mood &amp; Feelings Questionnaire — parent long version. Child depression screening.">Estado de Ánimo y Sentimientos — versión larga para padres/madres. Cribado de depresión infantil.</div>
-          <div class="tool-card-meta">
-            <span class="meta-tag age" data-es="Jóvenes ≤11" data-en="Youth ≤11">Jóvenes ≤11</span>
-            <span class="meta-tag" data-es="33 ítems" data-en="33 items">33 ítems</span>
-            <span class="meta-tag" data-es="Corte: ≥27" data-en="Cutoff: ≥27">Corte: ≥27</span>
-          </div>
-        </a>
-
-        <!-- PHQ-A — READY -->
-        <a href="phqa.html" class="tool-card ready">
-          <div class="tool-card-header">
-            <div class="tool-card-icon">😔</div>
-            <span class="tool-status ready" data-es="Disponible" data-en="Available">Disponible</span>
-          </div>
-          <div class="tool-card-name">PHQ-A</div>
-          <div class="tool-card-desc" data-es="Patient Health Questionnaire — Adolescent. Cribado de depresión, escala de severidad 0–27." data-en="Patient Health Questionnaire — Adolescent. Depression screening, 0–27 severity scale.">Patient Health Questionnaire — Adolescent. Cribado de depresión, escala de severidad 0–27.</div>
-          <div class="tool-card-meta">
-            <span class="meta-tag age" data-es="Adolescentes ≥12" data-en="Adolescents ≥12">Adolescentes ≥12</span>
-            <span class="meta-tag" data-es="9 ítems" data-en="9 items">9 ítems</span>
-            <span class="meta-tag" data-es="Corte: ≥10" data-en="Cutoff: ≥10">Corte: ≥10</span>
-          </div>
-        </a>
-
-        <!-- SCARED-N — READY -->
-        <a href="scared.html" class="tool-card ready">
-          <div class="tool-card-header">
-            <div class="tool-card-icon">😰</div>
-            <span class="tool-status ready" data-es="Disponible" data-en="Available">Disponible</span>
-          </div>
-          <div class="tool-card-name">SCARED-N <span style="font-weight:400; font-size:var(--text-sm);" data-es="Niño/a" data-en="Child">Niño/a</span></div>
-          <div class="tool-card-desc" data-es="Escala de Ansiedad Infantil — autoinforme del niño/a. 5 subescalas." data-en="Screen for Child Anxiety — child self-report. 5 subscales.">Escala de Ansiedad Infantil — autoinforme del niño/a. 5 subescalas.</div>
-          <div class="tool-card-meta">
-            <span class="meta-tag age" data-es="Jóvenes ≤11" data-en="Youth ≤11">Jóvenes ≤11</span>
-            <span class="meta-tag" data-es="41 ítems" data-en="41 items">41 ítems</span>
-            <span class="meta-tag" data-es="Corte: ≥25" data-en="Cutoff: ≥25">Corte: ≥25</span>
-          </div>
-        </a>
-
-        <!-- SCARED-P — READY -->
-        <a href="scared-parent.html" class="tool-card ready">
-          <div class="tool-card-header">
-            <div class="tool-card-icon">👨‍👩‍👦</div>
-            <span class="tool-status ready" data-es="Disponible" data-en="Available">Disponible</span>
-          </div>
-          <div class="tool-card-name">SCARED-P <span style="font-weight:400; font-size:var(--text-sm);" data-es="Padres" data-en="Parent">Padres</span></div>
-          <div class="tool-card-desc" data-es="Escala de Ansiedad Infantil — versión para padres/madres. 5 subescalas." data-en="Screen for Child Anxiety — parent report version. 5 subscales.">Escala de Ansiedad Infantil — versión para padres/madres. 5 subescalas.</div>
-          <div class="tool-card-meta">
-            <span class="meta-tag age" data-es="Jóvenes ≤11" data-en="Youth ≤11">Jóvenes ≤11</span>
-            <span class="meta-tag" data-es="41 ítems" data-en="41 items">41 ítems</span>
-            <span class="meta-tag" data-es="Corte: ≥25" data-en="Cutoff: ≥25">Corte: ≥25</span>
-          </div>
-        </a>
-
-        <!-- GAD-7 — READY -->
-        <a href="gad7.html" class="tool-card ready">
-          <div class="tool-card-header">
-            <div class="tool-card-icon">😰</div>
-            <span class="tool-status ready" data-es="Disponible" data-en="Available">Disponible</span>
-          </div>
-          <div class="tool-card-name">GAD-7</div>
-          <div class="tool-card-desc" data-es="Escala de Trastorno de Ansiedad Generalizada. Cribado de ansiedad en adolescentes." data-en="Generalized Anxiety Disorder Scale. Anxiety screening for adolescents.">Escala de Trastorno de Ansiedad Generalizada. Cribado de ansiedad en adolescentes.</div>
-          <div class="tool-card-meta">
-            <span class="meta-tag age" data-es="Adolescentes ≥12" data-en="Adolescents ≥12">Adolescentes ≥12</span>
-            <span class="meta-tag" data-es="7 ítems" data-en="7 items">7 ítems</span>
-            <span class="meta-tag" data-es="Corte: ≥10" data-en="Cutoff: ≥10">Corte: ≥10</span>
-          </div>
-        </a>
-
-        <!-- CAP Scale — Ready -->
-        <a href="cap.html" class="tool-card ready">
-          <div class="tool-card-header">
-            <div class="tool-card-icon">⚡</div>
-            <span class="tool-status ready" data-es="Disponible" data-en="Available">Disponible</span>
-          </div>
-          <div class="tool-card-name">CAP Scale</div>
-          <div class="tool-card-desc" data-es="Child Attention Profile — evaluación de inatención y sobreactividad. 12 ítems, calificado por maestro/a." data-en="Child Attention Profile — inattention and overactivity screening. 12 items, teacher-rated.">Child Attention Profile — evaluación de inatención y sobreactividad. 12 ítems, calificado por maestro/a.</div>
-          <div class="tool-card-meta">
-            <span class="meta-tag age" data-es="6–13 años" data-en="6–13 years">6–13 años</span>
-            <span class="meta-tag" data-es="Maestros" data-en="Teacher">Maestros</span>
-          </div>
-        </a>
-
-        <a href="snapiv.html" class="tool-card ready">
-          <div class="tool-card-header">
-            <div class="tool-card-icon">⚡</div>
-            <span class="tool-status ready" data-es="Disponible" data-en="Available">Disponible</span>
-          </div>
-          <div class="tool-card-name">SNAP-IV 26</div>
-          <div class="tool-card-desc" data-es="Swanson, Nolan and Pelham — evaluación de TDAH, inatención, hiperactividad y TND. 26 ítems." data-en="Swanson, Nolan and Pelham — ADHD, inattention, hyperactivity, and ODD. 26 items.">Swanson, Nolan and Pelham — evaluación de TDAH, inatención, hiperactividad y TND. 26 ítems.</div>
-          <div class="tool-card-meta">
-            <span class="meta-tag age" data-es="8–18 años" data-en="8–18 years">8–18 años</span>
-            <span class="meta-tag" data-es="Padres / Maestros" data-en="Parent / Teacher">Padres / Maestros</span>
-          </div>
-        </a>
-
-        <a href="crafft.html" class="tool-card ready">
-          <div class="tool-card-header">
-            <div class="tool-card-icon">🚦</div>
-            <span class="tool-status ready" data-es="Disponible" data-en="Available">Disponible</span>
-          </div>
-          <div class="tool-card-name">CRAFFT 2.1</div>
-          <div class="tool-card-desc" data-es="Car, Relax, Alone, Forget, Friends, Trouble — cribado de uso de sustancias en adolescentes." data-en="Car, Relax, Alone, Forget, Friends, Trouble — adolescent substance use screening.">Car, Relax, Alone, Forget, Friends, Trouble — cribado de uso de sustancias en adolescentes.</div>
-          <div class="tool-card-meta">
-            <span class="meta-tag age" data-es="12–21 años" data-en="12–21 years">12–21 años</span>
-            <span class="meta-tag" data-es="Autoadministrado" data-en="Self-administered">Autoadministrado</span>
-          </div>
-        </a>
-
-        <a href="dast10.html" class="tool-card ready">
-          <div class="tool-card-header">
-            <div class="tool-card-icon">🚦</div>
-            <span class="tool-status ready" data-es="Disponible" data-en="Available">Disponible</span>
-          </div>
-          <div class="tool-card-name">DAST-10</div>
-          <div class="tool-card-desc" data-es="Drug Abuse Screening Test — 10 ítems. Cribado de uso problemático de drogas." data-en="Drug Abuse Screening Test — 10 items. Screening for problematic drug use.">Drug Abuse Screening Test — 10 ítems. Cribado de uso problemático de drogas.</div>
-          <div class="tool-card-meta">
-            <span class="meta-tag age" data-es="Adolescentes y adultos" data-en="Adolescents and adults">Adolescentes y adultos</span>
-            <span class="meta-tag" data-es="Autoadministrado" data-en="Self-administered">Autoadministrado</span>
-          </div>
-        </a>
-
-        <!-- Vanderbilt — Parent -->
-        <a href="vanderbilt-parent.html" class="tool-card ready">
-          <div class="tool-card-header">
-            <div class="tool-card-icon">🧠</div>
-            <span class="tool-status ready" data-es="Disponible" data-en="Available">Disponible</span>
-          </div>
-          <div class="tool-card-name">Vanderbilt — <span style="font-weight:400;font-size:var(--text-sm);" data-es="Padres" data-en="Parent">Padres</span></div>
-          <div class="tool-card-desc" data-es="Escala de evaluación de Vanderbilt para padres — TDAH, TND, conducta, ansiedad/depresión. 55 ítems." data-en="Vanderbilt Assessment Scale — Parent. ADHD, ODD, conduct, anxiety/depression. 55 items.">Escala de evaluación de Vanderbilt para padres — TDAH, TND, conducta, ansiedad/depresión. 55 ítems.</div>
-          <div class="tool-card-meta">
-            <span class="meta-tag age" data-es="6–12 años" data-en="6–12 years">6–12 años</span>
-            <span class="meta-tag" data-es="Padres" data-en="Parent">Padres</span>
-          </div>
-        </a>
-
-        <!-- Vanderbilt — Teacher -->
-        <a href="vanderbilt-teacher.html" class="tool-card ready">
-          <div class="tool-card-header">
-            <div class="tool-card-icon">🏫</div>
-            <span class="tool-status ready" data-es="Disponible" data-en="Available">Disponible</span>
-          </div>
-          <div class="tool-card-name">Vanderbilt — <span style="font-weight:400;font-size:var(--text-sm);" data-es="Maestros" data-en="Teacher">Maestros</span></div>
-          <div class="tool-card-desc" data-es="Escala de evaluación de Vanderbilt para maestros — TDAH, conducta, desempeño académico. 43 ítems." data-en="Vanderbilt Assessment Scale — Teacher. ADHD, conduct, academic performance. 43 items.">Escala de evaluación de Vanderbilt para maestros — TDAH, conducta, desempeño académico. 43 ítems.</div>
-          <div class="tool-card-meta">
-            <span class="meta-tag age" data-es="6–12 años" data-en="6–12 years">6–12 años</span>
-            <span class="meta-tag" data-es="Maestros" data-en="Teacher">Maestros</span>
-          </div>
-        </a>
-
-
-        <!-- ASRS — Ready -->
-        <a href="asrs.html" class="tool-card ready">
-          <div class="tool-card-header">
-            <div class="tool-card-icon">📋</div>
-            <span class="tool-status ready" data-es="Disponible" data-en="Available">Disponible</span>
-          </div>
-          <div class="tool-card-name">ASRS v1.1</div>
-          <div class="tool-card-desc" data-es="Adult ADHD Self-Report Scale — tamizaje de TDAH en adultos. Parte A (6 ítems) + Parte B (12 ítems)." data-en="Adult ADHD Self-Report Scale — adult ADHD screener. Part A (6 items) + Part B (12 items).">Adult ADHD Self-Report Scale — tamizaje de TDAH en adultos. Parte A (6 ítems) + Parte B (12 ítems).</div>
-          <div class="tool-card-meta">
-            <span class="meta-tag age" data-es="Adultos ≥18" data-en="Adults ≥18">Adultos ≥18</span>
-            <span class="meta-tag" data-es="Autoinforme" data-en="Self-report">Autoinforme</span>
-          </div>
-        </a>
-
+      <!-- Tool Header -->
+      <div class="tool-header-card">
+        <h1>ASRS v1.1</h1>
+        <p data-es="Escala de Autorreporte de TDAH del Adulto — OMS / Harvard Medical School" data-en="Adult ADHD Self-Report Scale — WHO / Harvard Medical School">Escala de Autorreporte de TDAH del Adulto — OMS / Harvard Medical School</p>
+        <div class="tool-header-meta">
+          <span data-es="18 ítems" data-en="18 items">18 ítems</span>
+          <span data-es="Adultos ≥18 años" data-en="Adults ≥18 years">Adultos ≥18 años</span>
+          <span data-es="Autoinforme" data-en="Self-report">Autoinforme</span>
+          <span data-es="Parte A = tamizaje (ítems 1–6)" data-en="Part A = screener (items 1–6)">Parte A = tamizaje (ítems 1–6)</span>
+        </div>
       </div>
 
+      <!-- Instructions -->
+      <div class="instructions-box">
+        <h3 data-es="Instrucciones" data-en="Instructions">Instrucciones</h3>
+        <p data-es="Por favor responda cada pregunta sobre cómo se ha sentido y comportado en los últimos 6 meses. La Parte A (ítems 1–6) es el tamizaje principal. Marque con qué frecuencia ocurre cada comportamiento." data-en="Please answer each question about how you have felt and conducted yourself in the past 6 months. Part A (items 1–6) is the primary screener. Mark how often each behavior occurs.">Por favor responda cada pregunta sobre cómo se ha sentido y comportado en los últimos 6 meses. La Parte A (ítems 1–6) es el tamizaje principal. Marque con qué frecuencia ocurre cada comportamiento.</p>
+      </div>
+
+      <!-- Part A label -->
+      <div class="part-divider">
+        <span data-es="Parte A — Tamizaje (ítems 1–6)" data-en="Part A — Screener (items 1–6)">Parte A — Tamizaje (ítems 1–6)</span>
+      </div>
+
+      <!-- Questions -->
+      <div id="questions-container-a"></div>
+
+      <!-- Part B label -->
+      <div class="part-divider" style="background:var(--color-surface-offset);border-left-color:var(--color-text-muted);color:var(--color-text-muted);">
+        <span data-es="Parte B — Ítems adicionales (7–18)" data-en="Part B — Additional items (7–18)">Parte B — Ítems adicionales (7–18)</span>
+      </div>
+      <div class="part-b-note">
+        <span data-es="La Parte B no tiene puntuación de corte. Cada ítem positivo es información clínica adicional. Los sombreados naranja indican umbrales de respuesta positiva para esos ítems." data-en="Part B has no cutoff score. Each positive item provides additional clinical information. Orange highlights indicate positive response thresholds for those items.">La Parte B no tiene puntuación de corte. Cada ítem positivo es información clínica adicional. Los sombreados naranja indican umbrales de respuesta positiva para esos ítems.</span>
+      </div>
+
+      <div id="questions-container-b"></div>
+
+      <!-- Score Panel (BOTTOM — not sticky) -->
+      <div class="score-panel" id="scorePanel">
+        <div class="score-panel-title" data-es="Resultado" data-en="Result">Resultado</div>
+
+        <div class="score-display">
+          <div class="score-total" id="partAScore">0</div>
+          <div class="score-max" data-es="/ 6 positivos en Parte A" data-en="/ 6 positive in Part A">/ 6 positivos en Parte A</div>
+        </div>
+
+        <div class="score-result-badge incomplete" id="resultBadge">
+          <span id="resultText">0/6 respondidas</span>
+        </div>
+
+        <!-- Subscale breakdown -->
+        <div class="subscale-grid" style="grid-template-columns: repeat(2,1fr);">
+          <div class="subscale-item" id="subPartA">
+            <div class="subscale-label" data-es="Parte A — Positivos" data-en="Part A — Positives">Parte A — Positivos</div>
+            <div class="subscale-score"><span id="score_partA">0</span><span style="font-size:var(--text-sm);color:var(--color-text-muted)">/6</span></div>
+            <div class="subscale-cutoff" data-es="Corte: ≥4 = tamizaje positivo" data-en="Cutoff: ≥4 = positive screen">Corte: ≥4 = tamizaje positivo</div>
+          </div>
+          <div class="subscale-item" id="subPartB">
+            <div class="subscale-label" data-es="Parte B — Positivos" data-en="Part B — Positives">Parte B — Positivos</div>
+            <div class="subscale-score"><span id="score_partB">0</span><span style="font-size:var(--text-sm);color:var(--color-text-muted)">/12</span></div>
+            <div class="subscale-cutoff" data-es="Sin corte — info adicional" data-en="No cutoff — additional info">Sin corte — info adicional</div>
+          </div>
+        </div>
+
+        <!-- Part A positive items list -->
+        <div id="posItemsBox" style="display:none;margin-bottom:var(--space-4);padding:var(--space-3) var(--space-4);background:var(--color-warning-highlight);border-radius:var(--radius-md);font-size:var(--text-sm);">
+          <div style="font-weight:700;color:var(--color-warning);margin-bottom:var(--space-1);" data-es="Ítems positivos Parte A:" data-en="Part A positive items:">Ítems positivos Parte A:</div>
+          <div id="posItemsList" style="color:var(--color-text);"></div>
+        </div>
+
+        <!-- Note summary -->
+        <div id="noteSummaryBox" class="note-summary-box visible"></div>
+
+        <!-- Actions -->
+        <div class="score-actions" style="margin-top:var(--space-4);">
+          <button type="button" class="btn-secondary" onclick="copyNote()">
+            <span id="copyBtnLabel" data-es="Copiar resumen" data-en="Copy summary">Copiar resumen</span>
+          </button>
+          <span class="copy-feedback" id="copyFeedback"></span>
+          <button type="button" class="btn-secondary" onclick="resetForm()">
+            <span data-es="Reiniciar" data-en="Reset">Reiniciar</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Copyright footer -->
+      <div class="copyright-footer">
+        <strong data-es="Derechos de autor:" data-en="Copyright:">Derechos de autor:</strong>
+        <span data-es=" ASRS v1.1 — Escala de Autorreporte de TDAH del Adulto. © Organización Mundial de la Salud y Harvard Medical School. Desarrollada por Kessler RC, et al. (2005). Psychological Medicine, 35(2), 245–256. Usada con permiso para fines clínicos sin fines de lucro." data-en=" ASRS v1.1 — Adult ADHD Self-Report Scale. © World Health Organization and Harvard Medical School. Developed by Kessler RC, et al. (2005). Psychological Medicine, 35(2), 245–256. Used with permission for non-commercial clinical purposes."> ASRS v1.1 — Escala de Autorreporte de TDAH del Adulto. © Organización Mundial de la Salud y Harvard Medical School. Desarrollada por Kessler RC, et al. (2005). Psychological Medicine, 35(2), 245–256. Usada con permiso para fines clínicos sin fines de lucro.</span>
       </div>
 
     </div><!-- /page-content -->
-  </main>
-
+  </div><!-- /main-content -->
 </div><!-- /app-layout -->
 
 <script>
-// ---- Theme toggle ----
+// ASRS v1.1 — 18 items
+// Part A: items 1–6 (screener)
+// Part B: items 7–18 (additional probes, no cutoff)
+
+// Threshold rules:
+// Items 1,2,3,9,12,16,18: positive if >= "Sometimes" (value >= 2)
+// Items 4,5,6,7,8,10,11,13,14,15,17: positive if >= "Often" (value >= 3)
+
+const FREQ_LABELS = {
+  es: ['Nunca', 'Raramente', 'A veces', 'A menudo', 'Muy frecuente'],
+  en: ['Never', 'Rarely', 'Sometimes', 'Often', 'Very Often']
+};
+const FREQ_VALUES = [0, 1, 2, 3, 4]; // 0=Never ... 4=Very Often
+
+// threshold: 2 = Sometimes+, 3 = Often+
+const QUESTIONS = [
+  // Part A
+  { n:1,  part:'A', threshold:2, es:'¿Con qué frecuencia tiene dificultad para terminar los últimos detalles de un proyecto una vez que las partes más difíciles ya están hechas?', en:'How often do you have trouble wrapping up the final details of a project, once the challenging parts have been done?' },
+  { n:2,  part:'A', threshold:2, es:'¿Con qué frecuencia tiene dificultad para organizar las cosas cuando tiene que hacer una tarea que requiere organización?', en:'How often do you have difficulty getting things in order when you have to do a task that requires organization?' },
+  { n:3,  part:'A', threshold:2, es:'¿Con qué frecuencia tiene problemas para recordar citas u obligaciones?', en:'How often do you have problems remembering appointments or obligations?' },
+  { n:4,  part:'A', threshold:3, es:'Cuando tiene una tarea que requiere mucho pensamiento, ¿con qué frecuencia evita o demora el empezarla?', en:'When you have a task that requires a lot of thought, how often do you avoid or delay getting started?' },
+  { n:5,  part:'A', threshold:3, es:'¿Con qué frecuencia mueve nerviosamente las manos o los pies o se retuerce en el asiento cuando tiene que estar sentado/a por mucho tiempo?', en:'How often do you fidget or squirm with your hands or feet when you have to sit down for a long time?' },
+  { n:6,  part:'A', threshold:3, es:'¿Con qué frecuencia se siente demasiado activo/a y obligado/a a hacer cosas, como si fuera manejado/a por un motor?', en:'How often do you feel overly active and compelled to do things, like you were driven by a motor?' },
+  // Part B
+  { n:7,  part:'B', threshold:3, es:'¿Con qué frecuencia comete errores por descuido cuando tiene que trabajar en un proyecto aburrido o difícil?', en:'How often do you make careless mistakes when you have to work on a boring or difficult project?' },
+  { n:8,  part:'B', threshold:3, es:'¿Con qué frecuencia tiene dificultad para mantener la atención cuando está haciendo un trabajo aburrido o repetitivo?', en:'How often do you have difficulty keeping your attention when you are doing boring or repetitive work?' },
+  { n:9,  part:'B', threshold:2, es:'¿Con qué frecuencia tiene dificultad para concentrarse en lo que le dicen, incluso cuando le hablan directamente?', en:'How often do you have difficulty concentrating on what people say to you, even when they are speaking directly to you?' },
+  { n:10, part:'B', threshold:3, es:'¿Con qué frecuencia pierde u olvida dónde pone las cosas en casa o en el trabajo?', en:'How often do you misplace or have difficulty finding things at home or at work?' },
+  { n:11, part:'B', threshold:3, es:'¿Con qué frecuencia se distrae por la actividad o el ruido a su alrededor?', en:'How often are you distracted by activity or noise around you?' },
+  { n:12, part:'B', threshold:2, es:'¿Con qué frecuencia se levanta de su asiento en reuniones u otras situaciones en que se espera que permanezca sentado/a?', en:'How often do you leave your seat in meetings or other situations in which you are expected to remain seated?' },
+  { n:13, part:'B', threshold:3, es:'¿Con qué frecuencia se siente inquieto/a o con nervios en el cuerpo?', en:'How often do you feel restless or fidgety?' },
+  { n:14, part:'B', threshold:3, es:'¿Con qué frecuencia tiene dificultad para relajarse cuando tiene tiempo libre?', en:'How often do you have difficulty unwinding and relaxing when you have time to yourself?' },
+  { n:15, part:'B', threshold:3, es:'¿Con qué frecuencia se encuentra hablando demasiado cuando está en situaciones sociales?', en:'How often do you find yourself talking too much when you are in social situations?' },
+  { n:16, part:'B', threshold:2, es:'En una conversación, ¿con qué frecuencia termina las oraciones de las personas con las que habla antes de que ellas puedan terminarlas?', en:'When you\'re in a conversation, how often do you find yourself finishing the sentences of the people you are talking to, before they can finish them?' },
+  { n:17, part:'B', threshold:3, es:'¿Con qué frecuencia tiene dificultad para esperar su turno en situaciones en que se requiere turnarse?', en:'How often do you have difficulty waiting your turn in situations when turn taking is required?' },
+  { n:18, part:'B', threshold:2, es:'¿Con qué frecuencia interrumpe a otros cuando están ocupados?', en:'How often do you interrupt others when they are busy?' },
+];
+
+const PART_A = QUESTIONS.filter(q => q.part === 'A');
+const PART_B = QUESTIONS.filter(q => q.part === 'B');
+
+function getTopbarHeight() {
+  const tb = document.querySelector('.topbar');
+  return tb ? tb.offsetHeight + 12 : 70;
+}
+
+function renderGroup(questions, containerId) {
+  const container = document.getElementById(containerId);
+  container.innerHTML = '';
+  questions.forEach((q, idx) => {
+    const globalIdx = QUESTIONS.indexOf(q);
+    const div = document.createElement('div');
+    div.className = 'question-section';
+    div.id = 'qsec' + q.n;
+    const subClass = 'subscale-' + q.part;
+
+    // Mark which options are "positive threshold" for visual cue
+    // threshold: 2 = options 2,3,4 are positive; 3 = options 3,4 are positive
+    const optionsHTML = FREQ_VALUES.map(v => {
+      const isPos = v >= q.threshold;
+      const posClass = isPos ? ' positive-threshold' : '';
+      return `
+        <div class="radio-option${posClass}">
+          <input type="radio" name="q${q.n}" id="q${q.n}_${v}" value="${v}"
+            onchange="onAnswerSelected(${q.n}, ${globalIdx})">
+          <label for="q${q.n}_${v}">
+            <span class="radio-score" style="font-size:var(--text-xs)">${v}</span>
+            <span class="radio-label-es">${FREQ_LABELS.es[v]}</span>
+            <span class="radio-label-en">${FREQ_LABELS.en[v]}</span>
+          </label>
+        </div>`;
+    }).join('');
+
+    div.innerHTML = `
+      <div class="question-row">
+        <div class="question-number ${subClass}">${q.n}</div>
+        <div class="question-body">
+          <div class="subscale-tag ${subClass}">${q.part}</div>
+          <div class="question-text-es">${q.es}</div>
+          <div class="question-text-en">${q.en}</div>
+          <div class="radio-group options-wrap">${optionsHTML}</div>
+        </div>
+      </div>`;
+    container.appendChild(div);
+  });
+}
+
+function onAnswerSelected(qNum, globalIdx) {
+  updateScore();
+  generateNote();
+  const nextGlobalIdx = globalIdx + 1;
+  if (nextGlobalIdx < QUESTIONS.length) {
+    const nextSec = document.getElementById('qsec' + QUESTIONS[nextGlobalIdx].n);
+    if (nextSec) window.scrollTo({ top: nextSec.getBoundingClientRect().top + window.scrollY - getTopbarHeight(), behavior: 'smooth' });
+  } else {
+    const panel = document.getElementById('scorePanel');
+    if (panel) window.scrollTo({ top: panel.getBoundingClientRect().top + window.scrollY - getTopbarHeight(), behavior: 'smooth' });
+  }
+}
+
+function getScores() {
+  let partAPositive = 0, partBPositive = 0;
+  let partAAnswered = 0, partBAnswered = 0;
+  const posItemsA = [];
+  const posItemsB = [];
+
+  QUESTIONS.forEach(q => {
+    const c = document.querySelector(`input[name="q${q.n}"]:checked`);
+    if (c !== null) {
+      const v = parseInt(c.value);
+      const isPos = v >= q.threshold;
+      if (q.part === 'A') {
+        partAAnswered++;
+        if (isPos) { partAPositive++; posItemsA.push(q.n); }
+      } else {
+        partBAnswered++;
+        if (isPos) { partBPositive++; posItemsB.push(q.n); }
+      }
+    }
+  });
+  return { partAPositive, partBPositive, partAAnswered, partBAnswered, posItemsA, posItemsB };
+}
+
+function updateScore() {
+  const { partAPositive, partBPositive, partAAnswered, partBAnswered, posItemsA } = getScores();
+  const lang = document.documentElement.getAttribute('data-lang') || 'es';
+  const isBi = lang === 'bi', isEN = lang === 'en';
+  const partAComplete = partAAnswered === 6;
+  const screenPositive = partAPositive >= 4;
+
+  document.getElementById('partAScore').textContent = partAPositive;
+  document.getElementById('score_partA').textContent = partAPositive;
+  document.getElementById('score_partB').textContent = partBPositive;
+
+  document.getElementById('subPartA').className = 'subscale-item' + (screenPositive ? ' concern' : '');
+
+  const badge = document.getElementById('resultBadge');
+  const text  = document.getElementById('resultText');
+  function setBadge(esTxt, enTxt, cls) {
+    badge.className = 'score-result-badge ' + cls;
+    text.setAttribute('data-es', esTxt);
+    text.setAttribute('data-en', enTxt);
+    if (isBi) text.innerHTML = esTxt + '<span class="bi-en-line">' + enTxt + '</span>';
+    else text.textContent = isEN ? enTxt : esTxt;
+  }
+
+  if (!partAComplete) {
+    setBadge(`${partAAnswered}/6 Parte A respondidas`, `${partAAnswered}/6 Part A answered`, 'incomplete');
+  } else if (screenPositive) {
+    setBadge('⚠ Tamizaje POSITIVO — Evaluación adicional indicada', '⚠ Screen POSITIVE — Further evaluation indicated', 'positive');
+  } else {
+    setBadge('✓ Tamizaje NEGATIVO (Parte A < 4 positivos)', '✓ Screen NEGATIVE (Part A < 4 positives)', 'negative');
+  }
+
+  // Show positive items
+  const posBox = document.getElementById('posItemsBox');
+  const posList = document.getElementById('posItemsList');
+  if (posItemsA.length > 0) {
+    posBox.style.display = '';
+    posList.textContent = posItemsA.map(n => `#${n}`).join(', ');
+  } else {
+    posBox.style.display = 'none';
+  }
+}
+
+function generateNote() {
+  const { partAPositive, partBPositive, partAAnswered, partBAnswered, posItemsA, posItemsB } = getScores();
+  const lang = document.documentElement.getAttribute('data-lang') || 'es';
+  const isBI = lang === 'bi', isEN = lang === 'en';
+  const todayES = new Date().toLocaleDateString('es-HN', { year:'numeric', month:'long', day:'numeric' });
+  const todayEN = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+  const screenPositive = partAPositive >= 4;
+  const resultES = screenPositive ? '⚠ POSITIVO — evaluación adicional indicada' : '✓ NEGATIVO';
+  const resultEN = screenPositive ? '⚠ POSITIVE — further evaluation indicated' : '✓ NEGATIVE';
+  const posAstr = posItemsA.length > 0 ? posItemsA.map(n=>`#${n}`).join(', ') : 'ninguno/none';
+  const posBstr = posItemsB.length > 0 ? posItemsB.map(n=>`#${n}`).join(', ') : 'ninguno/none';
+
+  const noteES =
+`ASRS v1.1 — Resumen de Resultados — ${todayES}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Instrumento: Adult ADHD Self-Report Scale v1.1
+Fuente: OMS / Harvard Medical School (Kessler et al., 2005)
+Ítems completados: Parte A ${partAAnswered}/6 | Parte B ${partBAnswered}/12
+
+PARTE A — TAMIZAJE:
+  • Ítems positivos: ${partAPositive}/6
+  • Resultado: ${resultES}
+  • Ítems positivos: ${posItemsA.length > 0 ? posItemsA.map(n=>`ítem ${n}`).join(', ') : 'ninguno'}
+
+PARTE B — SONDAS ADICIONALES:
+  • Ítems positivos: ${partBPositive}/12
+  • Ítems positivos: ${posItemsB.length > 0 ? posItemsB.map(n=>`ítem ${n}`).join(', ') : 'ninguno'}
+
+Nota: Un tamizaje positivo (≥4/6 en Parte A) es altamente consistente con TDAH y justifica evaluación clínica completa.`;
+
+  const noteEN =
+`ASRS v1.1 — Results Summary — ${todayEN}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Instrument: Adult ADHD Self-Report Scale v1.1
+Source: WHO / Harvard Medical School (Kessler et al., 2005)
+Items completed: Part A ${partAAnswered}/6 | Part B ${partBAnswered}/12
+
+PART A — SCREENER:
+  • Positive items: ${partAPositive}/6
+  • Result: ${resultEN}
+  • Positive items: ${posItemsA.length > 0 ? posItemsA.map(n=>`item ${n}`).join(', ') : 'none'}
+
+PART B — ADDITIONAL PROBES:
+  • Positive items: ${partBPositive}/12
+  • Positive items: ${posItemsB.length > 0 ? posItemsB.map(n=>`item ${n}`).join(', ') : 'none'}
+
+Note: A positive screen (≥4/6 on Part A) is highly consistent with ADHD and warrants full clinical evaluation.`;
+
+  const box = document.getElementById('noteSummaryBox');
+  box.textContent = isBI ? noteES + '\n\n' + noteEN : isEN ? noteEN : noteES;
+}
+
+function copyNote() {
+  const box = document.getElementById('noteSummaryBox');
+  const text = box.textContent;
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const fb = document.getElementById('copyFeedback');
+    const lang = document.documentElement.getAttribute('data-lang') || 'es';
+    fb.textContent = lang === 'en' ? 'Copied!' : '¡Copiado!';
+    fb.classList.add('show');
+    setTimeout(() => fb.classList.remove('show'), 2500);
+  }).catch(() => {});
+}
+
+function resetForm() {
+  QUESTIONS.forEach(q => {
+    document.querySelectorAll(`input[name="q${q.n}"]`).forEach(r => r.checked = false);
+  });
+  updateScore();
+  generateNote();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Theme toggle
 (function () {
   const t = document.querySelector('[data-theme-toggle]'), r = document.documentElement;
   let d = 'dark';
   r.setAttribute('data-theme', d);
+  const moonSVG = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+  const sunSVG  = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
   if (t) {
-    t.innerHTML = d === 'dark'
-      ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
-      : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+    t.innerHTML = sunSVG;
     t.addEventListener('click', () => {
       d = d === 'dark' ? 'light' : 'dark';
       r.setAttribute('data-theme', d);
-      t.innerHTML = d === 'dark'
-        ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
-        : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+      t.innerHTML = d === 'dark' ? sunSVG : moonSVG;
     });
   }
 })();
 
-// ---- Language toggle ----
-function applyLangToLinks(lang) {
-  document.querySelectorAll('a[href]').forEach(function(a) {
-    var href = a.getAttribute('href');
-    if (!href || href.startsWith('#') || href.startsWith('http')) return;
-    // Strip existing ?lang param then re-add
-    href = href.replace(/([?&])lang=[^&]*/g, '').replace(/[?&]$/, '');
-    a.setAttribute('href', href + (href.indexOf('?') >= 0 ? '&' : '?') + 'lang=' + lang);
-  });
-}
-
 function setLang(lang) {
+  const params = new URLSearchParams(location.search);
+  params.set('lang', lang);
+  history.replaceState(null, '', '?' + params.toString());
   document.documentElement.setAttribute('data-lang', lang);
-  const isEN = lang === 'en';
-  const isES = lang === 'es';
+  const isBi = lang === 'bi', isEN = lang === 'en';
 
-  // data-es / data-en labeled elements (nav labels, badges, static text)
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
-    el.textContent = isEN ? el.getAttribute('data-en') : el.getAttribute('data-es');
+    const esTxt = el.getAttribute('data-es');
+    const enTxt = el.getAttribute('data-en');
+    if (isBi) el.innerHTML = esTxt + '<span class="bi-en-line">' + enTxt + '</span>';
+    else el.textContent = isEN ? enTxt : esTxt;
   });
 
-  document.getElementById('btnES').classList.toggle('active', isES);
+  document.querySelectorAll('.question-text-en, .radio-label-en').forEach(el => {
+    el.style.display = (isBi || isEN) ? '' : 'none';
+  });
+
+  document.getElementById('btnES').classList.toggle('active', lang === 'es');
+  document.getElementById('btnBI').classList.toggle('active', isBi);
   document.getElementById('btnEN').classList.toggle('active', isEN);
-  applyLangToLinks(lang);
+
+  generateNote();
+  updateScore();
 }
 
-// ---- Restore lang from URL param on load ----
+// Init
 (function() {
-  var m = location.search.match(/[?&]lang=([^&]+)/);
-  if (m) setLang(decodeURIComponent(m[1]));
+  const params = new URLSearchParams(location.search);
+  const lang = params.get('lang') || 'es';
+  renderGroup(PART_A, 'questions-container-a');
+  renderGroup(PART_B, 'questions-container-b');
+  setLang(lang);
 })();
-
-// ---- Sidebar (mobile) ----
-
 </script>
 </body>
 </html>

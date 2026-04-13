@@ -1,10 +1,11 @@
 <!DOCTYPE html>
-<html lang="es" data-lang="es">
+<html lang="es" data-lang="es" data-theme="dark">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>CAP Scale — CoCM Pediátrico</title>
   <style>
+<style>
 /* ============================================================
    CoCM Pediátrico — Shared Stylesheet
    ============================================================ */
@@ -1186,64 +1187,360 @@ a, button, [role='button'], input, select {
   display: none !important;
 }
   </style>
+/* CAP subscale colors */
+.question-number.subscale-IN { background: var(--color-primary-bg); color: var(--color-primary); }
+.question-number.subscale-OV { background: #fef3c7; color: #92400e; }
+[data-theme='dark'] .question-number.subscale-OV { background: #3d2e08; color: #fcd34d; }
+.subscale-tag.subscale-IN { background: var(--color-primary-bg); color: var(--color-primary); }
+.subscale-tag.subscale-OV { background: #fef3c7; color: #92400e; }
+[data-theme='dark'] .subscale-tag.subscale-OV { background: #3d2e08; color: #fcd34d; }
+.legend-dot.IN { background: var(--color-primary); }
+.legend-dot.OV { background: #daa520; }
+/* No sidebar */
+.no-sidebar .main-content { margin-left: 0; width: 100%; }
+</style>
 </head>
-<body>
-<div class="app-layout no-sidebar">
-<main class="main-content">
+<body class="no-sidebar">
+<div class="app-layout">
+  <div class="main-content">
+
+    <!-- TOPBAR -->
     <div class="topbar">
-      <div style="display:flex; align-items:center; gap:var(--space-3);">
+      <div style="display:flex;align-items:center;gap:var(--space-3);">
+        <a href="index.html" class="btn-ghost" style="padding:var(--space-2) var(--space-3);font-size:var(--text-sm);">← <span data-es="Inicio" data-en="Home">Inicio</span></a>
         <div>
           <div class="topbar-title">CAP Scale</div>
-          <div class="topbar-subtitle" data-es="TDAH" data-en="ADHD">TDAH</div>
+          <div class="topbar-subtitle" data-es="Perfil de Atención Infantil (6–13 años)" data-en="Child Attention Profile (6–13 years)">Perfil de Atención Infantil (6–13 años)</div>
         </div>
       </div>
       <div class="topbar-actions">
         <div class="lang-toggle">
-          <button class="lang-btn active" id="btnES" onclick="setLang('es')">ES</button>
-          <button class="lang-btn" id="btnBI" onclick="setLang('bi')">ES+EN</button>
-          <button class="lang-btn" id="btnEN" onclick="setLang('en')">EN</button>
+          <button class="lang-btn active" onclick="setLang('es')" id="btnES">ES</button>
+          <button class="lang-btn" onclick="setLang('bi')" id="btnBI">ES+EN</button>
+          <button class="lang-btn" onclick="setLang('en')" id="btnEN">EN</button>
         </div>
-        <button class="theme-toggle" data-theme-toggle aria-label="Cambiar tema">
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-          </svg>
+        <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
         </button>
       </div>
     </div>
 
-    <div class="page-content">
-      <div class="breadcrumb">
-        <a href="index.html" data-es="Panel Principal" data-en="Dashboard">Panel Principal</a>
-        <span class="breadcrumb-sep">›</span>
-        <span>CAP Scale</span>
+    <!-- PAGE CONTENT -->
+    <div class="page-content" style="max-width:800px;margin:0 auto;">
+
+      <!-- Medical Disclaimer -->
+      <div class="disclaimer-banner">
+        <strong data-es="Aviso Médico:" data-en="Medical Disclaimer:">Aviso Médico:</strong>
+        <span data-es=" Esta herramienta es solo para uso clínico de apoyo. No reemplaza el juicio clínico, el diagnóstico médico ni la evaluación profesional. Los resultados deben interpretarse en el contexto clínico completo del paciente." data-en=" This tool is for clinical support use only. It does not replace clinical judgment, medical diagnosis, or professional evaluation. Results must be interpreted within the full clinical context of the patient."> Esta herramienta es solo para uso clínico de apoyo. No reemplaza el juicio clínico, el diagnóstico médico ni la evaluación profesional. Los resultados deben interpretarse en el contexto clínico completo del paciente.</span>
       </div>
 
-      <div class="placeholder-hero">
-        <div class="placeholder-icon">⚡</div>
-        <h2>CAP Scale</h2>
-        <p style="font-style:italic; margin-bottom:var(--space-4);">Child Attention Problems Scale</p>
-        <p data-es="Escala de problemas de atención en niños. Evaluación de TDAH para jóvenes. Herramienta prioritaria para ≤11 años." data-en="Child attention problems scale. ADHD evaluation for youth. Priority tool for ≤11 years.">Escala de problemas de atención en niños. Evaluación de TDAH para jóvenes. Herramienta prioritaria para ≤11 años.</p>
-        <div style="display:flex; justify-content:center; gap:var(--space-3); margin-top:var(--space-6); flex-wrap:wrap;">
-          <span class="meta-tag age" style="font-size:var(--text-sm);" data-es="Jóvenes ≤11 años (prioridad)" data-en="Youth ≤11 years (priority)">Jóvenes ≤11 años (prioridad)</span>
-          <span class="meta-tag" style="font-size:var(--text-sm);" data-es="TDAH" data-en="ADHD">TDAH</span>
+      <!-- Tool Header -->
+      <div class="tool-header-card">
+        <h1>CAP Scale</h1>
+        <p data-es="Perfil de Atención Infantil — Edelbrock &amp; Barkley" data-en="Child Attention Profile — Edelbrock &amp; Barkley">Perfil de Atención Infantil — Edelbrock &amp; Barkley</p>
+        <div class="tool-header-meta">
+          <span data-es="12 ítems" data-en="12 items">12 ítems</span>
+          <span data-es="Edades 6–13 años" data-en="Ages 6–13 years">Edades 6–13 años</span>
+          <span data-es="Calificado por maestro/a" data-en="Teacher-rated">Calificado por maestro/a</span>
+          <span data-es="Última semana" data-en="Past week">Última semana</span>
         </div>
       </div>
 
-      <div style="background:var(--color-primary-bg); border:1px solid var(--color-primary-highlight); border-radius:var(--radius-xl); padding:var(--space-8); text-align:center;">
-        <div style="font-size:2rem; margin-bottom:var(--space-4);">🔧</div>
-        <h3 style="font-size:var(--text-lg); font-weight:700; color:var(--color-primary); margin-bottom:var(--space-3); font-family:var(--font-display);" data-es="En construcción" data-en="Under Construction">En construcción</h3>
-        <p style="color:var(--color-text-muted); margin-bottom:var(--space-5);" data-es="Esta herramienta interactiva estará disponible próximamente. Por ahora, utilice el formulario físico correspondiente." data-en="This interactive tool will be available soon. For now, please use the corresponding physical form.">Esta herramienta interactiva estará disponible próximamente. Por ahora, utilice el formulario físico correspondiente.</p>
-        <a href="index.html" class="btn-primary" style="display:inline-flex; margin:0 auto;">
-          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
-          <span data-es="Volver al Panel" data-en="Back to Dashboard">Volver al Panel</span>
-        </a>
+      <!-- Instructions -->
+      <div class="instructions-box">
+        <h3 data-es="Instrucciones" data-en="Instructions">Instrucciones</h3>
+        <p data-es="Para cada comportamiento, indique qué tan bien describe al niño/a durante la última semana. Seleccione 0 = No es cierto, 1 = Algo o a veces cierto, o 2 = Muy cierto o frecuente. Todos los ítems son requeridos." data-en="For each behavior, indicate how well it describes the child during the past week. Select 0 = Not True, 1 = Somewhat or Sometimes True, or 2 = Very or Often True. All items are required.">Para cada comportamiento, indique qué tan bien describe al niño/a durante la última semana. Seleccione 0 = No es cierto, 1 = Algo o a veces cierto, o 2 = Muy cierto o frecuente. Todos los ítems son requeridos.</p>
       </div>
 
-    </div>
-  </main>
-</div>
+      <!-- Subscale legend -->
+      <div class="subscale-legend">
+        <div class="legend-item"><div class="legend-dot IN"></div><span data-es="IN = Inatención" data-en="IN = Inattention">IN = Inatención</span></div>
+        <div class="legend-item"><div class="legend-dot OV"></div><span data-es="OV = Sobreactividad" data-en="OV = Overactivity">OV = Sobreactividad</span></div>
+      </div>
+
+      <!-- Questions -->
+      <div id="questions-container"></div>
+
+      <!-- Score Panel (BOTTOM — not sticky) -->
+      <div class="score-panel" id="scorePanel">
+        <div class="score-panel-title" data-es="Resultado" data-en="Result">Resultado</div>
+
+        <div class="score-display">
+          <div class="score-total" id="totalScore">0</div>
+          <div class="score-max" data-es="/ 24 total" data-en="/ 24 total">/ 24 total</div>
+        </div>
+
+        <div class="score-result-badge incomplete" id="resultBadge">
+          <span id="resultText">0/12 respondidas</span>
+        </div>
+
+        <!-- Subscale breakdown -->
+        <div class="subscale-grid" style="grid-template-columns: repeat(3,1fr);">
+          <div class="subscale-item" id="subIN">
+            <div class="subscale-label" data-es="Inatención (IN)" data-en="Inattention (IN)">Inatención (IN)</div>
+            <div class="subscale-score"><span id="score_subIN">0</span><span style="font-size:var(--text-sm);color:var(--color-text-muted)">/14</span></div>
+            <div class="subscale-cutoff" data-es="Ítems 1,2,5,7,9,10,12" data-en="Items 1,2,5,7,9,10,12">Ítems 1,2,5,7,9,10,12</div>
+          </div>
+          <div class="subscale-item" id="subOV">
+            <div class="subscale-label" data-es="Sobreactividad (OV)" data-en="Overactivity (OV)">Sobreactividad (OV)</div>
+            <div class="subscale-score"><span id="score_subOV">0</span><span style="font-size:var(--text-sm);color:var(--color-text-muted)">/10</span></div>
+            <div class="subscale-cutoff" data-es="Ítems 3,4,6,8,11" data-en="Items 3,4,6,8,11">Ítems 3,4,6,8,11</div>
+          </div>
+          <div class="subscale-item" id="subTOT">
+            <div class="subscale-label" data-es="Total" data-en="Total">Total</div>
+            <div class="subscale-score"><span id="score_subTOT">0</span><span style="font-size:var(--text-sm);color:var(--color-text-muted)">/24</span></div>
+            <div class="subscale-cutoff" data-es="Todos los ítems" data-en="All items">Todos los ítems</div>
+          </div>
+        </div>
+
+        <!-- Normative reference -->
+        <div style="background:var(--color-surface-offset);border-radius:var(--radius-lg);padding:var(--space-4);margin-bottom:var(--space-4);font-size:var(--text-xs);">
+          <div style="font-weight:700;margin-bottom:var(--space-2);color:var(--color-text);" data-es="Valores normativos (Barkley &amp; Edelbrock)" data-en="Normative values (Barkley &amp; Edelbrock)">Valores normativos (Barkley &amp; Edelbrock)</div>
+          <table style="width:100%;border-collapse:collapse;font-size:var(--text-xs);">
+            <thead><tr style="color:var(--color-text-muted);">
+              <th style="text-align:left;padding:2px 4px;" data-es="Percentil" data-en="Percentile">Percentil</th>
+              <th style="text-align:center;padding:2px 4px;" data-es="IN (T/M/F)" data-en="IN (A/B/G)">IN (T/M/F)</th>
+              <th style="text-align:center;padding:2px 4px;" data-es="OV (T/M/F)" data-en="OV (A/B/G)">OV (T/M/F)</th>
+              <th style="text-align:center;padding:2px 4px;" data-es="Total (T/M/F)" data-en="Total (A/B/G)">Total (T/M/F)</th>
+            </tr></thead>
+            <tbody>
+              <tr><td style="padding:2px 4px;" data-es="84°" data-en="84th">84°</td><td style="text-align:center;padding:2px 4px;">6/7/5</td><td style="text-align:center;padding:2px 4px;">4/4/2</td><td style="text-align:center;padding:2px 4px;">10/11/8</td></tr>
+              <tr><td style="padding:2px 4px;" data-es="93°" data-en="93rd">93°</td><td style="text-align:center;padding:2px 4px;">8/9/7</td><td style="text-align:center;padding:2px 4px;">6/6/5</td><td style="text-align:center;padding:2px 4px;">14/15/11</td></tr>
+              <tr><td style="padding:2px 4px;" data-es="98°" data-en="98th">98°</td><td style="text-align:center;padding:2px 4px;">11/12/10</td><td style="text-align:center;padding:2px 4px;">8/8/7</td><td style="text-align:center;padding:2px 4px;">19/20/16</td></tr>
+            </tbody>
+          </table>
+          <div style="margin-top:var(--space-2);color:var(--color-text-muted);" data-es="T=Todos, M=Masculino, F=Femenino. ≥84° percentil = preocupación clínicamente significativa." data-en="A=All, B=Boys, G=Girls. ≥84th percentile = clinically significant concern.">T=Todos, M=Masculino, F=Femenino. ≥84° percentil = preocupación clínicamente significativa.</div>
+        </div>
+
+        <!-- Note summary -->
+        <div id="noteSummaryBox" class="note-summary-box visible"></div>
+
+        <!-- Actions -->
+        <div class="score-actions" style="margin-top:var(--space-4);">
+          <button type="button" class="btn-secondary" onclick="copyNote()">
+            <span id="copyBtnLabel" data-es="Copiar resumen" data-en="Copy summary">Copiar resumen</span>
+          </button>
+          <span class="copy-feedback" id="copyFeedback"></span>
+          <button type="button" class="btn-secondary" onclick="resetForm()">
+            <span data-es="Reiniciar" data-en="Reset">Reiniciar</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Copyright footer -->
+      <div class="copyright-footer">
+        <strong data-es="Derechos de autor:" data-en="Copyright:">Derechos de autor:</strong>
+        <span data-es=" CAP Scale — Child Attention Profile. Datos normativos de Russell A. Barkley y Craig Edelbrock. Diseño del formulario © 1999 Henry L. Shapiro, M.D. Usado con fines clínicos educativos. Esta aplicación no reproduce el formulario completo con derechos de autor." data-en=" CAP Scale — Child Attention Profile. Normative data from Russell A. Barkley and Craig Edelbrock. Form design © 1999 Henry L. Shapiro, M.D. Used for clinical educational purposes. This application does not reproduce the full copyrighted form."> CAP Scale — Child Attention Profile. Datos normativos de Russell A. Barkley y Craig Edelbrock. Diseño del formulario © 1999 Henry L. Shapiro, M.D. Usado con fines clínicos educativos. Esta aplicación no reproduce el formulario completo con derechos de autor.</span>
+      </div>
+
+    </div><!-- /page-content -->
+  </div><!-- /main-content -->
+</div><!-- /app-layout -->
 
 <script>
+const QUESTIONS = [
+  { n:1,  sub:'IN', es:'No termina lo que empieza.', en:'Fails to finish things he/she starts.' },
+  { n:2,  sub:'IN', es:'No puede concentrarse, no puede prestar atención por mucho tiempo.', en:'Can\'t concentrate, can\'t pay attention for long.' },
+  { n:3,  sub:'OV', es:'No puede quedarse quieto/a, inquieto/a o hiperactivo/a.', en:'Can\'t sit still, restless or hyperactive.' },
+  { n:4,  sub:'OV', es:'Se mueve nerviosamente o no puede estar quieto/a.', en:'Fidgets.' },
+  { n:5,  sub:'IN', es:'Sueña despierto/a o se pierde en sus pensamientos.', en:'Daydreams or gets lost in his/her thoughts.' },
+  { n:6,  sub:'OV', es:'Impulsivo/a o actúa sin pensar.', en:'Impulsive or acts without thinking.' },
+  { n:7,  sub:'IN', es:'Dificultad para seguir instrucciones.', en:'Difficulty following directions.' },
+  { n:8,  sub:'OV', es:'Habla fuera de turno.', en:'Talks out of turn.' },
+  { n:9,  sub:'IN', es:'El trabajo le queda mal presentado o sucio.', en:'Messy work.' },
+  { n:10, sub:'IN', es:'Falta de atención, se distrae fácilmente.', en:'Inattentive, easily distracted.' },
+  { n:11, sub:'OV', es:'Habla demasiado.', en:'Talks too much.' },
+  { n:12, sub:'IN', es:'No cumple con las tareas asignadas.', en:'Fails to carry out assigned tasks.' },
+];
+
+const IN_ITEMS  = [1,2,5,7,9,10,12];
+const OV_ITEMS  = [3,4,6,8,11];
+
+const LABELS = {
+  es: { 0:'No es cierto', 1:'A veces cierto', 2:'Muy cierto' },
+  en: { 0:'Not True',     1:'Sometimes True', 2:'Very True'  }
+};
+
+function getTopbarHeight() {
+  const tb = document.querySelector('.topbar');
+  return tb ? tb.offsetHeight + 12 : 70;
+}
+
+function renderQuestions() {
+  const container = document.getElementById('questions-container');
+  container.innerHTML = '';
+  QUESTIONS.forEach((q, idx) => {
+    const div = document.createElement('div');
+    div.className = 'question-section';
+    div.id = 'qsec' + q.n;
+    const subClass = 'subscale-' + q.sub;
+    div.innerHTML = `
+      <div class="question-row">
+        <div class="question-number ${subClass}">${q.n}</div>
+        <div class="question-body">
+          <div class="subscale-tag ${subClass}">${q.sub}</div>
+          <div class="question-text-es">${q.es}</div>
+          <div class="question-text-en">${q.en}</div>
+          <div class="radio-group">
+            ${[0,1,2].map(v => `
+              <div class="radio-option">
+                <input type="radio" name="q${q.n}" id="q${q.n}_${v}" value="${v}"
+                  onchange="onAnswerSelected(${q.n}, ${idx})">
+                <label for="q${q.n}_${v}">
+                  <span class="radio-score">${v}</span>
+                  <span class="radio-label-es">${LABELS.es[v]}</span>
+                  <span class="radio-label-en">${LABELS.en[v]}</span>
+                </label>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      </div>`;
+    container.appendChild(div);
+  });
+  updateScore();
+  generateNote();
+}
+
+function onAnswerSelected(qNum, idx) {
+  updateScore();
+  generateNote();
+  const nextIdx = idx + 1;
+  if (nextIdx < QUESTIONS.length) {
+    const nextSec = document.getElementById('qsec' + QUESTIONS[nextIdx].n);
+    if (nextSec) window.scrollTo({ top: nextSec.getBoundingClientRect().top + window.scrollY - getTopbarHeight(), behavior: 'smooth' });
+  } else {
+    const panel = document.getElementById('scorePanel');
+    if (panel) window.scrollTo({ top: panel.getBoundingClientRect().top + window.scrollY - getTopbarHeight(), behavior: 'smooth' });
+  }
+}
+
+function getScores() {
+  let total=0, IN=0, OV=0, answered=0;
+  QUESTIONS.forEach(q => {
+    const c = document.querySelector(`input[name="q${q.n}"]:checked`);
+    if (c) {
+      const v = parseInt(c.value);
+      total += v; answered++;
+      if (IN_ITEMS.includes(q.n))  IN += v;
+      if (OV_ITEMS.includes(q.n))  OV += v;
+    }
+  });
+  return { total, IN, OV, answered };
+}
+
+function updateScore() {
+  const { total, IN, OV, answered } = getScores();
+  const complete = answered === 12;
+  const lang = document.documentElement.getAttribute('data-lang') || 'es';
+  const isBi = lang === 'bi', isEN = lang === 'en';
+
+  document.getElementById('totalScore').textContent = total;
+  document.getElementById('score_subIN').textContent  = IN;
+  document.getElementById('score_subOV').textContent  = OV;
+  document.getElementById('score_subTOT').textContent = total;
+
+  // Clinical concern thresholds (84th %ile, all/combined)
+  const INconcern  = IN  >= 6;
+  const OVconcern  = OV  >= 4;
+  const TOTconcern = total >= 10;
+
+  document.getElementById('subIN').className  = 'subscale-item' + (INconcern  ? ' concern' : '');
+  document.getElementById('subOV').className  = 'subscale-item' + (OVconcern  ? ' concern' : '');
+  document.getElementById('subTOT').className = 'subscale-item' + (TOTconcern ? ' concern' : '');
+
+  const badge = document.getElementById('resultBadge');
+  const text  = document.getElementById('resultText');
+
+  function setBadge(esTxt, enTxt, cls) {
+    badge.className = 'score-result-badge ' + cls;
+    text.setAttribute('data-es', esTxt);
+    text.setAttribute('data-en', enTxt);
+    if (isBi) text.innerHTML = esTxt + '<span class="bi-en-line">' + enTxt + '</span>';
+    else text.textContent = isEN ? enTxt : esTxt;
+  }
+
+  if (!complete) {
+    setBadge(`${answered}/12 respondidas`, `${answered}/12 answered`, 'incomplete');
+    return;
+  }
+
+  const anyClinical = INconcern || OVconcern || TOTconcern;
+  if (anyClinical) setBadge('⚠ Puntuación en rango clínico (≥84° percentil)', '⚠ Score in clinical range (≥84th percentile)', 'positive');
+  else setBadge('✓ Sin hallazgos clínicamente significativos', '✓ No clinically significant findings', 'negative');
+}
+
+function generateNote() {
+  const { total, IN, OV, answered } = getScores();
+  const complete = answered === 12;
+  const lang = document.documentElement.getAttribute('data-lang') || 'es';
+  const isBI = lang === 'bi', isEN = lang === 'en';
+  const todayES = new Date().toLocaleDateString('es-HN', { year:'numeric', month:'long', day:'numeric' });
+  const todayEN = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+
+  const flagIN  = IN  >= 6  ? ' ⚠ ≥84°p' : '';
+  const flagOV  = OV  >= 4  ? ' ⚠ ≥84°p' : '';
+  const flagTOT = total >= 10 ? ' ⚠ ≥84°p' : '';
+  const pctNote = '(84°p: IN≥6, OV≥4, Total≥10)';
+
+  const noteES =
+`CAP Scale — Resumen de Resultados — ${todayES}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Instrumento: Child Attention Profile (Edelbrock & Barkley)
+Calificado por: maestro/a
+Rango de edad: 6–13 años | Período: última semana
+Ítems completados: ${answered}/12
+
+Puntuaciones:
+  • Inatención (IN, ítems 1,2,5,7,9,10,12): ${IN}/14${flagIN}
+  • Sobreactividad (OV, ítems 3,4,6,8,11):   ${OV}/10${flagOV}
+  • Total:                                    ${total}/24${flagTOT}
+
+Valores de referencia ${pctNote}`;
+
+  const noteEN =
+`CAP Scale — Results Summary — ${todayEN}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Instrument: Child Attention Profile (Edelbrock & Barkley)
+Rated by: teacher
+Age range: 6–13 years | Period: past week
+Items completed: ${answered}/12
+
+Scores:
+  • Inattention (IN, items 1,2,5,7,9,10,12): ${IN}/14${flagIN}
+  • Overactivity (OV, items 3,4,6,8,11):      ${OV}/10${flagOV}
+  • Total:                                     ${total}/24${flagTOT}
+
+Reference values ${pctNote}`;
+
+  const box = document.getElementById('noteSummaryBox');
+  box.textContent = isBI ? noteES + '\n\n' + noteEN : isEN ? noteEN : noteES;
+}
+
+function copyNote() {
+  const box = document.getElementById('noteSummaryBox');
+  const text = box.textContent;
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(() => {
+    const fb = document.getElementById('copyFeedback');
+    const lang = document.documentElement.getAttribute('data-lang') || 'es';
+    fb.textContent = lang === 'en' ? 'Copied!' : '¡Copiado!';
+    fb.classList.add('show');
+    setTimeout(() => fb.classList.remove('show'), 2500);
+  }).catch(() => {});
+}
+
+function resetForm() {
+  QUESTIONS.forEach(q => {
+    const radios = document.querySelectorAll(`input[name="q${q.n}"]`);
+    radios.forEach(r => r.checked = false);
+  });
+  updateScore();
+  generateNote();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// Theme toggle
 (function () {
   const t = document.querySelector('[data-theme-toggle]'), r = document.documentElement;
   let d = 'dark';
@@ -1251,7 +1548,7 @@ a, button, [role='button'], input, select {
   const moonSVG = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
   const sunSVG  = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
   if (t) {
-    t.innerHTML = d === 'dark' ? sunSVG : moonSVG;
+    t.innerHTML = sunSVG;
     t.addEventListener('click', () => {
       d = d === 'dark' ? 'light' : 'dark';
       r.setAttribute('data-theme', d);
@@ -1261,37 +1558,37 @@ a, button, [role='button'], input, select {
 })();
 
 function setLang(lang) {
+  const params = new URLSearchParams(location.search);
+  params.set('lang', lang);
+  history.replaceState(null, '', '?' + params.toString());
   document.documentElement.setAttribute('data-lang', lang);
-  const isBi = lang === 'bi';
-  const isEN = lang === 'en';
-  const isES = lang === 'es';
+  const isBi = lang === 'bi', isEN = lang === 'en';
 
-  // data-es / data-en labeled elements (nav labels, badges, static text)
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
-    // Skip elements that are question-text-es or question-text-en — handled separately
-    if (el.classList.contains('question-text-es') || el.classList.contains('question-text-en')) return;
-    el.textContent = isEN ? el.getAttribute('data-en') : el.getAttribute('data-es');
+    const esTxt = el.getAttribute('data-es');
+    const enTxt = el.getAttribute('data-en');
+    if (isBi) el.innerHTML = esTxt + '<span class="bi-en-line">' + enTxt + '</span>';
+    else el.textContent = isEN ? enTxt : esTxt;
   });
 
-  document.getElementById('btnES').classList.toggle('active', isES);
+  document.querySelectorAll('.question-text-en, .radio-label-en').forEach(el => {
+    el.style.display = (isBi || isEN) ? '' : 'none';
+  });
+
+  document.getElementById('btnES').classList.toggle('active', lang === 'es');
   document.getElementById('btnBI').classList.toggle('active', isBi);
   document.getElementById('btnEN').classList.toggle('active', isEN);
-  // Propagate lang to all navigation links
-  document.querySelectorAll('a[href]').forEach(function(a) {
-    var href = a.getAttribute('href');
-    if (!href || href.startsWith('#') || href.startsWith('http')) return;
-    href = href.replace(/([?&])lang=[^&]*/g, '').replace(/[?&]$/, '');
-    a.setAttribute('href', href + (href.indexOf('?') >= 0 ? '&' : '?') + 'lang=' + lang);
-  });
+
+  generateNote();
+  updateScore();
 }
 
-
-
-
-// ---- Restore lang from URL param on load ----
+// Init
 (function() {
-  var m = location.search.match(/[?&]lang=([^&]+)/);
-  if (m) setLang(decodeURIComponent(m[1]));
+  const params = new URLSearchParams(location.search);
+  const lang = params.get('lang') || 'es';
+  renderQuestions();
+  setLang(lang);
 })();
 </script>
 </body>
