@@ -1,0 +1,2837 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark" data-lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Escala de Vanderbilt — Maestros — CoCM Honduras</title>
+  <style>
+/* ============================================================
+   CoCM Pediátrico — Shared Stylesheet
+   ============================================================ */
+
+
+/* Offline-safe: system font stack — no CDN required */
+
+/* ===================== DESIGN TOKENS ===================== */
+:root,
+[data-theme='light'] {
+  /* Type Scale */
+  --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+  --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+  --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+  --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* Surfaces */
+  --color-bg: #f7f6f2;
+  --color-surface: #f9f8f5;
+  --color-surface-2: #fbfbf9;
+  --color-surface-offset: #f0eeea;
+  --color-surface-offset-2: #e8e5e0;
+  --color-divider: #dcd9d5;
+  --color-border: #d4d1ca;
+
+  /* Text */
+  --color-text: #28251d;
+  --color-text-muted: #7a7974;
+  --color-text-faint: #bab9b4;
+  --color-text-inverse: #f9f8f4;
+
+  /* Primary Teal (matching Sheets register) */
+  --color-primary: #01696f;
+  --color-primary-hover: #0c4e54;
+  --color-primary-active: #0f3638;
+  --color-primary-highlight: #cedcd8;
+  --color-primary-bg: #e8f2f1;
+
+  /* Status */
+  --color-success: #437a22;
+  --color-success-highlight: #d4dfcc;
+  --color-warning: #964219;
+  --color-warning-highlight: #ddcfc6;
+  --color-error: #a12c7b;
+  --color-error-highlight: #e0ced7;
+
+  /* Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-interactive: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px oklch(0.2 0.01 80 / 0.06);
+  --shadow-md: 0 4px 12px oklch(0.2 0.01 80 / 0.08);
+  --shadow-lg: 0 12px 32px oklch(0.2 0.01 80 / 0.12);
+
+  /* Fonts */
+  --font-display: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+
+  /* Sidebar */
+  --sidebar-width: 260px;
+}
+
+[data-theme='dark'] {
+  --color-bg: #171614;
+  --color-surface: #1c1b19;
+  --color-surface-2: #201f1d;
+  --color-surface-offset: #1d1c1a;
+  --color-surface-offset-2: #22211f;
+  --color-surface-dynamic: #2d2c2a;
+  --color-divider: #262523;
+  --color-border: #393836;
+  --color-text: #cdccca;
+  --color-text-muted: #797876;
+  --color-text-faint: #5a5957;
+  --color-text-inverse: #2b2a28;
+  --color-primary: #4f98a3;
+  --color-primary-hover: #227f8b;
+  --color-primary-active: #1a626b;
+  --color-primary-highlight: #313b3b;
+  --color-primary-bg: #1e2d2d;
+  --color-success: #6daa45;
+  --color-success-highlight: #3a4435;
+  --color-warning: #bb653b;
+  --color-warning-highlight: #564942;
+  --color-error: #d163a7;
+  --color-error-highlight: #4c3d46;
+  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.2);
+  --shadow-md: 0 4px 12px oklch(0 0 0 / 0.3);
+  --shadow-lg: 0 12px 32px oklch(0 0 0 / 0.4);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --color-bg: #171614;
+    --color-surface: #1c1b19;
+    --color-surface-2: #201f1d;
+    --color-surface-offset: #1d1c1a;
+    --color-surface-offset-2: #22211f;
+    --color-surface-dynamic: #2d2c2a;
+    --color-divider: #262523;
+    --color-border: #393836;
+    --color-text: #cdccca;
+    --color-text-muted: #797876;
+    --color-text-faint: #5a5957;
+    --color-text-inverse: #2b2a28;
+    --color-primary: #4f98a3;
+    --color-primary-hover: #227f8b;
+    --color-primary-active: #1a626b;
+    --color-primary-highlight: #313b3b;
+    --color-primary-bg: #1e2d2d;
+    --color-success: #6daa45;
+    --color-success-highlight: #3a4435;
+    --color-warning: #bb653b;
+    --color-warning-highlight: #564942;
+    --color-error: #d163a7;
+    --color-error-highlight: #4c3d46;
+    --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.2);
+    --shadow-md: 0 4px 12px oklch(0 0 0 / 0.3);
+    --shadow-lg: 0 12px 32px oklch(0 0 0 / 0.4);
+  }
+}
+
+/* ===================== BASE RESET ===================== */
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  -webkit-text-size-adjust: none; text-size-adjust: none;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility; scroll-behavior: smooth;
+  scroll-padding-top: var(--space-16);
+}
+body {
+  min-height: 100dvh; line-height: 1.6;
+  font-family: var(--font-body); font-size: var(--text-base);
+  color: var(--color-text); background-color: var(--color-bg);
+}
+img, svg { display: block; max-width: 100%; height: auto; }
+input, button, textarea, select { font: inherit; color: inherit; }
+h1,h2,h3,h4,h5,h6 { text-wrap: balance; line-height: 1.15; font-family: var(--font-display); }
+p, li { text-wrap: pretty; }
+button { cursor: pointer; background: none; border: none; }
+::selection { background: oklch(from var(--color-primary) l c h / 0.25); color: var(--color-text); }
+:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; border-radius: var(--radius-sm); }
+a, button, [role='button'], input, select {
+  transition: color var(--transition-interactive), background var(--transition-interactive),
+    border-color var(--transition-interactive), box-shadow var(--transition-interactive);
+}
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border-width: 0; }
+
+/* ===================== LAYOUT ===================== */
+.app-layout {
+  display: flex;
+  min-height: 100dvh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: var(--sidebar-width);
+  flex-shrink: 0;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100dvh;
+  overflow-y: auto;
+  z-index: 100;
+  transition: transform var(--transition-interactive);
+}
+
+.sidebar-header {
+  padding: var(--space-6) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.sidebar-logo-icon {
+  width: 36px;
+  height: 36px;
+  background: var(--color-primary);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-family: var(--font-display);
+  flex-shrink: 0;
+}
+
+.sidebar-logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.sidebar-logo-text .title {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-text);
+  font-family: var(--font-display);
+}
+
+.sidebar-logo-text .subtitle {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.sidebar-nav {
+  padding: var(--space-4) var(--space-3);
+  flex: 1;
+}
+
+.sidebar-section-label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: var(--space-4) var(--space-3) var(--space-2);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  margin-bottom: var(--space-1);
+}
+
+.nav-item:hover {
+  background: var(--color-surface-offset);
+  color: var(--color-text);
+}
+
+.nav-item.active {
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.nav-item .nav-icon {
+  font-size: 1rem;
+  width: 20px;
+  text-align: center;
+}
+
+.nav-item .nav-badge {
+  margin-left: auto;
+  font-size: var(--text-xs);
+  background: var(--color-primary-highlight);
+  color: var(--color-primary);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-weight: 600;
+}
+
+.nav-item .nav-badge.placeholder {
+  background: var(--color-surface-offset-2);
+  color: var(--color-text-faint);
+}
+
+/* Age group dividers in nav */
+.nav-age-group {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-xs);
+  color: var(--color-text-faint);
+  font-style: italic;
+  margin-top: var(--space-1);
+}
+
+.sidebar-footer {
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Main content */
+.main-content {
+  margin-left: var(--sidebar-width);
+  flex: 1;
+  min-width: 0;
+}
+
+/* Topbar */
+.topbar {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-4) var(--space-8);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.topbar-title {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-text);
+  font-family: var(--font-display);
+}
+
+.topbar-subtitle {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin-top: var(--space-1);
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* Page content */
+.page-content {
+  padding: var(--space-8);
+  max-width: 880px;
+}
+
+/* ===================== COMPONENTS ===================== */
+
+/* Theme toggle */
+.theme-toggle {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  background: transparent;
+}
+.theme-toggle:hover {
+  background: var(--color-surface-offset);
+  color: var(--color-text);
+}
+
+/* Lang toggle */
+.lang-toggle {
+  display: flex;
+  background: var(--color-surface-offset);
+  border-radius: var(--radius-full);
+  padding: 2px;
+  gap: 2px;
+}
+.lang-btn {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background: transparent;
+}
+.lang-btn.active {
+  background: var(--color-primary);
+  color: white;
+}
+
+/* Cards — dashboard */
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-5);
+  margin-top: var(--space-6);
+}
+
+.tool-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  text-decoration: none;
+  color: var(--color-text);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-interactive), box-shadow var(--transition-interactive), border-color var(--transition-interactive);
+}
+
+.tool-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary);
+}
+
+.tool-card.ready {
+  border-left: 4px solid var(--color-primary);
+}
+
+.tool-card.placeholder {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.tool-card.placeholder:hover {
+  transform: none;
+  box-shadow: var(--shadow-sm);
+  border-color: var(--color-border);
+}
+
+.tool-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.tool-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  background: var(--color-primary-bg);
+}
+
+.tool-card.placeholder .tool-card-icon {
+  background: var(--color-surface-offset);
+}
+
+.tool-status {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  padding: 3px var(--space-2);
+  border-radius: var(--radius-full);
+}
+
+.tool-status.ready {
+  background: var(--color-success-highlight);
+  color: var(--color-success);
+}
+
+.tool-status.coming-soon {
+  background: var(--color-surface-offset-2);
+  color: var(--color-text-muted);
+}
+
+.tool-card-name {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-text);
+  font-family: var(--font-display);
+}
+
+.tool-card-desc {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.tool-card-meta {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-top: auto;
+}
+
+.meta-tag {
+  font-size: var(--text-xs);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-offset);
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.meta-tag.age {
+  background: var(--color-primary-highlight);
+  color: var(--color-primary);
+}
+
+/* ===================== TOOL PAGE — PSC-17 ===================== */
+
+.tool-header-card {
+  background: var(--color-primary);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6) var(--space-8);
+  color: white;
+  margin-bottom: var(--space-6);
+}
+
+.tool-header-card h1 {
+  font-size: var(--text-xl);
+  font-weight: 800;
+  color: white;
+  font-family: var(--font-display);
+}
+
+.tool-header-card p {
+  font-size: var(--text-sm);
+  opacity: 0.85;
+  max-width: none;
+  margin-top: var(--space-2);
+}
+
+.tool-header-meta {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.tool-header-meta span {
+  font-size: var(--text-xs);
+  background: rgba(255,255,255,0.2);
+  padding: 3px var(--space-3);
+  border-radius: var(--radius-full);
+  font-weight: 500;
+}
+
+/* Instructions box */
+.instructions-box {
+  background: var(--color-primary-bg);
+  border: 1px solid var(--color-primary-highlight);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.instructions-box h3 {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: var(--space-2);
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.instructions-box p {
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  max-width: none;
+}
+
+/* Question card */
+.question-section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5) var(--space-6);
+  margin-bottom: var(--space-3);
+}
+
+.question-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.question-number {
+  width: 28px;
+  height: 28px;
+  background: var(--color-surface-offset);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.question-number.subscale-I { background: var(--color-primary-bg); color: var(--color-primary); }
+.question-number.subscale-A { background: #fff3cd; color: #856404; }
+.question-number.subscale-E { background: #f8d7da; color: #842029; }
+[data-theme='dark'] .question-number.subscale-A { background: #3d3520; color: #e8c84a; }
+[data-theme='dark'] .question-number.subscale-E { background: #3d1f22; color: #e07070; }
+
+.question-body {
+  flex: 1;
+  position: relative;
+}
+
+.subscale-tag {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  opacity: 0.85;
+  background: var(--color-surface-offset);
+  color: var(--color-text-muted);
+}
+
+.subscale-tag.subscale-I { background: var(--color-primary-bg); color: var(--color-primary); }
+.subscale-tag.subscale-A { background: #fff3cd; color: #856404; }
+.subscale-tag.subscale-E { background: #f8d7da; color: #842029; }
+[data-theme='dark'] .subscale-tag.subscale-A { background: #3d3520; color: #e8c84a; }
+[data-theme='dark'] .subscale-tag.subscale-E { background: #3d1f22; color: #e07070; }
+
+.question-text-es {
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--color-text);
+  line-height: 1.4;
+}
+
+/* Bilingual secondary line for ALL static text (nav, instructions, score panel, header, etc.) */
+/* Same pattern as question-text-en in bilingual mode */
+.bi-en-line {
+  display: block;
+  font-size: var(--text-xs);
+  font-weight: 400;
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin-top: 2px;
+  line-height: 1.3;
+}
+
+/* EN-only mode: same size as ES */
+[data-lang='en'] .question-text-en {
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--color-text);
+  font-style: normal;
+  margin-top: 0;
+}
+
+/* Bilingual mode: EN line is smaller, italic, muted */
+[data-lang='bi'] .question-text-en {
+  font-size: var(--text-xs);
+  font-weight: 400;
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin-top: var(--space-1);
+}
+
+.question-text-en {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-top: var(--space-1);
+  font-style: italic;
+  display: none; /* shown only in EN or Bilingual mode via JS */
+}
+
+.radio-group {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.radio-option {
+  flex: 1;
+  min-width: 80px;
+}
+
+.radio-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.radio-option label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-3);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: center;
+  gap: var(--space-1);
+  transition: all var(--transition-interactive);
+  background: var(--color-bg);
+}
+
+.radio-option label:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-bg);
+}
+
+.radio-option input[type="radio"]:checked + label {
+  border-color: var(--color-primary);
+  background: var(--color-primary-bg);
+  box-shadow: 0 0 0 3px var(--color-primary-highlight);
+}
+
+.radio-score {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-primary);
+  font-family: var(--font-display);
+  line-height: 1;
+}
+
+.radio-label-es {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.radio-label-en {
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+  display: none; /* shown only in EN or Bilingual mode */
+}
+
+/* Score panel — static at bottom, never sticky/floating */
+.score-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  margin-top: var(--space-6);
+  box-shadow: var(--shadow-lg);
+}
+
+.score-panel-title {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-4);
+  font-family: var(--font-display);
+}
+
+.score-display {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.score-total {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--color-text);
+  font-family: var(--font-display);
+  line-height: 1;
+}
+
+.score-max {
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+}
+
+.score-result-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  margin-bottom: var(--space-4);
+}
+
+.score-result-badge.negative {
+  background: var(--color-success-highlight);
+  color: var(--color-success);
+}
+
+.score-result-badge.positive {
+  background: var(--color-error-highlight);
+  color: var(--color-error);
+}
+
+.score-result-badge.incomplete {
+  background: var(--color-surface-offset);
+  color: var(--color-text-muted);
+}
+
+/* Subscale bars */
+.subscale-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.subscale-item {
+  background: var(--color-surface-offset);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+}
+
+.subscale-label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-1);
+}
+
+.subscale-score {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  font-family: var(--font-display);
+  color: var(--color-text);
+  line-height: 1;
+}
+
+.subscale-cutoff {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.subscale-item.concern .subscale-score {
+  color: var(--color-error);
+}
+
+.subscale-item.concern {
+  background: var(--color-error-highlight);
+}
+
+/* Score actions */
+.score-actions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  background: var(--color-primary);
+  color: white;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+}
+.btn-primary:hover { background: var(--color-primary-hover); color: white; }
+.btn-primary:active { background: var(--color-primary-active); }
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  background: var(--color-surface-offset);
+  color: var(--color-text);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  border: 1px solid var(--color-border);
+}
+.btn-secondary:hover { background: var(--color-surface-offset-2); }
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  color: var(--color-text-muted);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+.btn-ghost:hover { background: var(--color-surface-offset); color: var(--color-text); }
+
+/* Note summary box */
+.note-summary-box {
+  background: var(--color-surface-offset);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-5);
+  margin-top: var(--space-4);
+  font-family: monospace;
+  font-size: var(--text-sm);
+  white-space: pre-wrap;
+  color: var(--color-text);
+  display: none;
+}
+
+.note-summary-box.visible {
+  display: block;
+}
+
+/* Legend */
+.subscale-legend {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-5);
+  padding: var(--space-4);
+  background: var(--color-surface-offset);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-xs);
+}
+.legend-item { display: flex; align-items: center; gap: var(--space-2); }
+.legend-dot {
+  width: 10px; height: 10px; border-radius: var(--radius-full);
+}
+.legend-dot.I { background: var(--color-primary); }
+.legend-dot.A { background: #daa520; }
+.legend-dot.E { background: #dc3545; }
+
+/* Placeholder page */
+.placeholder-hero {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-12) var(--space-8);
+  text-align: center;
+  margin-bottom: var(--space-6);
+}
+
+.placeholder-icon {
+  font-size: 3rem;
+  margin-bottom: var(--space-4);
+}
+
+.placeholder-hero h2 {
+  font-size: var(--text-xl);
+  font-weight: 800;
+  color: var(--color-text);
+  margin-bottom: var(--space-3);
+  font-family: var(--font-display);
+}
+
+.placeholder-hero p {
+  color: var(--color-text-muted);
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* Mobile hamburger */
+.hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+}
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 90;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-4);
+}
+.breadcrumb a { color: var(--color-primary); text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb-sep { color: var(--color-text-faint); }
+
+/* Dashboard summary section */
+.dashboard-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+.summary-stat {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+}
+
+.summary-stat .stat-value {
+  font-size: var(--text-xl);
+  font-weight: 800;
+  color: var(--color-primary);
+  font-family: var(--font-display);
+  line-height: 1;
+}
+
+.summary-stat .stat-label {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-top: var(--space-2);
+  font-weight: 500;
+}
+
+/* Section headings */
+.section-heading {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-text);
+  font-family: var(--font-display);
+  margin-bottom: var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.section-heading::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+/* Workflow table links */
+.workflow-link {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: var(--text-xs);
+  background: var(--color-primary-bg);
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  display: inline-block;
+  transition: background var(--transition-interactive), color var(--transition-interactive);
+}
+.workflow-link:hover {
+  background: var(--color-primary);
+  color: white;
+}
+.workflow-link.placeholder {
+  background: var(--color-surface-offset);
+  color: var(--color-text-muted);
+}
+.workflow-link.placeholder:hover {
+  background: var(--color-surface-offset-2);
+  color: var(--color-text);
+}
+
+/* Copy feedback */
+.copy-feedback {
+  font-size: var(--text-xs);
+  color: var(--color-success);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.copy-feedback.show { opacity: 1; }
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(calc(-1 * var(--sidebar-width)));
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .sidebar-overlay.open {
+    display: block;
+  }
+  .main-content {
+    margin-left: 0;
+  }
+  .topbar {
+    padding: var(--space-4);
+  }
+  .page-content {
+    padding: var(--space-5) var(--space-4);
+  }
+  .hamburger {
+    display: flex;
+  }
+  .subscale-grid {
+    grid-template-columns: 1fr;
+  }
+  .radio-group {
+    gap: var(--space-1);
+  }
+}
+
+/* ===================== MOBILE / TOUCH ENHANCEMENTS ===================== */
+
+/* Larger tap targets on touch screens */
+@media (hover: none) and (pointer: coarse) {
+  .radio-option label {
+    min-height: 60px;
+    padding: var(--space-3) var(--space-2);
+  }
+  .nav-item {
+    padding: var(--space-3) var(--space-3);
+    min-height: 44px;
+  }
+  .btn-primary, .btn-secondary, .btn-ghost {
+    min-height: 44px;
+  }
+  .lang-btn {
+    min-height: 32px;
+    padding: var(--space-2) var(--space-3);
+  }
+}
+
+/* Additional small-screen adjustments */
+@media (max-width: 768px) {
+  .tool-grid {
+    grid-template-columns: 1fr;
+  }
+  .dashboard-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .score-panel {
+    position: static;
+    border-radius: var(--radius-xl);
+  }
+  .tool-header-card {
+    padding: var(--space-5);
+  }
+  .score-actions {
+    flex-direction: column;
+  }
+  .score-actions .btn-primary,
+  .score-actions .btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+  .subscale-legend {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+}
+
+
+/* No sidebar — main fills full width */
+.no-sidebar .main-content {
+  margin-left: 0;
+  width: 100%;
+}
+.no-sidebar .sidebar {
+  display: none !important;
+}
+  </style>
+  <style>
+    
+/* ===== Subscale header ===== */
+.subscale-header {
+  margin: var(--space-6) 0 var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--color-surface-raised);
+  border-left: 4px solid var(--color-primary);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  font-weight: 700;
+  font-size: var(--text-base);
+}
+.subscale-header .en-label {
+  display: block;
+  font-size: var(--text-xs);
+  font-style: italic;
+  color: var(--color-text-muted);
+  font-weight: 400;
+  margin-top: 2px;
+}
+/* Subscale badge colors */
+.badge-IN  { background: #e0f2fe; color: #0369a1; }
+.badge-HI  { background: #fef3c7; color: #92400e; }
+.badge-ODD { background: #fee2e2; color: #991b1b; }
+.badge-CD  { background: #ffe4e6; color: #9f1239; }
+.badge-ANX { background: #f0fdf4; color: #166534; }
+.badge-PERF{ background: #f5f3ff; color: #5b21b6; }
+[data-theme='dark'] .badge-IN  { background: #0c3a56; color: #7dd3fc; }
+[data-theme='dark'] .badge-HI  { background: #3d2a00; color: #fcd34d; }
+[data-theme='dark'] .badge-ODD { background: #3d0a0a; color: #fca5a5; }
+[data-theme='dark'] .badge-CD  { background: #4c0519; color: #fda4af; }
+[data-theme='dark'] .badge-ANX { background: #052e16; color: #86efac; }
+[data-theme='dark'] .badge-PERF{ background: #2e1065; color: #c4b5fd; }
+/* Performance note */
+.perf-note {
+  margin-bottom: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+/* Score panel subscale rows */
+.subscale-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: var(--space-1) 0;
+  border-bottom: 1px solid var(--color-border);
+  font-size: var(--text-sm);
+  gap: var(--space-2);
+}
+.subscale-row:last-child { border-bottom: none; }
+.subscale-row .sub-label { flex: 1; color: var(--color-text-muted); }
+.subscale-row .sub-score { font-weight: 700; font-size: var(--text-base); }
+.subscale-row .sub-flag  { font-size: var(--text-xs); font-weight: 600; }
+.flag-pos  { color: var(--color-error, #dc2626); }
+.flag-neg  { color: var(--color-text-muted); }
+.adhd-result {
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  font-size: var(--text-sm);
+  text-align: center;
+}
+.adhd-pos {
+  background: rgba(220,38,38,0.1);
+  border: 1px solid var(--color-error, #dc2626);
+  color: var(--color-error, #dc2626);
+}
+.adhd-neg {
+  background: rgba(22,163,74,0.1);
+  border: 1px solid #16a34a;
+  color: #16a34a;
+}
+[data-theme='dark'] .adhd-neg { color: #86efac; border-color: #86efac; }
+/* Copyright footer */
+.copyright-footer {
+  margin-top: var(--space-8);
+  padding: var(--space-4);
+  background: var(--color-surface-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+.copyright-footer strong { color: var(--color-text); }
+/* Disclaimer */
+.disclaimer-banner {
+  margin-bottom: var(--space-6);
+  padding: var(--space-3) var(--space-4);
+  background: rgba(245,158,11,0.08);
+  border: 1px solid rgba(245,158,11,0.3);
+  border-radius: var(--radius-md);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+    /* Performance options wrap on small screens */
+    .options-wrap { flex-wrap: wrap; gap: var(--space-2); }
+    .perf-opt { min-width: 120px; flex: 1 1 auto; text-align: center; }
+    /* Bilingual subscale headers */
+    .subscale-header .es-label { display: block; }
+    .subscale-header .en-label { display: block; margin-top: 2px; }
+    [data-lang='es'] .en-label,
+    [data-lang='en'] .es-label { display: none !important; }
+    [data-lang='both'] .en-label { display: block !important; }
+  </style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<header class="top-bar">
+  <div class="top-bar-left">
+    <a href="index.html" class="back-link" aria-label="Volver al inicio">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </a>
+    <div class="tool-title-group">
+      <span class="tool-title es-label">Escala de Vanderbilt — Maestros</span>
+      <span class="tool-title en-label">Vanderbilt Assessment Scale — Teacher</span>
+      <span class="tool-subtitle es-label">Evaluación de TDAH y conducta, versión para maestros</span>
+      <span class="tool-subtitle en-label">ADHD & Behavior Assessment, Teacher Version</span>
+    </div>
+  </div>
+  <div class="top-bar-right">
+    <div class="lang-toggle" role="group" aria-label="Idioma">
+      <button id="btn-es"   class="lang-btn active" aria-pressed="true">ES</button>
+      <button id="btn-en"   class="lang-btn" aria-pressed="false">EN</button>
+      <button id="btn-both" class="lang-btn" aria-pressed="false">ES+EN</button>
+    </div>
+    <button id="theme-btn" class="icon-btn" aria-label="Cambiar tema" title="Cambiar tema">
+      <span id="theme-label">☀️</span>
+    </button>
+  </div>
+</header>
+
+<main class="main-content">
+
+  
+<div class="disclaimer-banner">
+  <strong>Aviso / Disclaimer:</strong>
+  Esta herramienta es solo para fines de detección clínica. No reemplaza el juicio clínico ni constituye un diagnóstico. Los resultados deben ser interpretados por un profesional de salud calificado en el contexto clínico completo del paciente. /
+  <em>This tool is for clinical screening purposes only. It does not replace clinical judgment and does not constitute a diagnosis. Results must be interpreted by a qualified health professional in the full clinical context of the patient.</em>
+</div>
+
+
+  <!-- Age / respondent badge -->
+  <div style="margin-bottom:var(--space-4);display:flex;gap:var(--space-2);flex-wrap:wrap">
+    <span class="badge-chip" style="background:var(--color-surface-raised);border:1px solid var(--color-border);padding:4px 10px;border-radius:999px;font-size:var(--text-xs);color:var(--color-text-muted)">
+      <span class="es-label">Edad: 6–12 años / years</span>
+      <span class="en-label">Age: 6–12 años / years</span>
+    </span>
+    <span class="badge-chip" style="background:var(--color-surface-raised);border:1px solid var(--color-border);padding:4px 10px;border-radius:999px;font-size:var(--text-xs);color:var(--color-text-muted)">
+      <span class="es-label">43 ítems</span>
+      <span class="en-label">43 items</span>
+    </span>
+  </div>
+
+  <!-- QUESTIONS -->
+  <div id="questions-container">
+    
+    <div class="subscale-header">
+      <span class="es-label">Inatención</span>
+      <span class="en-label">Inattention (Items 1–9)</span>
+    </div>
+    <div class="question-block" id="q1">
+      <div class="question-header">
+        <span class="question-number">1</span>
+        <span class="question-text">
+          <span class="es-label">No pone atención a los detalles o comete errores por descuido en sus tareas u otras actividades.</span>
+          <span class="en-label">Fails to give close attention to details or makes careless mistakes in schoolwork or activities.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 1">
+        <label class="option-btn" data-item="1" data-val="0">
+          <input type="radio" name="item1" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="1" data-val="1">
+          <input type="radio" name="item1" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="1" data-val="2">
+          <input type="radio" name="item1" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="1" data-val="3">
+          <input type="radio" name="item1" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q2">
+      <div class="question-header">
+        <span class="question-number">2</span>
+        <span class="question-text">
+          <span class="es-label">Se le dificulta mantenerse atento durante las tareas o actividades.</span>
+          <span class="en-label">Has difficulty sustaining attention in tasks or play activities.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 2">
+        <label class="option-btn" data-item="2" data-val="0">
+          <input type="radio" name="item2" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="2" data-val="1">
+          <input type="radio" name="item2" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="2" data-val="2">
+          <input type="radio" name="item2" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="2" data-val="3">
+          <input type="radio" name="item2" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q3">
+      <div class="question-header">
+        <span class="question-number">3</span>
+        <span class="question-text">
+          <span class="es-label">Parece no estar escuchando cuando se le habla directamente.</span>
+          <span class="en-label">Does not seem to listen when spoken to directly.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 3">
+        <label class="option-btn" data-item="3" data-val="0">
+          <input type="radio" name="item3" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="3" data-val="1">
+          <input type="radio" name="item3" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="3" data-val="2">
+          <input type="radio" name="item3" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="3" data-val="3">
+          <input type="radio" name="item3" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q4">
+      <div class="question-header">
+        <span class="question-number">4</span>
+        <span class="question-text">
+          <span class="es-label">No sigue las instrucciones hasta el final y no concluye sus actividades (no porque se rehúse o no comprenda).</span>
+          <span class="en-label">Does not follow through on instructions and fails to finish tasks.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 4">
+        <label class="option-btn" data-item="4" data-val="0">
+          <input type="radio" name="item4" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="4" data-val="1">
+          <input type="radio" name="item4" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="4" data-val="2">
+          <input type="radio" name="item4" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="4" data-val="3">
+          <input type="radio" name="item4" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q5">
+      <div class="question-header">
+        <span class="question-number">5</span>
+        <span class="question-text">
+          <span class="es-label">Tiene dificultad al organizar sus tareas diarias y actividades.</span>
+          <span class="en-label">Has difficulty organizing tasks and activities.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 5">
+        <label class="option-btn" data-item="5" data-val="0">
+          <input type="radio" name="item5" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="5" data-val="1">
+          <input type="radio" name="item5" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="5" data-val="2">
+          <input type="radio" name="item5" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="5" data-val="3">
+          <input type="radio" name="item5" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q6">
+      <div class="question-header">
+        <span class="question-number">6</span>
+        <span class="question-text">
+          <span class="es-label">Evita, le disgusta o no quiere comenzar actividades que requieren un esfuerzo mental sostenido.</span>
+          <span class="en-label">Avoids, dislikes, or is reluctant to engage in tasks requiring sustained mental effort.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 6">
+        <label class="option-btn" data-item="6" data-val="0">
+          <input type="radio" name="item6" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="6" data-val="1">
+          <input type="radio" name="item6" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="6" data-val="2">
+          <input type="radio" name="item6" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="6" data-val="3">
+          <input type="radio" name="item6" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q7">
+      <div class="question-header">
+        <span class="question-number">7</span>
+        <span class="question-text">
+          <span class="es-label">Pierde las cosas necesarias para sus tareas o actividades (tareas, lápices, libros).</span>
+          <span class="en-label">Loses things necessary for tasks or activities.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 7">
+        <label class="option-btn" data-item="7" data-val="0">
+          <input type="radio" name="item7" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="7" data-val="1">
+          <input type="radio" name="item7" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="7" data-val="2">
+          <input type="radio" name="item7" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="7" data-val="3">
+          <input type="radio" name="item7" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q8">
+      <div class="question-header">
+        <span class="question-number">8</span>
+        <span class="question-text">
+          <span class="es-label">Se distrae fácilmente con estímulos externos.</span>
+          <span class="en-label">Is easily distracted by extraneous stimuli.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 8">
+        <label class="option-btn" data-item="8" data-val="0">
+          <input type="radio" name="item8" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="8" data-val="1">
+          <input type="radio" name="item8" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="8" data-val="2">
+          <input type="radio" name="item8" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="8" data-val="3">
+          <input type="radio" name="item8" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q9">
+      <div class="question-header">
+        <span class="question-number">9</span>
+        <span class="question-text">
+          <span class="es-label">Es olvidadizo(a) en sus actividades cotidianas.</span>
+          <span class="en-label">Is forgetful in daily activities.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 9">
+        <label class="option-btn" data-item="9" data-val="0">
+          <input type="radio" name="item9" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="9" data-val="1">
+          <input type="radio" name="item9" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="9" data-val="2">
+          <input type="radio" name="item9" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="9" data-val="3">
+          <input type="radio" name="item9" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="subscale-header">
+      <span class="es-label">Hiperactividad / Impulsividad</span>
+      <span class="en-label">Hyperactivity/Impulsivity (Items 10–18)</span>
+    </div>
+    <div class="question-block" id="q10">
+      <div class="question-header">
+        <span class="question-number">10</span>
+        <span class="question-text">
+          <span class="es-label">Mueve constantemente las manos o los pies, o no se está quieto(a) en su asiento.</span>
+          <span class="en-label">Fidgets with hands or feet or squirms in seat.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 10">
+        <label class="option-btn" data-item="10" data-val="0">
+          <input type="radio" name="item10" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="10" data-val="1">
+          <input type="radio" name="item10" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="10" data-val="2">
+          <input type="radio" name="item10" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="10" data-val="3">
+          <input type="radio" name="item10" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q11">
+      <div class="question-header">
+        <span class="question-number">11</span>
+        <span class="question-text">
+          <span class="es-label">Se pone de pie cuando debiera permanecer sentado(a).</span>
+          <span class="en-label">Leaves seat in classroom or in other situations in which remaining seated is expected.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 11">
+        <label class="option-btn" data-item="11" data-val="0">
+          <input type="radio" name="item11" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="11" data-val="1">
+          <input type="radio" name="item11" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="11" data-val="2">
+          <input type="radio" name="item11" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="11" data-val="3">
+          <input type="radio" name="item11" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q12">
+      <div class="question-header">
+        <span class="question-number">12</span>
+        <span class="question-text">
+          <span class="es-label">Corre o camina por todos lados en situaciones inapropiadas.</span>
+          <span class="en-label">Runs about or climbs excessively in situations in which it is inappropriate.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 12">
+        <label class="option-btn" data-item="12" data-val="0">
+          <input type="radio" name="item12" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="12" data-val="1">
+          <input type="radio" name="item12" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="12" data-val="2">
+          <input type="radio" name="item12" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="12" data-val="3">
+          <input type="radio" name="item12" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q13">
+      <div class="question-header">
+        <span class="question-number">13</span>
+        <span class="question-text">
+          <span class="es-label">Se le dificulta jugar o comenzar actividades de recreo de manera tranquila.</span>
+          <span class="en-label">Has difficulty playing or engaging in leisure activities quietly.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 13">
+        <label class="option-btn" data-item="13" data-val="0">
+          <input type="radio" name="item13" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="13" data-val="1">
+          <input type="radio" name="item13" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="13" data-val="2">
+          <input type="radio" name="item13" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="13" data-val="3">
+          <input type="radio" name="item13" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q14">
+      <div class="question-header">
+        <span class="question-number">14</span>
+        <span class="question-text">
+          <span class="es-label">Está en constante movimiento o actúa como si "tuviera un motor por dentro".</span>
+          <span class="en-label">Is "on the go" or often acts as if "driven by a motor".</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 14">
+        <label class="option-btn" data-item="14" data-val="0">
+          <input type="radio" name="item14" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="14" data-val="1">
+          <input type="radio" name="item14" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="14" data-val="2">
+          <input type="radio" name="item14" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="14" data-val="3">
+          <input type="radio" name="item14" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q15">
+      <div class="question-header">
+        <span class="question-number">15</span>
+        <span class="question-text">
+          <span class="es-label">Habla demasiado.</span>
+          <span class="en-label">Talks excessively.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 15">
+        <label class="option-btn" data-item="15" data-val="0">
+          <input type="radio" name="item15" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="15" data-val="1">
+          <input type="radio" name="item15" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="15" data-val="2">
+          <input type="radio" name="item15" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="15" data-val="3">
+          <input type="radio" name="item15" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q16">
+      <div class="question-header">
+        <span class="question-number">16</span>
+        <span class="question-text">
+          <span class="es-label">Responde precipitadamente, incluso antes de escuchar la pregunta completa.</span>
+          <span class="en-label">Blurts out answers before questions have been completed.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 16">
+        <label class="option-btn" data-item="16" data-val="0">
+          <input type="radio" name="item16" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="16" data-val="1">
+          <input type="radio" name="item16" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="16" data-val="2">
+          <input type="radio" name="item16" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="16" data-val="3">
+          <input type="radio" name="item16" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q17">
+      <div class="question-header">
+        <span class="question-number">17</span>
+        <span class="question-text">
+          <span class="es-label">Tiene dificultad al esperar su turno.</span>
+          <span class="en-label">Has difficulty awaiting turn.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 17">
+        <label class="option-btn" data-item="17" data-val="0">
+          <input type="radio" name="item17" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="17" data-val="1">
+          <input type="radio" name="item17" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="17" data-val="2">
+          <input type="radio" name="item17" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="17" data-val="3">
+          <input type="radio" name="item17" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q18">
+      <div class="question-header">
+        <span class="question-number">18</span>
+        <span class="question-text">
+          <span class="es-label">Interrumpe o se entromete en conversaciones o actividades ajenas.</span>
+          <span class="en-label">Interrupts or intrudes on others.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 18">
+        <label class="option-btn" data-item="18" data-val="0">
+          <input type="radio" name="item18" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="18" data-val="1">
+          <input type="radio" name="item18" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="18" data-val="2">
+          <input type="radio" name="item18" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="18" data-val="3">
+          <input type="radio" name="item18" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="subscale-header">
+      <span class="es-label">TND / Trastorno de Conducta</span>
+      <span class="en-label">ODD/Conduct Disorder (Items 19–28)</span>
+    </div>
+    <div class="question-block" id="q19">
+      <div class="question-header">
+        <span class="question-number">19</span>
+        <span class="question-text">
+          <span class="es-label">Pierde el control de sus emociones.</span>
+          <span class="en-label">Loses temper.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 19">
+        <label class="option-btn" data-item="19" data-val="0">
+          <input type="radio" name="item19" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="19" data-val="1">
+          <input type="radio" name="item19" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="19" data-val="2">
+          <input type="radio" name="item19" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="19" data-val="3">
+          <input type="radio" name="item19" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q20">
+      <div class="question-header">
+        <span class="question-number">20</span>
+        <span class="question-text">
+          <span class="es-label">Desafía abiertamente o se niega a cumplir las órdenes o reglas de los adultos.</span>
+          <span class="en-label">Actively defies or refuses to comply with adults' requests or rules.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 20">
+        <label class="option-btn" data-item="20" data-val="0">
+          <input type="radio" name="item20" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="20" data-val="1">
+          <input type="radio" name="item20" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="20" data-val="2">
+          <input type="radio" name="item20" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="20" data-val="3">
+          <input type="radio" name="item20" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q21">
+      <div class="question-header">
+        <span class="question-number">21</span>
+        <span class="question-text">
+          <span class="es-label">Se le ve enojado(a) o resentido(a).</span>
+          <span class="en-label">Is angry or resentful.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 21">
+        <label class="option-btn" data-item="21" data-val="0">
+          <input type="radio" name="item21" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="21" data-val="1">
+          <input type="radio" name="item21" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="21" data-val="2">
+          <input type="radio" name="item21" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="21" data-val="3">
+          <input type="radio" name="item21" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q22">
+      <div class="question-header">
+        <span class="question-number">22</span>
+        <span class="question-text">
+          <span class="es-label">Es rencoroso(a) y vengativo(a).</span>
+          <span class="en-label">Is spiteful or vindictive.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 22">
+        <label class="option-btn" data-item="22" data-val="0">
+          <input type="radio" name="item22" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="22" data-val="1">
+          <input type="radio" name="item22" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="22" data-val="2">
+          <input type="radio" name="item22" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="22" data-val="3">
+          <input type="radio" name="item22" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q23">
+      <div class="question-header">
+        <span class="question-number">23</span>
+        <span class="question-text">
+          <span class="es-label">Reta, amenaza o intimida a otros.</span>
+          <span class="en-label">Bullies, threatens, or intimidates others.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 23">
+        <label class="option-btn" data-item="23" data-val="0">
+          <input type="radio" name="item23" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="23" data-val="1">
+          <input type="radio" name="item23" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="23" data-val="2">
+          <input type="radio" name="item23" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="23" data-val="3">
+          <input type="radio" name="item23" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q24">
+      <div class="question-header">
+        <span class="question-number">24</span>
+        <span class="question-text">
+          <span class="es-label">Comienza peleas de contacto físico.</span>
+          <span class="en-label">Initiates physical fights.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 24">
+        <label class="option-btn" data-item="24" data-val="0">
+          <input type="radio" name="item24" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="24" data-val="1">
+          <input type="radio" name="item24" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="24" data-val="2">
+          <input type="radio" name="item24" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="24" data-val="3">
+          <input type="radio" name="item24" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q25">
+      <div class="question-header">
+        <span class="question-number">25</span>
+        <span class="question-text">
+          <span class="es-label">Miente para conseguir bienes o favores o para eludir sus obligaciones.</span>
+          <span class="en-label">Lies to obtain goods or favors or to avoid obligations.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 25">
+        <label class="option-btn" data-item="25" data-val="0">
+          <input type="radio" name="item25" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="25" data-val="1">
+          <input type="radio" name="item25" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="25" data-val="2">
+          <input type="radio" name="item25" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="25" data-val="3">
+          <input type="radio" name="item25" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q26">
+      <div class="question-header">
+        <span class="question-number">26</span>
+        <span class="question-text">
+          <span class="es-label">Es físicamente cruel con los demás.</span>
+          <span class="en-label">Is physically cruel to people.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 26">
+        <label class="option-btn" data-item="26" data-val="0">
+          <input type="radio" name="item26" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="26" data-val="1">
+          <input type="radio" name="item26" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="26" data-val="2">
+          <input type="radio" name="item26" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="26" data-val="3">
+          <input type="radio" name="item26" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q27">
+      <div class="question-header">
+        <span class="question-number">27</span>
+        <span class="question-text">
+          <span class="es-label">Ha robado objetos de cierto valor.</span>
+          <span class="en-label">Has stolen items of nontrivial value.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 27">
+        <label class="option-btn" data-item="27" data-val="0">
+          <input type="radio" name="item27" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="27" data-val="1">
+          <input type="radio" name="item27" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="27" data-val="2">
+          <input type="radio" name="item27" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="27" data-val="3">
+          <input type="radio" name="item27" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q28">
+      <div class="question-header">
+        <span class="question-number">28</span>
+        <span class="question-text">
+          <span class="es-label">Destruye deliberadamente la propiedad ajena.</span>
+          <span class="en-label">Deliberately destroys others' property.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 28">
+        <label class="option-btn" data-item="28" data-val="0">
+          <input type="radio" name="item28" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="28" data-val="1">
+          <input type="radio" name="item28" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="28" data-val="2">
+          <input type="radio" name="item28" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="28" data-val="3">
+          <input type="radio" name="item28" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="subscale-header">
+      <span class="es-label">Ansiedad / Depresión</span>
+      <span class="en-label">Anxiety/Depression (Items 29–35)</span>
+    </div>
+    <div class="question-block" id="q29">
+      <div class="question-header">
+        <span class="question-number">29</span>
+        <span class="question-text">
+          <span class="es-label">Siente miedo, ansiedad o está preocupado(a).</span>
+          <span class="en-label">Is fearful, anxious, or worried.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 29">
+        <label class="option-btn" data-item="29" data-val="0">
+          <input type="radio" name="item29" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="29" data-val="1">
+          <input type="radio" name="item29" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="29" data-val="2">
+          <input type="radio" name="item29" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="29" data-val="3">
+          <input type="radio" name="item29" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q30">
+      <div class="question-header">
+        <span class="question-number">30</span>
+        <span class="question-text">
+          <span class="es-label">Está al pendiente de sus actos o se avergüenza fácilmente.</span>
+          <span class="en-label">Is self-conscious or easily embarrassed.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 30">
+        <label class="option-btn" data-item="30" data-val="0">
+          <input type="radio" name="item30" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="30" data-val="1">
+          <input type="radio" name="item30" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="30" data-val="2">
+          <input type="radio" name="item30" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="30" data-val="3">
+          <input type="radio" name="item30" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q31">
+      <div class="question-header">
+        <span class="question-number">31</span>
+        <span class="question-text">
+          <span class="es-label">Teme hacer nuevas cosas por temor a cometer errores.</span>
+          <span class="en-label">Is afraid to try new things for fear of making mistakes.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 31">
+        <label class="option-btn" data-item="31" data-val="0">
+          <input type="radio" name="item31" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="31" data-val="1">
+          <input type="radio" name="item31" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="31" data-val="2">
+          <input type="radio" name="item31" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="31" data-val="3">
+          <input type="radio" name="item31" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q32">
+      <div class="question-header">
+        <span class="question-number">32</span>
+        <span class="question-text">
+          <span class="es-label">Se desprecia a sí mismo(a) o se siente inferior.</span>
+          <span class="en-label">Feels worthless or inferior.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 32">
+        <label class="option-btn" data-item="32" data-val="0">
+          <input type="radio" name="item32" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="32" data-val="1">
+          <input type="radio" name="item32" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="32" data-val="2">
+          <input type="radio" name="item32" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="32" data-val="3">
+          <input type="radio" name="item32" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q33">
+      <div class="question-header">
+        <span class="question-number">33</span>
+        <span class="question-text">
+          <span class="es-label">Siente que los problemas son responsabilidad suya y se siente culpable.</span>
+          <span class="en-label">Blames self for problems; feels guilty.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 33">
+        <label class="option-btn" data-item="33" data-val="0">
+          <input type="radio" name="item33" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="33" data-val="1">
+          <input type="radio" name="item33" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="33" data-val="2">
+          <input type="radio" name="item33" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="33" data-val="3">
+          <input type="radio" name="item33" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q34">
+      <div class="question-header">
+        <span class="question-number">34</span>
+        <span class="question-text">
+          <span class="es-label">Se siente solo(a), rechazado(a) o sin amor; se queja de que nadie lo(la) quiere.</span>
+          <span class="en-label">Feels lonely, unwanted, or unloved.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 34">
+        <label class="option-btn" data-item="34" data-val="0">
+          <input type="radio" name="item34" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="34" data-val="1">
+          <input type="radio" name="item34" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="34" data-val="2">
+          <input type="radio" name="item34" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="34" data-val="3">
+          <input type="radio" name="item34" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q35">
+      <div class="question-header">
+        <span class="question-number">35</span>
+        <span class="question-text">
+          <span class="es-label">Se le ve triste, infeliz o deprimido(a).</span>
+          <span class="en-label">Is sad, unhappy, or depressed.</span>
+        </span>
+      </div>
+      <div class="options-row" role="radiogroup" aria-label="Pregunta 35">
+        <label class="option-btn" data-item="35" data-val="0">
+          <input type="radio" name="item35" value="0">
+          <span class="es-label">Nunca</span><span class="en-label">Never</span>
+        </label>
+        <label class="option-btn" data-item="35" data-val="1">
+          <input type="radio" name="item35" value="1">
+          <span class="es-label">A veces</span><span class="en-label">Sometimes</span>
+        </label>
+        <label class="option-btn" data-item="35" data-val="2">
+          <input type="radio" name="item35" value="2">
+          <span class="es-label">Seguido</span><span class="en-label">Often</span>
+        </label>
+        <label class="option-btn" data-item="35" data-val="3">
+          <input type="radio" name="item35" value="3">
+          <span class="es-label">Muy seguido</span><span class="en-label">Very often</span>
+        </label>
+      </div>
+    </div>
+    <div class="subscale-header">
+      <span class="es-label">Rendimiento Académico (escala 1–5)</span>
+      <span class="en-label">Academic Performance Scale (Items 36–38)</span>
+    </div><div class="perf-note">
+      <span class="es-label">1 = Excelente &nbsp;|&nbsp; 2 = Sobre lo normal &nbsp;|&nbsp; 3 = Normal &nbsp;|&nbsp; 4 = Con cierta dificultad &nbsp;|&nbsp; 5 = Con dificultad</span>
+      <span class="en-label" style="display:block;margin-top:2px">1 = Excellent &nbsp;|&nbsp; 5 = Problematic</span>
+    </div>
+    <div class="question-block" id="q36">
+      <div class="question-header">
+        <span class="question-number badge-PERF">36</span>
+        <span class="question-text">
+          <span class="es-label">Lectura</span>
+          <span class="en-label">Reading</span>
+        </span>
+      </div>
+      <div class="options-row options-wrap" role="radiogroup" aria-label="Pregunta 36">
+        
+        <label class="option-btn perf-opt" data-item="36" data-val="1">
+          <input type="radio" name="item36" value="1">
+          <span class="es-label">Excelente</span><span class="en-label">Excellent</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="36" data-val="2">
+          <input type="radio" name="item36" value="2">
+          <span class="es-label">Sobre lo normal</span><span class="en-label">Above average</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="36" data-val="3">
+          <input type="radio" name="item36" value="3">
+          <span class="es-label">Normal</span><span class="en-label">Average</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="36" data-val="4">
+          <input type="radio" name="item36" value="4">
+          <span class="es-label">Con cierta dificultad</span><span class="en-label">Somewhat of a problem</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="36" data-val="5">
+          <input type="radio" name="item36" value="5">
+          <span class="es-label">Con dificultad</span><span class="en-label">Problematic</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q37">
+      <div class="question-header">
+        <span class="question-number badge-PERF">37</span>
+        <span class="question-text">
+          <span class="es-label">Matemáticas</span>
+          <span class="en-label">Mathematics</span>
+        </span>
+      </div>
+      <div class="options-row options-wrap" role="radiogroup" aria-label="Pregunta 37">
+        
+        <label class="option-btn perf-opt" data-item="37" data-val="1">
+          <input type="radio" name="item37" value="1">
+          <span class="es-label">Excelente</span><span class="en-label">Excellent</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="37" data-val="2">
+          <input type="radio" name="item37" value="2">
+          <span class="es-label">Sobre lo normal</span><span class="en-label">Above average</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="37" data-val="3">
+          <input type="radio" name="item37" value="3">
+          <span class="es-label">Normal</span><span class="en-label">Average</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="37" data-val="4">
+          <input type="radio" name="item37" value="4">
+          <span class="es-label">Con cierta dificultad</span><span class="en-label">Somewhat of a problem</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="37" data-val="5">
+          <input type="radio" name="item37" value="5">
+          <span class="es-label">Con dificultad</span><span class="en-label">Problematic</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q38">
+      <div class="question-header">
+        <span class="question-number badge-PERF">38</span>
+        <span class="question-text">
+          <span class="es-label">Expresión escrita</span>
+          <span class="en-label">Written expression</span>
+        </span>
+      </div>
+      <div class="options-row options-wrap" role="radiogroup" aria-label="Pregunta 38">
+        
+        <label class="option-btn perf-opt" data-item="38" data-val="1">
+          <input type="radio" name="item38" value="1">
+          <span class="es-label">Excelente</span><span class="en-label">Excellent</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="38" data-val="2">
+          <input type="radio" name="item38" value="2">
+          <span class="es-label">Sobre lo normal</span><span class="en-label">Above average</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="38" data-val="3">
+          <input type="radio" name="item38" value="3">
+          <span class="es-label">Normal</span><span class="en-label">Average</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="38" data-val="4">
+          <input type="radio" name="item38" value="4">
+          <span class="es-label">Con cierta dificultad</span><span class="en-label">Somewhat of a problem</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="38" data-val="5">
+          <input type="radio" name="item38" value="5">
+          <span class="es-label">Con dificultad</span><span class="en-label">Problematic</span>
+        </label>
+      </div>
+    </div>
+    <div class="subscale-header">
+      <span class="es-label">Desempeño en el Aula (escala 1–5)</span>
+      <span class="en-label">Classroom Behavioral Performance (Items 39–43)</span>
+    </div>
+    <div class="question-block" id="q39">
+      <div class="question-header">
+        <span class="question-number badge-PERF">39</span>
+        <span class="question-text">
+          <span class="es-label">Relación con sus compañeros</span>
+          <span class="en-label">Relationship with peers</span>
+        </span>
+      </div>
+      <div class="options-row options-wrap" role="radiogroup" aria-label="Pregunta 39">
+        
+        <label class="option-btn perf-opt" data-item="39" data-val="1">
+          <input type="radio" name="item39" value="1">
+          <span class="es-label">Excelente</span><span class="en-label">Excellent</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="39" data-val="2">
+          <input type="radio" name="item39" value="2">
+          <span class="es-label">Sobre lo normal</span><span class="en-label">Above average</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="39" data-val="3">
+          <input type="radio" name="item39" value="3">
+          <span class="es-label">Normal</span><span class="en-label">Average</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="39" data-val="4">
+          <input type="radio" name="item39" value="4">
+          <span class="es-label">Con cierta dificultad</span><span class="en-label">Somewhat of a problem</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="39" data-val="5">
+          <input type="radio" name="item39" value="5">
+          <span class="es-label">Con dificultad</span><span class="en-label">Problematic</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q40">
+      <div class="question-header">
+        <span class="question-number badge-PERF">40</span>
+        <span class="question-text">
+          <span class="es-label">Sigue instrucciones</span>
+          <span class="en-label">Follows directions</span>
+        </span>
+      </div>
+      <div class="options-row options-wrap" role="radiogroup" aria-label="Pregunta 40">
+        
+        <label class="option-btn perf-opt" data-item="40" data-val="1">
+          <input type="radio" name="item40" value="1">
+          <span class="es-label">Excelente</span><span class="en-label">Excellent</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="40" data-val="2">
+          <input type="radio" name="item40" value="2">
+          <span class="es-label">Sobre lo normal</span><span class="en-label">Above average</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="40" data-val="3">
+          <input type="radio" name="item40" value="3">
+          <span class="es-label">Normal</span><span class="en-label">Average</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="40" data-val="4">
+          <input type="radio" name="item40" value="4">
+          <span class="es-label">Con cierta dificultad</span><span class="en-label">Somewhat of a problem</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="40" data-val="5">
+          <input type="radio" name="item40" value="5">
+          <span class="es-label">Con dificultad</span><span class="en-label">Problematic</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q41">
+      <div class="question-header">
+        <span class="question-number badge-PERF">41</span>
+        <span class="question-text">
+          <span class="es-label">Conducta en clase</span>
+          <span class="en-label">Disrupts class</span>
+        </span>
+      </div>
+      <div class="options-row options-wrap" role="radiogroup" aria-label="Pregunta 41">
+        
+        <label class="option-btn perf-opt" data-item="41" data-val="1">
+          <input type="radio" name="item41" value="1">
+          <span class="es-label">Excelente</span><span class="en-label">Excellent</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="41" data-val="2">
+          <input type="radio" name="item41" value="2">
+          <span class="es-label">Sobre lo normal</span><span class="en-label">Above average</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="41" data-val="3">
+          <input type="radio" name="item41" value="3">
+          <span class="es-label">Normal</span><span class="en-label">Average</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="41" data-val="4">
+          <input type="radio" name="item41" value="4">
+          <span class="es-label">Con cierta dificultad</span><span class="en-label">Somewhat of a problem</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="41" data-val="5">
+          <input type="radio" name="item41" value="5">
+          <span class="es-label">Con dificultad</span><span class="en-label">Problematic</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q42">
+      <div class="question-header">
+        <span class="question-number badge-PERF">42</span>
+        <span class="question-text">
+          <span class="es-label">Concluye las tareas asignadas</span>
+          <span class="en-label">Completes assignments</span>
+        </span>
+      </div>
+      <div class="options-row options-wrap" role="radiogroup" aria-label="Pregunta 42">
+        
+        <label class="option-btn perf-opt" data-item="42" data-val="1">
+          <input type="radio" name="item42" value="1">
+          <span class="es-label">Excelente</span><span class="en-label">Excellent</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="42" data-val="2">
+          <input type="radio" name="item42" value="2">
+          <span class="es-label">Sobre lo normal</span><span class="en-label">Above average</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="42" data-val="3">
+          <input type="radio" name="item42" value="3">
+          <span class="es-label">Normal</span><span class="en-label">Average</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="42" data-val="4">
+          <input type="radio" name="item42" value="4">
+          <span class="es-label">Con cierta dificultad</span><span class="en-label">Somewhat of a problem</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="42" data-val="5">
+          <input type="radio" name="item42" value="5">
+          <span class="es-label">Con dificultad</span><span class="en-label">Problematic</span>
+        </label>
+      </div>
+    </div>
+    <div class="question-block" id="q43">
+      <div class="question-header">
+        <span class="question-number badge-PERF">43</span>
+        <span class="question-text">
+          <span class="es-label">Habilidad para organizarse</span>
+          <span class="en-label">Organizational skills</span>
+        </span>
+      </div>
+      <div class="options-row options-wrap" role="radiogroup" aria-label="Pregunta 43">
+        
+        <label class="option-btn perf-opt" data-item="43" data-val="1">
+          <input type="radio" name="item43" value="1">
+          <span class="es-label">Excelente</span><span class="en-label">Excellent</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="43" data-val="2">
+          <input type="radio" name="item43" value="2">
+          <span class="es-label">Sobre lo normal</span><span class="en-label">Above average</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="43" data-val="3">
+          <input type="radio" name="item43" value="3">
+          <span class="es-label">Normal</span><span class="en-label">Average</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="43" data-val="4">
+          <input type="radio" name="item43" value="4">
+          <span class="es-label">Con cierta dificultad</span><span class="en-label">Somewhat of a problem</span>
+        </label>
+        <label class="option-btn perf-opt" data-item="43" data-val="5">
+          <input type="radio" name="item43" value="5">
+          <span class="es-label">Con dificultad</span><span class="en-label">Problematic</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCORE PANEL -->
+  <div id="score-panel" class="score-panel">
+    <div class="score-panel-header">
+      <span class="es-label">Resultados</span>
+      <span class="en-label">Results</span>
+    </div>
+
+    <!-- Progress -->
+    <div class="progress-row">
+      <div class="progress-track"><div id="progress-bar" class="progress-fill" style="width:0%"></div></div>
+      <span id="progress-text" class="progress-label">0 / 43</span>
+    </div>
+
+    <!-- Subscale rows -->
+    <div id="subscale-rows" style="margin: var(--space-3) 0;"></div>
+
+    <!-- ADHD result -->
+    <div id="adhd-result"></div>
+
+    <!-- Copy output -->
+    <div class="copy-box" style="margin-top:var(--space-4)">
+      <pre id="copy-text-content" class="copy-text" style="white-space:pre-wrap;word-break:break-word;font-size:var(--text-xs);line-height:1.6;color:var(--color-text-muted)"></pre>
+      <button id="copy-btn" class="copy-btn">
+        <span class="es-label">Copiar</span>
+        <span class="en-label">Copy</span>
+      </button>
+    </div>
+
+    <!-- Reset -->
+    <button id="reset-btn" class="reset-btn" style="margin-top:var(--space-4);width:100%">
+      <span class="es-label">Reiniciar</span>
+      <span class="en-label">Reset</span>
+    </button>
+  </div>
+
+  
+<div class="copyright-footer">
+  <strong>Aviso de derechos de autor / Copyright Notice</strong><br>
+  Las recomendaciones contenidas en esta publicación no indican un curso exclusivo de tratamiento ni constituyen un estándar de atención médica. Las variaciones, tomando en cuenta las circunstancias individuales, pueden ser apropiadas. Documento original incluido como parte de <em>Addressing Mental Health Concerns in Primary Care: A Clinician's Toolkit</em>. Copyright &copy; 2010 American Academy of Pediatrics and National Initiative for Children's Healthcare Quality (NICHQ). All Rights Reserved. The American Academy of Pediatrics does not review or endorse any modifications made to this document and in no event shall the AAP be liable for any such changes.
+</div>
+
+
+</main>
+
+<script>
+
+const TOTAL = 43;
+const answers = {};
+
+function getVal(n) { return answers[n] !== undefined ? answers[n] : null; }
+function countGe2(start, end) {
+  let c = 0;
+  for (let i = start; i <= end; i++) { if (getVal(i) !== null && getVal(i) >= 2) c++; }
+  return c;
+}
+function countPerfHigh(start, end) {
+  let c = 0;
+  for (let i = start; i <= end; i++) { if (getVal(i) !== null && getVal(i) >= 4) c++; }
+  return c;
+}
+
+function computeResults() {
+  const IN  = countGe2(1, 9);
+  const HI  = countGe2(10, 18);
+  const ODDCD = countGe2(19, 28);
+  const ANX   = countGe2(29, 35);
+  const PERF_HIGH = countPerfHigh(36, 43);
+
+  const adhd_pos_IN = IN >= 6;
+  const adhd_pos_HI = HI >= 6;
+  const adhd_any = adhd_pos_IN || adhd_pos_HI;
+
+  const done = Object.keys(answers).length;
+  const pct  = Math.round((done / TOTAL) * 100);
+
+  return { IN, HI, ODDCD, ANX, PERF_HIGH, adhd_pos_IN, adhd_pos_HI, adhd_any, done, pct };
+}
+
+function adhdSubtype(pos_IN, pos_HI) {
+  if (pos_IN && pos_HI) return { es: "Predominantemente Combinado", en: "Combined Presentation" };
+  if (pos_IN)           return { es: "Predominantemente Inatento",   en: "Predominantly Inattentive" };
+  if (pos_HI)           return { es: "Predominantemente Hiperactivo/Impulsivo", en: "Predominantly Hyperactive-Impulsive" };
+  return null;
+}
+
+function renderScore() {
+  const r = computeResults();
+  const lang = document.documentElement.getAttribute('data-lang') || 'es';
+  const es = lang === 'es';
+  const both = lang === 'both';
+
+  function tx(esText, enText) {
+    if (es)   return esText;
+    if (both) return `<span class="es-label">${esText}</span><span class="en-label">${enText}</span>`;
+    return enText;
+  }
+
+  document.getElementById('progress-bar').style.width = r.pct + '%';
+  document.getElementById('progress-text').textContent = r.done + ' / ' + TOTAL;
+
+  const rows = [
+    { label_es: 'Inatención (1–9)',       label_en: 'Inattention (1–9)',        score: r.IN,    max: 9,  cut: 6 },
+    { label_es: 'Hipervact./Impuls. (10–18)', label_en: 'Hyperact./Imp. (10–18)',   score: r.HI,    max: 9,  cut: 6 },
+    { label_es: 'TND/Conducta (19–28)',   label_en: 'ODD/Conduct (19–28)',      score: r.ODDCD, max: 10, cut: 4 },
+    { label_es: 'Ansiedad/Dep. (29–35)', label_en: 'Anxiety/Dep. (29–35)',     score: r.ANX,   max: 7,  cut: 3 },
+  ];
+
+  let rowsHtml = rows.map(row => {
+    const flag = row.score >= row.cut;
+    return `<div class="subscale-row">
+      <span class="sub-label">${both ? tx(row.label_es, row.label_en) : (es ? row.label_es : row.label_en)}</span>
+      <span class="sub-score">${row.score}/${row.max}</span>
+      <span class="sub-flag ${flag ? 'flag-pos' : 'flag-neg'}">${flag ? (es || both ? '▲ Elevado' : '▲ Elevated') : '✓'}</span>
+    </div>`;
+  }).join('');
+
+  rowsHtml += `<div class="subscale-row">
+    <span class="sub-label">${tx('Desempeño (≥4): ítems 36–43', 'Performance (≥4): items 36–43')}</span>
+    <span class="sub-score">${r.PERF_HIGH}/8</span>
+    <span class="sub-flag ${r.PERF_HIGH >= 2 ? 'flag-pos' : 'flag-neg'}">${r.PERF_HIGH >= 2 ? (es || both ? '▲ Ver' : '▲ Review') : '✓'}</span>
+  </div>`;
+
+  document.getElementById('subscale-rows').innerHTML = rowsHtml;
+
+  let adhdHtml = '';
+  if (r.done < 18) {
+    adhdHtml = `<div class="adhd-result" style="opacity:0.5">${tx('Complete ítems 1–18 para evaluación de TDAH', 'Complete items 1–18 for ADHD assessment')}</div>`;
+  } else {
+    const subtype = adhdSubtype(r.adhd_pos_IN, r.adhd_pos_HI);
+    if (subtype) {
+      adhdHtml = `<div class="adhd-result adhd-pos">
+        ${tx('Criterios de TDAH cumplidos', 'ADHD criteria met')}<br>
+        <span style="font-weight:400">${tx(subtype.es, subtype.en)}</span>
+      </div>`;
+    } else {
+      adhdHtml = `<div class="adhd-result adhd-neg">${tx('Criterios de TDAH no cumplidos (ítems 1–18)', 'ADHD criteria not met (items 1–18)')}</div>`;
+    }
+  }
+  document.getElementById('adhd-result').innerHTML = adhdHtml;
+
+  const copyLines = [
+    'Vanderbilt — Maestro/a / Teacher',
+    '',
+    `Inatención: ${r.IN}/9 ${r.adhd_pos_IN ? '[ELEVADO]' : ''}`,
+    `Hipervact./Impuls.: ${r.HI}/9 ${r.adhd_pos_HI ? '[ELEVADO]' : ''}`,
+    `TND/Conducta: ${r.ODDCD}/10`,
+    `Ansiedad/Dep.: ${r.ANX}/7`,
+    `Desempeño (≥4): ${r.PERF_HIGH}/8`,
+    '',
+  ];
+  if (r.done >= 18) {
+    const subtype = adhdSubtype(r.adhd_pos_IN, r.adhd_pos_HI);
+    if (subtype) {
+      copyLines.push(`TDAH: Criterios cumplidos — ${subtype.es}`);
+    } else {
+      copyLines.push('TDAH: Criterios NO cumplidos');
+    }
+  }
+  copyLines.push(`Completado: ${r.done}/${TOTAL} ítems`);
+  document.getElementById('copy-text-content').textContent = copyLines.join('\n');
+}
+
+
+// ── Theme ──────────────────────────────────────────────────
+function applyTheme(t) {
+  document.documentElement.setAttribute('data-theme', t);
+  // theme in memory only
+  document.getElementById('theme-label').textContent = t === 'dark' ? '☀️' : '🌙';
+}
+document.getElementById('theme-btn').addEventListener('click', () => {
+  applyTheme(document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+});
+
+// ── Language ────────────────────────────────────────────────
+function applyLang(l) {
+  document.documentElement.setAttribute('data-lang', l);
+  const params = new URLSearchParams(location.search);
+  params.set('lang', l);
+  history.replaceState(null, '', '?' + params.toString());
+  ['btn-es','btn-en','btn-both'].forEach(id => {
+    document.getElementById(id).classList.toggle('active', id === 'btn-' + l);
+  });
+  renderScore();
+}
+document.getElementById('btn-es').addEventListener('click',   () => applyLang('es'));
+document.getElementById('btn-en').addEventListener('click',   () => applyLang('en'));
+document.getElementById('btn-both').addEventListener('click', () => applyLang('both'));
+
+// ── Answers & scroll ─────────────────────────────────────────
+document.querySelectorAll('.option-btn').forEach(btn => {
+  btn.addEventListener('click', function() {
+    const item = +this.dataset.item;
+    const val  = +this.dataset.val;
+    answers[item] = val;
+
+    // Deselect siblings
+    const rg = this.closest('.options-row');
+    rg.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+    this.classList.add('selected');
+    this.querySelector('input').checked = true;
+
+    // Mark question answered
+    const qblock = document.getElementById('q' + item);
+    if (qblock) qblock.classList.add('answered');
+
+    renderScore();
+
+    // Auto-scroll to next unanswered
+    const all = Array.from(document.querySelectorAll('.question-block'));
+    const next = all.find(b => !b.classList.contains('answered'));
+    if (next) {
+      setTimeout(() => next.scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
+    } else {
+      setTimeout(() => document.getElementById('score-panel').scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
+    }
+  });
+});
+
+// ── Reset ────────────────────────────────────────────────────
+document.getElementById('reset-btn').addEventListener('click', () => {
+  Object.keys(answers).forEach(k => delete answers[k]);
+  document.querySelectorAll('.option-btn').forEach(b => {
+    b.classList.remove('selected');
+    b.querySelector('input').checked = false;
+  });
+  document.querySelectorAll('.question-block').forEach(b => b.classList.remove('answered'));
+  renderScore();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+});
+
+// ── Copy ─────────────────────────────────────────────────────
+document.getElementById('copy-btn').addEventListener('click', () => {
+  const txt = document.getElementById('copy-text-content').textContent;
+  navigator.clipboard.writeText(txt).then(() => {
+    const btn = document.getElementById('copy-btn');
+    const lang = document.documentElement.getAttribute('data-lang') || 'es';
+    btn.textContent = lang === 'en' ? 'Copied!' : '¡Copiado!';
+    setTimeout(() => {
+      btn.innerHTML = lang === 'en' ? 'Copy' : 'Copiar';
+    }, 1500);
+  });
+});
+
+// ── Init ─────────────────────────────────────────────────────
+const savedTheme = 'dark';
+applyTheme(savedTheme);
+const urlLang = new URLSearchParams(location.search).get('lang') || 'es';
+applyLang(urlLang);
+renderScore();
+
+</script>
+</body>
+</html>
