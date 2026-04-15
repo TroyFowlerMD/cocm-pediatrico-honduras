@@ -2898,37 +2898,44 @@ function applyLang(l) {
 document.getElementById('btn-es').addEventListener('click',   () => applyLang('es'));
 document.getElementById('btn-en').addEventListener('click',   () => applyLang('en'));
 
-// ── Answers & scroll ─────────────────────────────────────────
-document.querySelectorAll('.option-btn').forEach(btn => {
-  btn.addEventListener('click', function() {
-    const item = +this.dataset.item;
-    const val  = +this.dataset.val;
-    answers[item] = val;
-
-    // Deselect siblings
-    const rg = this.closest('.options-row');
-    rg.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
-    this.classList.add('selected');
-    this.querySelector('input').checked = true;
-
-    // Mark question answered
-    const qblock = document.getElementById('q' + item);
-    if (qblock) qblock.classList.add('answered');
-
-    renderScore();
-
-    // Auto-scroll to next unanswered (only if not already visible)
-    const all = Array.from(document.querySelectorAll('.question-block'));
-    const next = all.find(b => !b.classList.contains('answered'));
-    const tbH = (document.querySelector('.topbar') || {getBoundingClientRect: () => ({height:50})}).getBoundingClientRect().height + 8;
-    function isVis(el) { if (!el) return false; var r = el.getBoundingClientRect(); return r.top < window.innerHeight && r.bottom > tbH; }
-    if (next) {
-      if (!isVis(next)) setTimeout(() => { var top = next.getBoundingClientRect().top + window.scrollY - tbH; window.scrollTo({top, behavior:'smooth'}); }, 80);
-    } else {
-      setTimeout(() => { var p = document.getElementById('score-panel'); if(p) { var top = p.getBoundingClientRect().top + window.scrollY - tbH; window.scrollTo({top, behavior:'smooth'}); }}, 80);
+    // ── Answers & scroll (section-aware) ────────────────────────────────────
+    function _tbH2() { var t = document.querySelector('.topbar'); return t ? t.getBoundingClientRect().height + 8 : 58; }
+    function _scrollToTopEl(el) {
+      if (!el) return;
+      var top = el.getBoundingClientRect().top + window.scrollY - _tbH2();
+      window.scrollTo({ top: top, behavior: 'smooth' });
     }
-  });
-});
+    document.querySelectorAll('.option-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const item = +this.dataset.item;
+        const val  = +this.dataset.val;
+        answers[item] = val;
+
+        // Deselect siblings
+        const rg = this.closest('.options-row');
+        rg.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+        this.classList.add('selected');
+        this.querySelector('input').checked = true;
+
+        // Mark question answered
+        const qblock = document.getElementById('q' + item);
+        if (qblock) qblock.classList.add('answered');
+
+        renderScore();
+
+        // Scroll: first unanswered question to top; if all answered, score-panel to top
+        setTimeout(function() {
+          var allBlocks = Array.from(document.querySelectorAll('.question-block'));
+          var nextBlock = allBlocks.find(function(b) { return !b.classList.contains('answered'); });
+          if (nextBlock) {
+            _scrollToTopEl(nextBlock);
+          } else {
+            var panel = document.getElementById('score-panel');
+            if (panel) _scrollToTopEl(panel);
+          }
+        }, 80);
+      });
+    });
 
 // ── Reset ────────────────────────────────────────────────────
 document.getElementById('reset-btn').addEventListener('click', () => {

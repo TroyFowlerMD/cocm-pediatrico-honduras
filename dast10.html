@@ -735,6 +735,10 @@ a, button, [role='button'], input, select {
 }
 
 .radio-score {
+  display: none; /* hidden — language-aware labels used instead */
+}
+
+.radio-label-es {
   font-size: var(--text-lg);
   font-weight: 700;
   color: var(--color-primary);
@@ -742,17 +746,13 @@ a, button, [role='button'], input, select {
   line-height: 1;
 }
 
-.radio-label-es {
-  font-size: var(--text-xs);
-  font-weight: 600;
-  color: var(--color-text);
-}
-
 .radio-label-en {
-  font-size: 0.65rem;
-  color: var(--color-text-muted);
-  font-style: italic;
-  display: none; /* shown only in EN or Bilingual mode */
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-primary);
+  font-family: var(--font-display);
+  line-height: 1;
+  display: none; /* shown only in EN mode via data-lang CSS rules */
 }
 
 /* Score panel — static at bottom, never sticky/floating */
@@ -1132,15 +1132,10 @@ a, button, [role='button'], input, select {
     padding: var(--space-1) 2px !important;
     min-height: 52px;
   }
-  .radio-score {
-    font-size: var(--text-base) !important;
-  }
   .radio-label-es,
   .radio-label-en {
-    font-size: 0.55rem !important;
+    font-size: 0.9rem !important;
     line-height: 1.1 !important;
-    word-break: break-word !important;
-    hyphens: auto !important;
   }
 }
 
@@ -1464,30 +1459,20 @@ function renderQuestions() {
 }
 
 // ===== SMART AUTO-SCROLL =====
-// ===== SMART AUTO-SCROLL =====
-// Rules:
-// 1. When an answer is selected, find the next UNANSWERED question.
-// 2. If that next question is already fully/partially visible → don't scroll (user can see it).
-// 3. If it's off-screen (below viewport) → scroll to it.
-// 4. On last question answered → scroll to score panel.
+// On each answer: scroll so the first unanswered question sits at the top of the screen.
+// On last answer: scroll score panel to top.
 var _answeredQNums = new Set();
 function _tbH() { var t = document.querySelector('.topbar'); return t ? t.getBoundingClientRect().height + 8 : 58; }
-function _isVisible(el) {
-  if (!el) return false;
-  var r = el.getBoundingClientRect();
-  var tbH = _tbH(), vh = window.innerHeight;
-  // Element top is within viewport (below topbar, above bottom)
-  return r.top < vh && r.bottom > tbH;
-}
-function _scrollTo(el) {
+function _scrollToTop(el) {
   if (!el) return;
-  window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - _tbH(), behavior: 'smooth' });
+  var top = el.getBoundingClientRect().top + window.scrollY - _tbH();
+  window.scrollTo({ top: top, behavior: 'smooth' });
 }
 function onAnswerSelected(qNum, idx) {
   _answeredQNums.add(qNum);
   updateScore();
   generateNote();
-  // Find next unanswered question
+  // Find first unanswered question
   var nextQ = null;
   for (var i = 0; i < QUESTIONS.length; i++) {
     if (!_answeredQNums.has(QUESTIONS[i].n)) {
@@ -1495,16 +1480,14 @@ function onAnswerSelected(qNum, idx) {
       break;
     }
   }
-  if (nextQ) {
-    // Only scroll if next question is not yet visible
-    if (!_isVisible(nextQ)) {
-      setTimeout(function() { _scrollTo(nextQ); }, 80);
+  setTimeout(function() {
+    if (nextQ) {
+      _scrollToTop(nextQ);
+    } else {
+      var panel = document.getElementById('scorePanel');
+      if (panel) _scrollToTop(panel);
     }
-  } else {
-    // All answered — scroll to score panel
-    var panel = document.getElementById('scorePanel');
-    if (panel) setTimeout(function() { _scrollTo(panel); }, 80);
-  }
+  }, 80);
 }
 
 function getScores() {

@@ -238,13 +238,20 @@
     }
 
     /* Monitor box */
-    .monitor-box {
+    /* Monitoring column alignment */
+[style*="grid-column:5"] {
+  align-items: stretch !important;
+}
+
+.monitor-box {
       display: flex; flex-direction: column; gap: 4px;
       padding: 8px 10px;
       border-radius: 8px;
       background: var(--teal-dim);
       border: 1px solid var(--teal-border);
-    }
+    
+  align-self: stretch;
+}
     .monitor-label {
       font-size: 10px; color: var(--muted); font-weight: 600;
       text-transform: uppercase; letter-spacing: .04em;
@@ -553,11 +560,8 @@
     <div style="grid-column:3; grid-row:2; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
       <div class="tool-box teal">
         <div><span class="age-badge"><span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span></span></div>
-        <a href="cap.html" class="tool-link"><span class="dot"></span>CAP Scale</a>
-        <span class="tool-sub"><span class="es">(prioridad para ≤11)</span><span class="en">(priority for ≤11)</span></span>
-        <a href="vanderbilt-parent.html" class="tool-link" style="margin-top:4px;"><span class="dot"></span>Vanderbilt-P</a>
+        <a href="vanderbilt-parent.html" class="tool-link"><span class="dot"></span>Vanderbilt-P</a>
         <a href="vanderbilt-teacher.html" class="tool-link"><span class="dot"></span>Vanderbilt-T</a>
-        <span class="tool-sub"><span class="es">(si CAP no es viable)</span><span class="en">(if CAP not viable)</span></span>
       </div>
       <div class="tool-box teal">
         <div><span class="age-badge"><span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span></span></div>
@@ -578,7 +582,8 @@
       <div class="monitor-box">
         <span class="monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span>
         <a href="cap.html" class="tool-link" style="font-size:11px;"><span class="dot"></span>CAP Scale</a>
-        <a href="vanderbilt-parent.html" class="tool-link" style="font-size:11px;"><span class="dot"></span>Vanderbilt</a>
+        <span class="tool-sub" style="font-size:10px;"><span class="es">(prioridad)</span><span class="en">(priority)</span></span>
+        <a href="vanderbilt-parent.html" class="tool-link" style="font-size:11px; margin-top:2px;"><span class="dot"></span>Vanderbilt</a>
         <span class="tool-sub"><span class="es">(si CAP no es viable)</span><span class="en">(if CAP not viable)</span></span>
       </div>
       <div class="monitor-box">
@@ -639,7 +644,6 @@
       <div class="tool-box teal">
         <div><span class="age-badge"><span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span></span></div>
         <a href="crafft.html" class="tool-link"><span class="dot"></span>CRAFFT</a>
-        <a href="dast10.html" class="tool-link"><span class="dot"></span>DAST-10</a>
       </div>
     </div>
     <div style="grid-column:4; grid-row:4; display:flex; align-items:center; justify-content:center; padding:4px;">

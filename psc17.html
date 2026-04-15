@@ -1485,30 +1485,20 @@ function renderQuestions() {
 
 // ===== ON ANSWER SELECTED — advance to next question =====
 // ===== SMART AUTO-SCROLL =====
-// ===== SMART AUTO-SCROLL =====
-// Rules:
-// 1. When an answer is selected, find the next UNANSWERED question.
-// 2. If that next question is already fully/partially visible → don't scroll (user can see it).
-// 3. If it's off-screen (below viewport) → scroll to it.
-// 4. On last question answered → scroll to score panel.
+// On each answer: scroll so the first unanswered question sits at the top of the screen.
+// On last answer: scroll score panel to top.
 var _answeredQNums = new Set();
 function _tbH() { var t = document.querySelector('.topbar'); return t ? t.getBoundingClientRect().height + 8 : 58; }
-function _isVisible(el) {
-  if (!el) return false;
-  var r = el.getBoundingClientRect();
-  var tbH = _tbH(), vh = window.innerHeight;
-  // Element top is within viewport (below topbar, above bottom)
-  return r.top < vh && r.bottom > tbH;
-}
-function _scrollTo(el) {
+function _scrollToTop(el) {
   if (!el) return;
-  window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - _tbH(), behavior: 'smooth' });
+  var top = el.getBoundingClientRect().top + window.scrollY - _tbH();
+  window.scrollTo({ top: top, behavior: 'smooth' });
 }
 function onAnswerSelected(qNum, idx) {
   _answeredQNums.add(qNum);
   updateScore();
   generateNote();
-  // Find next unanswered question
+  // Find first unanswered question
   var nextQ = null;
   for (var i = 0; i < QUESTIONS.length; i++) {
     if (!_answeredQNums.has(QUESTIONS[i].n)) {
@@ -1516,16 +1506,14 @@ function onAnswerSelected(qNum, idx) {
       break;
     }
   }
-  if (nextQ) {
-    // Only scroll if next question is not yet visible
-    if (!_isVisible(nextQ)) {
-      setTimeout(function() { _scrollTo(nextQ); }, 80);
+  setTimeout(function() {
+    if (nextQ) {
+      _scrollToTop(nextQ);
+    } else {
+      var panel = document.getElementById('scorePanel');
+      if (panel) _scrollToTop(panel);
     }
-  } else {
-    // All answered — scroll to score panel
-    var panel = document.getElementById('scorePanel');
-    if (panel) setTimeout(function() { _scrollTo(panel); }, 80);
-  }
+  }, 80);
 }
 
 // ===== SCORING =====

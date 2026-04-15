@@ -1542,31 +1542,25 @@ function renderPartB() {
 }
 
 var _crafftAnsweredIdxs = new Set();
-function _tbH() { var t=document.querySelector('.topbar'); return t?t.getBoundingClientRect().height:50; }
-function _scrollTo(el) { window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - _tbH(), behavior:'smooth'}); }
-function _hasUnansweredVisibleCrafft(total) {
-  var tbH=_tbH(), vh=window.innerHeight;
-  var qs = document.getElementById('partB-container').querySelectorAll('.question-section');
-  for (var i=0;i<qs.length;i++) {
-    if (_crafftAnsweredIdxs.has(i)) continue;
-    var r=qs[i].getBoundingClientRect();
-    if (r.top < vh && r.bottom > tbH) return true;
-  }
-  return false;
-}
+function _tbH() { var t=document.querySelector('.topbar'); return t?t.getBoundingClientRect().height+8:58; }
+function _scrollTo(el) { if(!el) return; window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - _tbH(), behavior:'smooth'}); }
 function onPartBSelected(qNum, idx, total) {
   _crafftAnsweredIdxs.add(idx);
   updateScore();
   generateNote();
-  if (_hasUnansweredVisibleCrafft(total)) return;
-  var nextIdx = idx + 1;
-  if (nextIdx < total) {
+  setTimeout(function() {
     var qs = document.getElementById('partB-container').querySelectorAll('.question-section');
-    if (qs[nextIdx]) _scrollTo(qs[nextIdx]);
-  } else {
-    var panel = document.getElementById('scorePanel');
-    if (panel) _scrollTo(panel);
-  }
+    var nextQ = null;
+    for (var i = 0; i < qs.length; i++) {
+      if (!_crafftAnsweredIdxs.has(i)) { nextQ = qs[i]; break; }
+    }
+    if (nextQ) {
+      _scrollTo(nextQ);
+    } else {
+      var panel = document.getElementById('scorePanel');
+      if (panel) _scrollTo(panel);
+    }
+  }, 80);
 }
 
 function getScores() {
