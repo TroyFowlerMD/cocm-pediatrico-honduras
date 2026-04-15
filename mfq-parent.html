@@ -1646,40 +1646,6 @@ function setLang(lang) {
   if (typeof generateNote === 'function') generateNote();
   if (typeof updateScore === 'function') updateScore();
   if (typeof setLangPartial === 'function') setLangPartial(lang);
-} else if (isEN) {
-      el.innerHTML = enHTML;
-    } else {
-      el.innerHTML = esHTML;
-    }
-  });
-
-  document.querySelectorAll('.question-text-es').forEach(el => {
-    el.style.display = (isES) ? 'block' : 'none';
-  });
-  document.querySelectorAll('.question-text-en').forEach(el => {
-    el.style.display = (isEN) ? 'block' : 'none';
-  });
-  document.querySelectorAll('.radio-label-es').forEach(el => {
-    el.style.display = (isES) ? 'block' : 'none';
-  });
-  document.querySelectorAll('.radio-label-en').forEach(el => {
-    el.style.display = (isEN) ? 'block' : 'none';
-  });
-
-  document.getElementById('btnES').classList.toggle('active', isES);
-  document.getElementById('btnEN').classList.toggle('active', isEN);
-
-  document.querySelectorAll('a[href]').forEach(function(a) {
-    var href = a.getAttribute('href');
-    if (!href || href.startsWith('#') || href.startsWith('http')) return;
-    href = href.replace(/([?&])lang=[^&]*/g, '').replace(/[?&]$/, '');
-    a.setAttribute('href', href + (href.indexOf('?') >= 0 ? '&' : '?') + 'lang=' + lang);
-  });
-
-  updateScore();
-  generateNote();
-}
-
 // ===== RESTORE LANG FROM URL =====
 (function() {
   var m = location.search.match(/[?&]lang=([^&]+)/);
