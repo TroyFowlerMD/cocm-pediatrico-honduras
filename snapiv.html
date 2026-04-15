@@ -693,12 +693,12 @@ a, button, [role='button'], input, select {
   display: flex;
   gap: var(--space-2);
   margin-top: var(--space-3);
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .radio-option {
   flex: 1;
-  min-width: 80px;
+  min-width: 0;
 }
 
 .radio-option input[type="radio"] {
@@ -1122,7 +1122,25 @@ a, button, [role='button'], input, select {
     grid-template-columns: 1fr;
   }
   .radio-group {
-    gap: var(--space-1);
+    gap: 3px;
+    flex-wrap: nowrap;
+  }
+  .radio-option {
+    min-width: 0;
+  }
+  .radio-option label {
+    padding: var(--space-1) 2px !important;
+    min-height: 52px;
+  }
+  .radio-score {
+    font-size: var(--text-base) !important;
+  }
+  .radio-label-es,
+  .radio-label-en {
+    font-size: 0.55rem !important;
+    line-height: 1.1 !important;
+    word-break: break-word !important;
+    hyphens: auto !important;
   }
 }
 
@@ -1465,7 +1483,7 @@ function renderQuestions() {
             ${[0,1,2,3].map(v => `
               <div class="radio-option">
                 <input type="radio" name="q${q.n}" id="q${q.n}_${v}" value="${v}"
-                  ${v===0?'checked':''}
+                  
                   onchange="onAnswerSelected(${q.n}, ${idx})">
                 <label for="q${q.n}_${v}">
                   <span class="radio-score">${v}</span>
@@ -1484,32 +1502,46 @@ function renderQuestions() {
 }
 
 // ===== SMART AUTO-SCROLL =====
-var _answeredIdxs = new Set();
-function _tbH() { var t=document.querySelector('.topbar'); return t?t.getBoundingClientRect().height:50; }
-function _scrollTo(el) { window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - _tbH(), behavior:'smooth'}); }
-function _hasUnansweredVisible() {
-  var tbH=_tbH(), vh=window.innerHeight;
-  for (var i=0;i<QUESTIONS.length;i++) {
-    if (_answeredIdxs.has(i)) continue;
-    var el=document.getElementById('qsec'+QUESTIONS[i].n);
-    if (!el) continue;
-    var r=el.getBoundingClientRect();
-    if (r.top < vh && r.bottom > tbH) return true;
-  }
-  return false;
+// ===== SMART AUTO-SCROLL =====
+// Rules:
+// 1. When an answer is selected, find the next UNANSWERED question.
+// 2. If that next question is already fully/partially visible → don't scroll (user can see it).
+// 3. If it's off-screen (below viewport) → scroll to it.
+// 4. On last question answered → scroll to score panel.
+var _answeredQNums = new Set();
+function _tbH() { var t = document.querySelector('.topbar'); return t ? t.getBoundingClientRect().height + 8 : 58; }
+function _isVisible(el) {
+  if (!el) return false;
+  var r = el.getBoundingClientRect();
+  var tbH = _tbH(), vh = window.innerHeight;
+  // Element top is within viewport (below topbar, above bottom)
+  return r.top < vh && r.bottom > tbH;
+}
+function _scrollTo(el) {
+  if (!el) return;
+  window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - _tbH(), behavior: 'smooth' });
 }
 function onAnswerSelected(qNum, idx) {
-  _answeredIdxs.add(idx);
+  _answeredQNums.add(qNum);
   updateScore();
   generateNote();
-  if (_hasUnansweredVisible()) return;
-  var nextIdx = idx + 1;
-  if (nextIdx < QUESTIONS.length) {
-    var nextEl = document.getElementById('qsec' + QUESTIONS[nextIdx].n);
-    if (nextEl) _scrollTo(nextEl);
+  // Find next unanswered question
+  var nextQ = null;
+  for (var i = 0; i < QUESTIONS.length; i++) {
+    if (!_answeredQNums.has(QUESTIONS[i].n)) {
+      nextQ = document.getElementById('qsec' + QUESTIONS[i].n);
+      break;
+    }
+  }
+  if (nextQ) {
+    // Only scroll if next question is not yet visible
+    if (!_isVisible(nextQ)) {
+      setTimeout(function() { _scrollTo(nextQ); }, 80);
+    }
   } else {
+    // All answered — scroll to score panel
     var panel = document.getElementById('scorePanel');
-    if (panel) _scrollTo(panel);
+    if (panel) setTimeout(function() { _scrollTo(panel); }, 80);
   }
 }
 
@@ -1610,10 +1642,11 @@ function copyNote() {
 }
 
 function resetForm() {
+  // Clear all radio selections
   QUESTIONS.forEach(q => {
-    const first = document.getElementById(`q${q.n}_0`);
-    if (first) first.checked = true;
+    document.querySelectorAll(`input[name="q${q.n}"]`).forEach(r => r.checked = false);
   });
+  _answeredQNums.clear();
   updateScore();
   generateNote();
   window.scrollTo({ top: 0, behavior: 'smooth' });

@@ -693,12 +693,12 @@ a, button, [role='button'], input, select {
   display: flex;
   gap: var(--space-2);
   margin-top: var(--space-3);
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
 }
 
 .radio-option {
   flex: 1;
-  min-width: 80px;
+  min-width: 0;
 }
 
 .radio-option input[type="radio"] {
@@ -1122,7 +1122,25 @@ a, button, [role='button'], input, select {
     grid-template-columns: 1fr;
   }
   .radio-group {
-    gap: var(--space-1);
+    gap: 3px;
+    flex-wrap: nowrap;
+  }
+  .radio-option {
+    min-width: 0;
+  }
+  .radio-option label {
+    padding: var(--space-1) 2px !important;
+    min-height: 52px;
+  }
+  .radio-score {
+    font-size: var(--text-base) !important;
+  }
+  .radio-label-es,
+  .radio-label-en {
+    font-size: 0.55rem !important;
+    line-height: 1.1 !important;
+    word-break: break-word !important;
+    hyphens: auto !important;
   }
 }
 

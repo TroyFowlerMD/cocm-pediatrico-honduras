@@ -378,8 +378,7 @@
 <div class="scroll-wrap flow-diagram">
 
   <!-- ═══════════════ COLUMN HEADERS ═══════════════ -->
-  <div style="display:grid; grid-template-columns:160px 110px 100px 170px 80px 150px; min-width:780px; padding:0 0 6px; column-gap:0;">
-    <div class="col-header"></div>
+  <div style="display:grid; grid-template-columns:160px 110px 270px 80px 150px; min-width:780px; padding:0 0 6px; column-gap:0;">
     <div class="col-header"></div>
     <div class="col-header"></div>
     <div class="col-header accent">
@@ -481,38 +480,51 @@
 
   <!-- ═══════════════ CONDITION ROWS ═══════════════ -->
 
-  <div style="display:grid; grid-template-columns:160px 110px 100px 170px 80px 150px; min-width:780px; row-gap:10px; column-gap:0; align-items:start; margin-top:4px;">
+  <!-- Age badge style -->
+  <style>
+  .age-badge {
+    display: inline-block;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--teal);
+    background: rgba(45,212,191,0.10);
+    border: 1px solid rgba(45,212,191,0.25);
+    border-radius: 4px;
+    padding: 1px 5px;
+    margin-bottom: 5px;
+    white-space: nowrap;
+  }
+  </style>
+
+  <div style="display:grid; grid-template-columns:160px 110px 270px 80px 150px; min-width:780px; row-gap:10px; column-gap:0; align-items:start; margin-top:4px;">
+
+    <!-- spacer col 1 rows 1-5 -->
+    <div style="grid-column:1; grid-row:1/6;"></div>
 
     <!-- ─── DEPRESSION ─── -->
-    <!-- Condition label -->
     <div style="grid-column:2; grid-row:1; padding:4px 6px; display:flex; align-items:center; justify-content:center;">
       <div class="cond-label" style="width:100%;">
         <span class="es">Depresión</span>
         <span class="en">Depression</span>
       </div>
     </div>
-    <!-- Age diamond -->
-    <div style="grid-column:3; grid-row:1; display:flex; flex-direction:column; align-items:center; gap:6px; padding:4px;">
-      <div style="font-size:10px; color:var(--teal); font-weight:700; text-align:center;">
-        <span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span>
-      </div>
-      <div style="font-size:10px; color:var(--teal); font-weight:700; text-align:center; margin-top:30px;">
-        <span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span>
-      </div>
-    </div>
-    <!-- Tools -->
-    <div style="grid-column:4; grid-row:1; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+    <!-- Tools (col 3, merged) -->
+    <div style="grid-column:3; grid-row:1; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
       <div class="tool-box teal">
+        <div><span class="age-badge"><span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span></span></div>
         <a href="mfq.html" class="tool-link"><span class="dot"></span>MFQ-C</a>
         <a href="mfq-parent.html" class="tool-link"><span class="dot"></span>MFQ-P</a>
         <span class="tool-sub"><span class="es">Estado de breve</span><span class="en">Brief mood screen</span></span>
       </div>
       <div class="tool-box teal">
+        <div><span class="age-badge"><span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span></span></div>
         <a href="phqa.html" class="tool-link"><span class="dot"></span>PHQ-A (PHQ-9)</a>
       </div>
     </div>
     <!-- Monitor question -->
-    <div style="grid-column:5; grid-row:1; display:flex; align-items:center; justify-content:center; padding:4px;">
+    <div style="grid-column:4; grid-row:1; display:flex; align-items:center; justify-content:center; padding:4px;">
       <div class="diamond-sm">
         <div class="diamond-sm-inner">
           <span class="es">¿Qué herramienta monitorear?</span>
@@ -521,7 +533,7 @@
       </div>
     </div>
     <!-- Monitor tools -->
-    <div style="grid-column:6; grid-row:1; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+    <div style="grid-column:5; grid-row:1; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
       <div class="monitor-box">
         <span class="monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span>
         <span class="tool-sub" style="font-size:11px; font-weight:600; color:var(--teal);">
@@ -530,48 +542,31 @@
       </div>
       <div class="monitor-box">
         <span class="monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span>
-        <a href="phqa.html" class="tool-link" style="font-size:11px;">
-          <span class="dot"></span>PHQ-A (PHQ-9)
-        </a>
+        <a href="phqa.html" class="tool-link" style="font-size:11px;"><span class="dot"></span>PHQ-A (PHQ-9)</a>
       </div>
     </div>
-
-    <!-- spacer col 1 rows 1-5 — the left-column entry flow -->
-    <div style="grid-column:1; grid-row:1/6;"></div>
 
     <!-- ─── TDAH ─── -->
     <div style="grid-column:2; grid-row:2; padding:4px 6px; display:flex; align-items:center; justify-content:center;">
       <div class="cond-label" style="width:100%;">TDAH</div>
     </div>
-    <div style="grid-column:3; grid-row:2; display:flex; flex-direction:column; align-items:center; gap:6px; padding:4px;">
-      <div style="font-size:10px; color:var(--teal); font-weight:700; text-align:center;">
-        <span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span>
-      </div>
-      <div style="font-size:10px; color:var(--teal); font-weight:700; text-align:center; margin-top:40px;">
-        <span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span>
-      </div>
-    </div>
-    <div style="grid-column:4; grid-row:2; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
-      <!-- Youth tools -->
+    <div style="grid-column:3; grid-row:2; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
       <div class="tool-box teal">
+        <div><span class="age-badge"><span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span></span></div>
         <a href="cap.html" class="tool-link"><span class="dot"></span>CAP Scale</a>
-        <span class="tool-sub">
-          <span class="es">(prioridad para ≤11)</span><span class="en">(priority for ≤11)</span>
-        </span>
+        <span class="tool-sub"><span class="es">(prioridad para ≤11)</span><span class="en">(priority for ≤11)</span></span>
         <a href="vanderbilt-parent.html" class="tool-link" style="margin-top:4px;"><span class="dot"></span>Vanderbilt-P</a>
         <a href="vanderbilt-teacher.html" class="tool-link"><span class="dot"></span>Vanderbilt-T</a>
-        <span class="tool-sub">
-          <span class="es">(si CAP no es viable)</span><span class="en">(if CAP not viable)</span>
-        </span>
+        <span class="tool-sub"><span class="es">(si CAP no es viable)</span><span class="en">(if CAP not viable)</span></span>
       </div>
-      <!-- Adolescent tools -->
       <div class="tool-box teal">
+        <div><span class="age-badge"><span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span></span></div>
         <a href="snapiv.html" class="tool-link"><span class="dot"></span>SNAP-IV</a>
         <span style="font-size:11px; color:var(--muted);">+</span>
         <a href="asrs.html" class="tool-link"><span class="dot"></span>ASRS-5</a>
       </div>
     </div>
-    <div style="grid-column:5; grid-row:2; display:flex; align-items:center; justify-content:center; padding:4px;">
+    <div style="grid-column:4; grid-row:2; display:flex; align-items:center; justify-content:center; padding:4px;">
       <div class="diamond-sm">
         <div class="diamond-sm-inner">
           <span class="es">¿Qué herramienta monitorear?</span>
@@ -579,7 +574,7 @@
         </div>
       </div>
     </div>
-    <div style="grid-column:6; grid-row:2; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+    <div style="grid-column:5; grid-row:2; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
       <div class="monitor-box">
         <span class="monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span>
         <a href="cap.html" class="tool-link" style="font-size:11px;"><span class="dot"></span>CAP Scale</a>
@@ -600,24 +595,18 @@
         <span class="es">Ansiedad</span><span class="en">Anxiety</span>
       </div>
     </div>
-    <div style="grid-column:3; grid-row:3; display:flex; flex-direction:column; align-items:center; gap:6px; padding:4px;">
-      <div style="font-size:10px; color:var(--teal); font-weight:700; text-align:center;">
-        <span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span>
-      </div>
-      <div style="font-size:10px; color:var(--teal); font-weight:700; text-align:center; margin-top:22px;">
-        <span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span>
-      </div>
-    </div>
-    <div style="grid-column:4; grid-row:3; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+    <div style="grid-column:3; grid-row:3; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
       <div class="tool-box teal">
+        <div><span class="age-badge"><span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span></span></div>
         <a href="scared.html" class="tool-link"><span class="dot"></span>SCARED-N</a>
         <a href="scared-parent.html" class="tool-link"><span class="dot"></span>SCARED-P</a>
       </div>
       <div class="tool-box teal">
+        <div><span class="age-badge"><span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span></span></div>
         <a href="gad7.html" class="tool-link"><span class="dot"></span>GAD-7</a>
       </div>
     </div>
-    <div style="grid-column:5; grid-row:3; display:flex; align-items:center; justify-content:center; padding:4px;">
+    <div style="grid-column:4; grid-row:3; display:flex; align-items:center; justify-content:center; padding:4px;">
       <div class="diamond-sm">
         <div class="diamond-sm-inner">
           <span class="es">¿Qué herramienta monitorear?</span>
@@ -625,7 +614,7 @@
         </div>
       </div>
     </div>
-    <div style="grid-column:6; grid-row:3; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+    <div style="grid-column:5; grid-row:3; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
       <div class="monitor-box">
         <span class="monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span>
         <a href="scared.html" class="tool-link" style="font-size:11px;"><span class="dot"></span>SCARED</a>
@@ -642,26 +631,18 @@
         <span class="es">Riesgo / SUD</span><span class="en">Risk / SUD</span>
       </div>
     </div>
-    <div style="grid-column:3; grid-row:4; display:flex; flex-direction:column; align-items:center; gap:6px; padding:4px;">
-      <div style="font-size:10px; color:var(--teal); font-weight:700; text-align:center;">
-        <span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span>
-      </div>
-      <div style="font-size:10px; color:var(--teal); font-weight:700; text-align:center; margin-top:22px;">
-        <span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span>
-      </div>
-    </div>
-    <div style="grid-column:4; grid-row:4; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+    <div style="grid-column:3; grid-row:4; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
       <div class="tool-box" style="background:var(--surface-2); border:1px dashed var(--border); align-items:center; justify-content:center;">
-        <span style="font-size:11px; color:var(--faint);">
-          <span class="es">— Ninguno —</span><span class="en">— None —</span>
-        </span>
+        <div><span class="age-badge" style="opacity:0.5;"><span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span></span></div>
+        <span style="font-size:11px; color:var(--faint);"><span class="es">— Ninguno —</span><span class="en">— None —</span></span>
       </div>
       <div class="tool-box teal">
+        <div><span class="age-badge"><span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span></span></div>
         <a href="crafft.html" class="tool-link"><span class="dot"></span>CRAFFT</a>
         <a href="dast10.html" class="tool-link"><span class="dot"></span>DAST-10</a>
       </div>
     </div>
-    <div style="grid-column:5; grid-row:4; display:flex; align-items:center; justify-content:center; padding:4px;">
+    <div style="grid-column:4; grid-row:4; display:flex; align-items:center; justify-content:center; padding:4px;">
       <div class="diamond-sm">
         <div class="diamond-sm-inner">
           <span class="es">¿Qué herramienta monitorear?</span>
@@ -669,11 +650,9 @@
         </div>
       </div>
     </div>
-    <div style="grid-column:6; grid-row:4; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+    <div style="grid-column:5; grid-row:4; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
       <div style="background:var(--surface-2); border:1px dashed var(--border); border-radius:8px; padding:8px 10px; display:flex; align-items:center; justify-content:center;">
-        <span style="font-size:10px; color:var(--faint);">
-          <span class="es">— Ninguno —</span><span class="en">— None —</span>
-        </span>
+        <span style="font-size:10px; color:var(--faint);"><span class="es">— Ninguno —</span><span class="en">— None —</span></span>
       </div>
       <div class="monitor-box">
         <span class="monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span>

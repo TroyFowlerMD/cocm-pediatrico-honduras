@@ -1364,6 +1364,75 @@ a, button, [role='button'], input, select {
   .option-btn .es-label { font-size: 0.5rem; }
 }
 
+
+/* ── Question card styling (CRAFFT-style) ── */
+.question-block {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-4) var(--space-5);
+  margin-bottom: var(--space-2);
+  transition: border-color 0.15s;
+}
+.question-block.answered {
+  border-color: var(--color-primary);
+  background: var(--color-surface);
+}
+
+/* Question header: number badge + text in a row */
+.question-header {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  margin-bottom: var(--space-3);
+}
+.question-header .question-number {
+  width: 28px;
+  height: 28px;
+  background: var(--color-surface-offset);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.question-header .question-text {
+  flex: 1;
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--color-text);
+  line-height: 1.4;
+}
+
+/* Section divider header */
+.subscale-header {
+  font-size: var(--text-xs);
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  color: var(--color-primary);
+  background: var(--color-primary-bg);
+  border: 1px solid rgba(45,212,191,0.2);
+  border-radius: var(--radius-lg);
+  padding: var(--space-2) var(--space-4);
+  margin: var(--space-5) 0 var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.subscale-header::before {
+  content: '';
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  flex-shrink: 0;
+}
 </style>
   
 </head>
@@ -2848,13 +2917,15 @@ document.querySelectorAll('.option-btn').forEach(btn => {
 
     renderScore();
 
-    // Auto-scroll to next unanswered
+    // Auto-scroll to next unanswered (only if not already visible)
     const all = Array.from(document.querySelectorAll('.question-block'));
     const next = all.find(b => !b.classList.contains('answered'));
+    const tbH = (document.querySelector('.topbar') || {getBoundingClientRect: () => ({height:50})}).getBoundingClientRect().height + 8;
+    function isVis(el) { if (!el) return false; var r = el.getBoundingClientRect(); return r.top < window.innerHeight && r.bottom > tbH; }
     if (next) {
-      setTimeout(() => next.scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
+      if (!isVis(next)) setTimeout(() => { var top = next.getBoundingClientRect().top + window.scrollY - tbH; window.scrollTo({top, behavior:'smooth'}); }, 80);
     } else {
-      setTimeout(() => document.getElementById('score-panel').scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
+      setTimeout(() => { var p = document.getElementById('score-panel'); if(p) { var top = p.getBoundingClientRect().top + window.scrollY - tbH; window.scrollTo({top, behavior:'smooth'}); }}, 80);
     }
   });
 });
