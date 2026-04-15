@@ -1186,7 +1186,18 @@ a, button, [role='button'], input, select {
 .no-sidebar .sidebar {
   display: none !important;
 }
-  </style>
+  
+
+/* CSS-driven language visibility (belt-and-suspenders with JS) */
+[data-lang='en'] .question-text-en,
+[data-lang='en'] .radio-label-en { display: block !important; }
+[data-lang='en'] .question-text-es,
+[data-lang='en'] .radio-label-es { display: none !important; }
+[data-lang='es'] .question-text-es,
+[data-lang='es'] .radio-label-es { display: block !important; }
+[data-lang='es'] .question-text-en,
+[data-lang='es'] .radio-label-en { display: none !important; }
+</style>
 </head>
 <body class="no-sidebar">
 <div class="app-layout">

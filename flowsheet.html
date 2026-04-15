@@ -302,9 +302,15 @@
 
     /* ── Responsive table fallback (small screens) ── */
     .table-fallback { display: none; }
+    .rotate-hint-mobile { display: none; }
+    .rotate-hint-desktop { display: none; }
     @media (max-width: 600px) {
       .flow-diagram { display: none; }
       .table-fallback { display: block; }
+      .rotate-hint-mobile { display: block; }
+    }
+    @media (min-width: 601px) {
+      .rotate-hint-desktop { display: block; }
     }
 
     /* Language */
@@ -679,32 +685,136 @@
 
   <!-- ─── Siglas / Legend ─── -->
   <div style="margin:24px 0 0; padding:14px 16px; background:var(--surface); border:1px solid var(--border); border-radius:10px; min-width:780px;">
-    <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:10px;">
+    <div style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:12px;">
       <span class="es">Siglas</span><span class="en">Abbreviations</span>
     </div>
-    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:4px 16px; font-size:11px; color:var(--muted); line-height:1.6;">
-      <div><b style="color:var(--text)">PSC</b> — <span class="es">Lista de Verificación de Síntomas Pediátricos</span><span class="en">Pediatric Symptom Checklist</span></div>
-      <div><b style="color:var(--text)">PHQ-A</b> — <span class="es">Cuestionario de Salud del Paciente (Adolescente)</span><span class="en">Patient Health Questionnaire (Adolescent)</span></div>
-      <div><b style="color:var(--text)">MFQ</b> — <span class="es">Cuestionario de Estado de Ánimo y Sentimientos</span><span class="en">Mood and Feelings Questionnaire</span></div>
-      <div><b style="color:var(--text)">CAP</b> — <span class="es">Escala de Problemas de Atención Clínica</span><span class="en">Child Attention Problems Scale</span></div>
-      <div><b style="color:var(--text)">SNAP-IV</b> — Swanson, Nolan and Pelham</div>
-      <div><b style="color:var(--text)">ASRS</b> — <span class="es">Escala de Autoinforme de TDAH en Adultos</span><span class="en">Adult ADHD Self-Report Scale</span></div>
-      <div><b style="color:var(--text)">SCARED</b> — <span class="es">Prueba de Detección de Trastornos de Ansiedad Infantil</span><span class="en">Screen for Child Anxiety Related Emotional Disorders</span></div>
-      <div><b style="color:var(--text)">GAD-7</b> — <span class="es">Trastorno de Ansiedad Generalizada</span><span class="en">Generalized Anxiety Disorder</span></div>
-      <div><b style="color:var(--text)">CRAFFT</b> — Car, Relax, Alone, Forget, Friends, Trouble</div>
-      <div><b style="color:var(--text)">DAST-10</b> — <span class="es">Prueba de Detección del Abuso de Drogas</span><span class="en">Drug Abuse Screening Test</span></div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(260px, 1fr)); gap:8px 20px; font-size:11px; color:var(--muted); line-height:1.5;">
+
+      <!-- PSC-17 -->
+      <div>
+        <a href="psc17.html" style="color:var(--teal); font-weight:700; text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">PSC-17</a>
+        <span style="color:var(--muted);"> — </span>
+        <span class="es">Tamizaje universal de salud mental conductual. 17 ítems. Edades 4–17.</span>
+        <span class="en">Universal behavioral health screening. 17 items. Ages 4–17.</span>
+      </div>
+
+      <!-- MFQ -->
+      <div>
+        <a href="mfq.html" style="color:var(--teal); font-weight:700; text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">MFQ-C</a>
+        <span style="color:var(--muted);"> / </span>
+        <a href="mfq-parent.html" style="color:var(--teal); font-weight:700; text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">MFQ-P</a>
+        <span style="color:var(--muted);"> — </span>
+        <span class="es">Cribado de depresión. Versión niño/a (MFQ-C, 8–17) y padres (MFQ-P, 6–17).</span>
+        <span class="en">Depression screening. Child version (MFQ-C, 8–17) and parent version (MFQ-P, 6–17).</span>
+      </div>
+
+      <!-- PHQ-A -->
+      <div>
+        <a href="phqa.html" style="color:var(--teal); font-weight:700; text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">PHQ-A</a>
+        <span style="color:var(--muted);"> — </span>
+        <span class="es">Cribado de depresión, escala 0–27. Edades 12–17.</span>
+        <span class="en">Depression screening, 0–27 severity scale. Ages 12–17.</span>
+      </div>
+
+      <!-- CAP -->
+      <div>
+        <a href="cap.html" style="color:var(--teal); font-weight:700; text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">CAP</a>
+        <span style="color:var(--muted);"> — </span>
+        <span class="es">Inatención y sobreactividad. 12 ítems, maestro/a. Edades 6–13.</span>
+        <span class="en">Inattention and overactivity. 12 items, teacher-rated. Ages 6–13.</span>
+      </div>
+
+      <!-- Vanderbilt -->
+      <div>
+        <a href="vanderbilt-parent.html" style="color:var(--teal); font-weight:700; text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">Vand-P</a>
+        <span style="color:var(--muted);"> / </span>
+        <a href="vanderbilt-teacher.html" style="color:var(--teal); font-weight:700; text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">Vand-T</a>
+        <span style="color:var(--muted);"> — </span>
+        <span class="es">TDAH, TND, conducta, ansiedad/depresión. Padres (55 ítems) y maestros (43 ítems). Edades 6–12.</span>
+        <span class="en">ADHD, ODD, conduct, anxiety/depression. Parent (55 items) and teacher (43 items). Ages 6–12.</span>
+      </div>
+
+      <!-- SNAP-IV -->
+      <div>
+        <a href="snapiv.html" style="color:var(--teal); font-weight:700; text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">SNAP-IV</a>
+        <span style="color:var(--muted);"> — </span>
+        <span class="es">TDAH, inatención, hiperactividad y TND. 26 ítems. Edades 6–18.</span>
+        <span class="en">ADHD, inattention, hyperactivity, and ODD. 26 items. Ages 6–18.</span>
+      </div>
+
+      <!-- ASRS-5 -->
+      <div>
+        <a href="asrs.html" style="color:var(--teal); font-weight:700; text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">ASRS-5</a>
+        <span style="color:var(--muted);"> — </span>
+        <span class="es">Tamizaje de TDAH. 6 ítems, corte ≥14. Adultos ≥18 años.</span>
+        <span class="en">ADHD screener. 6 items, cutoff ≥14. Adults ≥18 years.</span>
+      </div>
+
+      <!-- SCARED -->
+      <div>
+        <a href="scared.html" style="color:var(--teal); font-weight:700; text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">SCARED-N</a>
+        <span style="color:var(--muted);"> / </span>
+        <a href="scared-parent.html" style="color:var(--teal); font-weight:700; text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">SCARED-P</a>
+        <span style="color:var(--muted);"> — </span>
+        <span class="es">Cribado de ansiedad. 5 subescalas. Versión niño/a y padres. Edades 8–17.</span>
+        <span class="en">Anxiety screening. 5 subscales. Child and parent versions. Ages 8–17.</span>
+      </div>
+
+      <!-- GAD-7 -->
+      <div>
+        <a href="gad7.html" style="color:var(--teal); font-weight:700; text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">GAD-7</a>
+        <span style="color:var(--muted);"> — </span>
+        <span class="es">Cribado de ansiedad. 7 ítems, escala 0–21. Edades 12+.</span>
+        <span class="en">Anxiety screening. 7 items, 0–21 severity scale. Ages 12+.</span>
+      </div>
+
+      <!-- CRAFFT -->
+      <div>
+        <a href="crafft.html" style="color:var(--teal); font-weight:700; text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">CRAFFT</a>
+        <span style="color:var(--muted);"> — </span>
+        <span class="es">Cribado de uso de sustancias. Edades 12–21.</span>
+        <span class="en">Substance use screening. Ages 12–21.</span>
+      </div>
+
+      <!-- DAST-10 -->
+      <div>
+        <a href="dast10.html" style="color:var(--teal); font-weight:700; text-decoration:none;" onmouseover="this.style.textDecoration='underline'" onmouseout="this.style.textDecoration='none'">DAST-10</a>
+        <span style="color:var(--muted);"> — </span>
+        <span class="es">Cribado de uso problemático de drogas. 10 ítems. Edades 15+.</span>
+        <span class="en">Screening for problematic drug use. 10 items. Ages 15+.</span>
+      </div>
+
     </div>
   </div>
 
 </div><!-- /scroll-wrap -->
 
-<!-- Mobile fallback table -->
-<div class="table-fallback" style="padding:16px;">
-  <p style="font-size:12px; color:var(--muted); margin-bottom:12px;">
-    <span class="es">Gira el dispositivo horizontalmente para ver el flujo completo.</span>
-    <span class="en">Rotate device horizontally to view full flowchart.</span>
-  </p>
+<!-- Mobile fallback + desktop hint -->
+
+<!-- Mobile-only: prominent teal box with emoji -->
+<div class="rotate-hint-mobile" style="padding:16px;">
+  <div style="background:var(--teal); color:#fff; border-radius:12px; padding:18px 20px; display:flex; align-items:flex-start; gap:14px; margin-bottom:16px; box-shadow:0 4px 16px rgba(0,0,0,0.3);">
+    <span style="font-size:32px; line-height:1; flex-shrink:0;">&#128241;</span>
+    <div>
+      <div style="font-size:16px; font-weight:800; margin-bottom:4px;">
+        <span class="es">Gira el dispositivo</span>
+        <span class="en">Rotate your device</span>
+      </div>
+      <div style="font-size:14px; font-weight:500; opacity:0.92;">
+        <span class="es">Rota el celular horizontalmente para ver el diagrama de flujo completo.</span>
+        <span class="en">Rotate your phone horizontally to view the full flowchart.</span>
+      </div>
+    </div>
+  </div>
   <a href="index.html" style="color:var(--teal); font-size:13px;">← Dashboard</a>
+</div>
+
+<!-- Desktop/tablet: softer inline hint (shown when diagram may be cut off) -->
+<div class="rotate-hint-desktop" style="padding:4px 16px 12px;">
+  <p style="font-size:12px; color:var(--muted); margin:0;">
+    <span class="es">&#128241; Gira el dispositivo <b>móvil</b> horizontalmente para ver el flujo completo.</span>
+    <span class="en">&#128241; Rotate your <b>Mobile</b> device horizontally to view the full flowchart.</span>
+  </p>
 </div>
 
 <script>
@@ -722,6 +832,14 @@ function applyLang(l) {
   history.replaceState(null, '', '?' + p.toString());
   ['btn-es', 'btn-en'].forEach(id => {
     document.getElementById(id).classList.toggle('active', id === 'btn-' + l);
+  });
+  // Update all internal links (back links + abbreviation links) to carry lang param
+  document.querySelectorAll('a[href]').forEach(a => {
+    const href = a.getAttribute('href');
+    if (href && !href.startsWith('http') && !href.startsWith('#') && !href.startsWith('mailto')) {
+      const base = href.split('?')[0];
+      a.href = base + '?lang=' + l;
+    }
   });
 }
 document.getElementById('btn-es').addEventListener('click', () => applyLang('es'));

@@ -1226,6 +1226,17 @@ a, button, [role='button'], input, select {
   border-color: var(--color-primary) !important;
   background: var(--color-primary-bg) !important;
 }
+
+
+/* CSS-driven language visibility (belt-and-suspenders with JS) */
+[data-lang='en'] .question-text-en,
+[data-lang='en'] .radio-label-en { display: block !important; }
+[data-lang='en'] .question-text-es,
+[data-lang='en'] .radio-label-es { display: none !important; }
+[data-lang='es'] .question-text-es,
+[data-lang='es'] .radio-label-es { display: block !important; }
+[data-lang='es'] .question-text-en,
+[data-lang='es'] .radio-label-en { display: none !important; }
 </style>
 </head>
 <body>
