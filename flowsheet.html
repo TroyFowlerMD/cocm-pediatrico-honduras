@@ -548,11 +548,9 @@
     <div style="grid-column:4; grid-row:2; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
       <!-- Youth tools -->
       <div class="tool-box teal">
-        <div class="tool-soon"><span class="dot"></span>
-          <span class="es">CAP Scale (Prioridad)</span><span class="en">CAP Scale (Priority)</span>
-        </div>
-        <span class="tool-sub" style="color:var(--soon);">
-          <span class="es">Próximamente</span><span class="en">Coming soon</span>
+        <a href="cap.html" class="tool-link"><span class="dot"></span>CAP Scale</a>
+        <span class="tool-sub">
+          <span class="es">(prioridad para ≤11)</span><span class="en">(priority for ≤11)</span>
         </span>
         <a href="vanderbilt-parent.html" class="tool-link" style="margin-top:4px;"><span class="dot"></span>Vanderbilt-P</a>
         <a href="vanderbilt-teacher.html" class="tool-link"><span class="dot"></span>Vanderbilt-T</a>
@@ -564,11 +562,7 @@
       <div class="tool-box teal">
         <a href="snapiv.html" class="tool-link"><span class="dot"></span>SNAP-IV</a>
         <span style="font-size:11px; color:var(--muted);">+</span>
-        <div class="tool-soon"><span class="dot"></span>ASRS
-          <span class="tool-sub" style="color:var(--soon); margin-left:4px;">
-            <span class="es">(autoinformes — próx.)</span><span class="en">(self-report — soon)</span>
-          </span>
-        </div>
+        <a href="asrs.html" class="tool-link"><span class="dot"></span>ASRS-5</a>
       </div>
     </div>
     <div style="grid-column:5; grid-row:2; display:flex; align-items:center; justify-content:center; padding:4px;">
@@ -582,9 +576,7 @@
     <div style="grid-column:6; grid-row:2; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
       <div class="monitor-box">
         <span class="monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span>
-        <span class="tool-sub" style="font-size:11px; font-weight:600; color:var(--teal);">
-          <span class="es">CAP Scale (Prioridad)</span><span class="en">CAP Scale (Priority)</span>
-        </span>
+        <a href="cap.html" class="tool-link" style="font-size:11px;"><span class="dot"></span>CAP Scale</a>
         <a href="vanderbilt-parent.html" class="tool-link" style="font-size:11px;"><span class="dot"></span>Vanderbilt</a>
         <span class="tool-sub"><span class="es">(si CAP no es viable)</span><span class="en">(if CAP not viable)</span></span>
       </div>
@@ -592,7 +584,7 @@
         <span class="monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span>
         <a href="snapiv.html" class="tool-link" style="font-size:11px;"><span class="dot"></span>SNAP-IV</a>
         <span style="font-size:11px; color:var(--muted);">+</span>
-        <span class="tool-sub" style="font-size:11px; font-weight:600; color:var(--soon);">ASRS</span>
+        <a href="asrs.html" class="tool-link" style="font-size:11px;"><span class="dot"></span>ASRS-5</a>
       </div>
     </div>
 
@@ -728,11 +720,12 @@ function applyLang(l) {
   const p = new URLSearchParams(location.search);
   p.set('lang', l);
   history.replaceState(null, '', '?' + p.toString());
-    document.getElementById(id).classList.toggle('active', id === 'btn-' + l)
-  );
+  ['btn-es', 'btn-en'].forEach(id => {
+    document.getElementById(id).classList.toggle('active', id === 'btn-' + l);
+  });
 }
-document.getElementById('btn-es').addEventListener('click',   () => applyLang('es'));
-document.getElementById('btn-en').addEventListener('click',   () => applyLang('en'));
+document.getElementById('btn-es').addEventListener('click', () => applyLang('es'));
+document.getElementById('btn-en').addEventListener('click', () => applyLang('en'));
 applyTheme('dark');
 applyLang(new URLSearchParams(location.search).get('lang') || 'es');
 </script>
