@@ -1185,8 +1185,9 @@ a, button, [role='button'], input, select {
 .no-sidebar .sidebar {
   display: none !important;
 }
-  </style>
-  <style>
+  
+
+
     
 /* ===== Subscale header ===== */
 .subscale-header {
@@ -1297,8 +1298,90 @@ a, button, [role='button'], input, select {
     .subscale-header .en-label { display: block; margin-top: 2px; }
     [data-lang='es'] .en-label,
     [data-lang='en'] .es-label { display: none !important; }
-    [data-lang='both'] .en-label { display: block !important; }
-  </style>
+    [data-lang='en'] .en-label { display: block !important; }
+  
+/* Fix phantom radio highlight after auto-scroll */
+.radio-option input[type="radio"]:focus + label {
+  outline: none;
+  box-shadow: none;
+}
+.radio-option input[type="radio"]:not(:checked) + label {
+  border-color: var(--color-border) !important;
+  background: var(--color-bg) !important;
+  box-shadow: none !important;
+}
+.radio-option input[type="radio"]:not(:checked) + label:hover {
+  border-color: var(--color-primary) !important;
+  background: var(--color-primary-bg) !important;
+}
+
+/* Vanderbilt option buttons — compact radio style matching other tools */
+.options-row {
+  display: flex;
+  gap: var(--space-1);
+  margin-top: var(--space-2);
+  flex-wrap: nowrap;
+}
+.option-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-1) var(--space-2);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: center;
+  gap: 2px;
+  transition: all var(--transition-interactive);
+  background: var(--color-bg);
+  min-width: 0;
+  position: relative;
+}
+.option-btn input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+.option-btn:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-bg);
+}
+.option-btn.selected,
+.option-btn:has(input[type="radio"]:checked) {
+  border-color: var(--color-primary);
+  background: var(--color-primary-bg);
+  box-shadow: 0 0 0 2px var(--color-primary-highlight);
+}
+.option-btn .opt-score {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-primary);
+  line-height: 1;
+}
+.option-btn .es-label {
+  font-size: 0.6rem;
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: 1.2;
+}
+.option-btn .en-label {
+  font-size: 0.55rem;
+  color: var(--color-text-muted);
+  display: none;
+}
+[data-lang='en'] .option-btn .en-label { display: block; }
+[data-lang='en'] .option-btn .es-label { display: none; }
+@media (max-width: 480px) {
+  .options-row { gap: 2px; }
+  .option-btn { padding: 3px 2px; }
+  .option-btn .es-label { font-size: 0.5rem; }
+}
+
+</style>
+  
 </head>
 <body>
 
@@ -1319,7 +1402,6 @@ a, button, [role='button'], input, select {
     <div class="lang-toggle" role="group" aria-label="Idioma">
       <button id="btn-es"   class="lang-btn active" aria-pressed="true">ES</button>
       <button id="btn-en"   class="lang-btn" aria-pressed="false">EN</button>
-      <button id="btn-both" class="lang-btn" aria-pressed="false">ES+EN</button>
     </div>
     <button id="theme-btn" class="icon-btn" aria-label="Cambiar tema" title="Cambiar tema">
       <span id="theme-label">☀️</span>
@@ -2943,9 +3025,9 @@ a, button, [role='button'], input, select {
 
   
 <div class="copyright-footer">
-  <strong>Aviso de derechos de autor / Copyright Notice</strong><br>
-  Las recomendaciones contenidas en esta publicación no indican un curso exclusivo de tratamiento ni constituyen un estándar de atención médica. Las variaciones, tomando en cuenta las circunstancias individuales, pueden ser apropiadas. Documento original incluido como parte de <em>Addressing Mental Health Concerns in Primary Care: A Clinician's Toolkit</em>. Copyright &copy; 2010 American Academy of Pediatrics and National Initiative for Children's Healthcare Quality (NICHQ). All Rights Reserved. The American Academy of Pediatrics does not review or endorse any modifications made to this document and in no event shall the AAP be liable for any such changes.
-</div>
+    <strong data-es="Derechos de autor:" data-en="Copyright:">Derechos de autor:</strong>
+    <span data-es=" Escala de Evaluación Vanderbilt para Padres (VADPRS). © American Academy of Pediatrics (AAP) y National Initiative for Children's Healthcare Quality (NICHQ), 2002. Reproducido con fines clínicos no comerciales. No para distribución masiva ni uso con fines de lucro." data-en=" Vanderbilt ADHD Diagnostic Parent Rating Scale (VADPRS). © American Academy of Pediatrics (AAP) and National Initiative for Children's Healthcare Quality (NICHQ), 2002. Reproduced for non-commercial clinical use. Not for mass distribution or use for profit."> Escala de Evaluación Vanderbilt para Padres (VADPRS). © American Academy of Pediatrics (AAP) y National Initiative for Children's Healthcare Quality (NICHQ), 2002. Reproducido con fines clínicos no comerciales. No para distribución masiva ni uso con fines de lucro.</span>
+  </div>
 
 
 </main>
@@ -3003,7 +3085,7 @@ function renderScore() {
   const r = computeResults();
   const lang = document.documentElement.getAttribute('data-lang') || 'es';
   const es = lang === 'es';
-  const both = lang === 'both';
+  const both = lang === 'en';
 
   function tx(esText, enText) {
     if (es)   return esText;
@@ -3021,8 +3103,7 @@ function renderScore() {
     { label_es: 'Hipervact./Impuls. (10–18)', label_en: 'Hyperactivity/Imp. (10–18)', score: r.HI, max: 9, cut: 6, cls: 'badge-HI' },
     { label_es: 'TND (19–26)',            label_en: 'ODD (19–26)',              score: r.ODD, max: 8,  cut: 5, cls: 'badge-ODD' },
     { label_es: 'T. Conducta (27–40)',    label_en: 'Conduct (27–40)',          score: r.CD,  max: 14, cut: 3, cls: 'badge-CD'  },
-    { label_es: 'Ansiedad/Dep. (41–47)',  label_en: 'Anxiety/Dep. (41–47)',     score: r.ANX, max: 7,  cut: 3, cls: 'badge-ANX'},
-  ];
+    { label_es: 'Ansiedad/Dep. (41–47)',  label_en: 'Anxiety/Dep. (41–47)',     score: r.ANX, max: 7,  cut: 3, cls: 'badge-ANX'}];
 
   let rowsHtml = rows.map(row => {
     const flag = row.score >= row.cut;
@@ -3069,8 +3150,7 @@ function renderScore() {
     `T. Conducta: ${r.CD}/14`,
     `Ansiedad/Dep.: ${r.ANX}/7`,
     `Desempeño (≥4): ${r.PERF_HIGH}/8`,
-    '',
-  ];
+    ''];
   if (r.done >= 18) {
     const subtype = adhdSubtype(r.adhd_pos_IN, r.adhd_pos_HI);
     if (subtype) {
@@ -3100,14 +3180,13 @@ function applyLang(l) {
   const params = new URLSearchParams(location.search);
   params.set('lang', l);
   history.replaceState(null, '', '?' + params.toString());
-  ['btn-es','btn-en','btn-both'].forEach(id => {
+  ['btn-es','btn-en'].forEach(id => {
     document.getElementById(id).classList.toggle('active', id === 'btn-' + l);
   });
   renderScore();
 }
 document.getElementById('btn-es').addEventListener('click',   () => applyLang('es'));
 document.getElementById('btn-en').addEventListener('click',   () => applyLang('en'));
-document.getElementById('btn-both').addEventListener('click', () => applyLang('both'));
 
 // ── Answers & scroll ─────────────────────────────────────────
 document.querySelectorAll('.option-btn').forEach(btn => {

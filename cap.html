@@ -5,7 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>CAP Scale — CoCM Pediátrico</title>
   <style>
-<style>
 /* ============================================================
    CoCM Pediátrico — Shared Stylesheet
    ============================================================ */
@@ -1198,6 +1197,21 @@ a, button, [role='button'], input, select {
 .legend-dot.OV { background: #daa520; }
 /* No sidebar */
 .no-sidebar .main-content { margin-left: 0; width: 100%; }
+
+/* Fix phantom radio highlight after auto-scroll */
+.radio-option input[type="radio"]:focus + label {
+  outline: none;
+  box-shadow: none;
+}
+.radio-option input[type="radio"]:not(:checked) + label {
+  border-color: var(--color-border) !important;
+  background: var(--color-bg) !important;
+  box-shadow: none !important;
+}
+.radio-option input[type="radio"]:not(:checked) + label:hover {
+  border-color: var(--color-primary) !important;
+  background: var(--color-primary-bg) !important;
+}
 </style>
 </head>
 <body class="no-sidebar">
@@ -1216,7 +1230,6 @@ a, button, [role='button'], input, select {
       <div class="topbar-actions">
         <div class="lang-toggle">
           <button class="lang-btn active" onclick="setLang('es')" id="btnES">ES</button>
-          <button class="lang-btn" onclick="setLang('bi')" id="btnBI">ES+EN</button>
           <button class="lang-btn" onclick="setLang('en')" id="btnEN">EN</button>
         </div>
         <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme">
@@ -1329,9 +1342,9 @@ a, button, [role='button'], input, select {
 
       <!-- Copyright footer -->
       <div class="copyright-footer">
-        <strong data-es="Derechos de autor:" data-en="Copyright:">Derechos de autor:</strong>
-        <span data-es=" CAP Scale — Child Attention Profile. Datos normativos de Russell A. Barkley y Craig Edelbrock. Diseño del formulario © 1999 Henry L. Shapiro, M.D. Usado con fines clínicos educativos. Esta aplicación no reproduce el formulario completo con derechos de autor." data-en=" CAP Scale — Child Attention Profile. Normative data from Russell A. Barkley and Craig Edelbrock. Form design © 1999 Henry L. Shapiro, M.D. Used for clinical educational purposes. This application does not reproduce the full copyrighted form."> CAP Scale — Child Attention Profile. Datos normativos de Russell A. Barkley y Craig Edelbrock. Diseño del formulario © 1999 Henry L. Shapiro, M.D. Usado con fines clínicos educativos. Esta aplicación no reproduce el formulario completo con derechos de autor.</span>
-      </div>
+    <strong data-es="Derechos de autor:" data-en="Copyright:">Derechos de autor:</strong>
+    <span data-es=" CAP Scale — Child Attention Profile. Datos normativos de Russell A. Barkley y Craig Edelbrock. Diseño del formulario © 1999 Henry L. Shapiro, M.D. Reproducido con fines clínicos y educativos sin fines de lucro. No para distribución masiva ni uso comercial." data-en=" CAP Scale — Child Attention Profile. Normative data from Russell A. Barkley and Craig Edelbrock. Form design © 1999 Henry L. Shapiro, M.D. Reproduced for non-profit clinical and educational use. Not for mass distribution or commercial use."> CAP Scale — Child Attention Profile. Datos normativos de Russell A. Barkley y Craig Edelbrock. Diseño del formulario © 1999 Henry L. Shapiro, M.D. Reproducido con fines clínicos y educativos sin fines de lucro. No para distribución masiva ni uso comercial.</span>
+  </div>
 
     </div><!-- /page-content -->
   </div><!-- /main-content -->
@@ -1378,8 +1391,7 @@ function renderQuestions() {
       <div class="question-row">
         <div class="question-number ${subClass}">${q.n}</div>
         <div class="question-body">
-          <div class="subscale-tag ${subClass}">${q.sub}</div>
-          <div class="question-text-es">${q.es}</div>
+                    <div class="question-text-es">${q.es}</div>
           <div class="question-text-en">${q.en}</div>
           <div class="radio-group">
             ${[0,1,2].map(v => `
@@ -1433,7 +1445,7 @@ function updateScore() {
   const { total, IN, OV, answered } = getScores();
   const complete = answered === 12;
   const lang = document.documentElement.getAttribute('data-lang') || 'es';
-  const isBi = lang === 'bi', isEN = lang === 'en';
+  isEN = lang === 'en';
 
   document.getElementById('totalScore').textContent = total;
   document.getElementById('score_subIN').textContent  = IN;
@@ -1456,7 +1468,6 @@ function updateScore() {
     badge.className = 'score-result-badge ' + cls;
     text.setAttribute('data-es', esTxt);
     text.setAttribute('data-en', enTxt);
-    if (isBi) text.innerHTML = esTxt + '<span class="bi-en-line">' + enTxt + '</span>';
     else text.textContent = isEN ? enTxt : esTxt;
   }
 
@@ -1474,7 +1485,7 @@ function generateNote() {
   const { total, IN, OV, answered } = getScores();
   const complete = answered === 12;
   const lang = document.documentElement.getAttribute('data-lang') || 'es';
-  const isBI = lang === 'bi', isEN = lang === 'en';
+   isEN = lang === 'en';
   const todayES = new Date().toLocaleDateString('es-HN', { year:'numeric', month:'long', day:'numeric' });
   const todayEN = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
 
@@ -1514,7 +1525,7 @@ Scores:
 Reference values ${pctNote}`;
 
   const box = document.getElementById('noteSummaryBox');
-  box.textContent = isBI ? noteES + '\n\n' + noteEN : isEN ? noteEN : noteES;
+  box.textContent = isEN ? noteEN : noteES;
 }
 
 function copyNote() {
@@ -1562,21 +1573,28 @@ function setLang(lang) {
   params.set('lang', lang);
   history.replaceState(null, '', '?' + params.toString());
   document.documentElement.setAttribute('data-lang', lang);
-  const isBi = lang === 'bi', isEN = lang === 'en';
-
+  const isEN = lang === 'en';
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
-    const esTxt = el.getAttribute('data-es');
-    const enTxt = el.getAttribute('data-en');
-    if (isBi) el.innerHTML = esTxt + '<span class="bi-en-line">' + enTxt + '</span>';
-    else el.textContent = isEN ? enTxt : esTxt;
+    if (el.classList.contains('question-text-es') || el.classList.contains('question-text-en') ||
+        el.classList.contains('radio-label-es') || el.classList.contains('radio-label-en')) return;
+    el.textContent = isEN ? el.getAttribute('data-en') : el.getAttribute('data-es');
   });
+  document.querySelectorAll('.question-text-en, .radio-label-en').forEach(el => { el.style.display = isEN ? '' : 'none'; });
+  document.querySelectorAll('.question-text-es, .radio-label-es').forEach(el => { el.style.display = isEN ? 'none' : ''; });
+  const btnES = document.getElementById('btnES');
+  const btnEN = document.getElementById('btnEN');
+  if (btnES) btnES.classList.toggle('active', !isEN);
+  if (btnEN) btnEN.classList.toggle('active', isEN);
+  if (typeof generateNote === 'function') generateNote();
+  if (typeof updateScore === 'function') updateScore();
+  if (typeof setLangPartial === 'function') setLangPartial(lang);
+});
 
   document.querySelectorAll('.question-text-en, .radio-label-en').forEach(el => {
-    el.style.display = (isBi || isEN) ? '' : 'none';
+    el.style.display = (isEN) ? '' : 'none';
   });
 
   document.getElementById('btnES').classList.toggle('active', lang === 'es');
-  document.getElementById('btnBI').classList.toggle('active', isBi);
   document.getElementById('btnEN').classList.toggle('active', isEN);
 
   generateNote();

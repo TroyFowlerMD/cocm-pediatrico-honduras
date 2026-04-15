@@ -1211,6 +1211,21 @@ a, button, [role='button'], input, select {
 }
 .copyright-footer strong { color: var(--color-text); }
 
+
+/* Fix phantom radio highlight after auto-scroll */
+.radio-option input[type="radio"]:focus + label {
+  outline: none;
+  box-shadow: none;
+}
+.radio-option input[type="radio"]:not(:checked) + label {
+  border-color: var(--color-border) !important;
+  background: var(--color-bg) !important;
+  box-shadow: none !important;
+}
+.radio-option input[type="radio"]:not(:checked) + label:hover {
+  border-color: var(--color-primary) !important;
+  background: var(--color-primary-bg) !important;
+}
 </style>
 </head>
 <body>
@@ -1237,7 +1252,6 @@ a, button, [role='button'], input, select {
       <div class="topbar-actions">
         <div class="lang-toggle">
           <button class="lang-btn active" id="btnES" onclick="setLang('es')">ES</button>
-          <button class="lang-btn" id="btnBI" onclick="setLang('bi')">ES+EN</button>
           <button class="lang-btn" id="btnEN" onclick="setLang('en')">EN</button>
         </div>
         <button class="theme-toggle" data-theme-toggle aria-label="Cambiar tema">
@@ -1357,8 +1371,8 @@ a, button, [role='button'], input, select {
     </div><!-- /page-content -->
   
   <div class="copyright-footer">
-    <strong>Aviso de derechos de autor / Copyright Notice</strong><br>
-    Pediatric Symptom Checklist (PSC-17). Originalmente desarrollado por M. Jellinek, M.D., J.M. Murphy, Ed.D. y colaboradores en el Massachusetts General Hospital. El PSC es de dominio público. La traducción al español ha sido validada para uso clínico. Esta adaptación se proporciona únicamente para fines educativos y de detección clínica.
+    <strong data-es="Derechos de autor:" data-en="Copyright:">Derechos de autor:</strong>
+    <span data-es=" PSC-17. © Pediatric Symptom Checklist (PSC), Jellinek & Murphy, 1988. Adaptado para uso clínico y educativo sin fines de lucro. No autorizado para distribución masiva ni uso comercial." data-en=" PSC-17. © Pediatric Symptom Checklist (PSC), Jellinek & Murphy, 1988. Adapted for non-profit clinical and educational use. Not authorized for mass distribution or commercial use."> PSC-17. © Pediatric Symptom Checklist (PSC), Jellinek & Murphy, 1988. Adaptado para uso clínico y educativo sin fines de lucro. No autorizado para distribución masiva ni uso comercial.</span>
   </div>
 
 </main>
@@ -1496,7 +1510,6 @@ function updateScore() {
   document.getElementById('subE').className = 'subscale-item' + (E >= 7 ? ' concern' : '');
 
   // Result badge — treat 'bi' same as 'es' for primary text; add EN sub-line in bi mode
-  const isBiScore = (lang === 'bi');
   const showEN = (lang === 'en');
   const badge = document.getElementById('resultBadge');
   const text  = document.getElementById('resultText');
@@ -1504,9 +1517,7 @@ function updateScore() {
   function setBadgeText(esMsg, enMsg) {
     text.setAttribute('data-es', esMsg);
     text.setAttribute('data-en', enMsg);
-    if (isBiScore) {
-      text.innerHTML = esMsg + '<span class="bi-en-line">' + enMsg + '</span>';
-    } else {
+    {
       text.textContent = showEN ? enMsg : esMsg;
     }
   }
@@ -1528,7 +1539,6 @@ function generateNote() {
   const { total, I, A, E, answeredCount } = getScores();
   const complete = answeredCount === 17;
   const lang = document.documentElement.getAttribute('data-lang') || 'es';
-  const isBI = lang === 'bi';
   const isEN = lang === 'en';
 
   const today = new Date().toLocaleDateString(
@@ -1571,7 +1581,7 @@ Subscales:
   • Externalizing: ${E} / 14  ${E >= 7 ? '⚠ above cutoff (cutoff ≥7)' : ''}${flagsEN.length ? '\n\nAreas of concern:\n' + flagsEN.map(f => '  • ' + f).join('\n') : ''}`;
 
   let note;
-  if (isBI) {
+  if () {
     note = noteES + '\n\n' + noteEN;
   } else if (isEN) {
     note = noteEN;
@@ -1627,24 +1637,26 @@ function resetForm() {
 
 // ===== LANGUAGE =====
 function setLang(lang) {
+  const params = new URLSearchParams(location.search);
+  params.set('lang', lang);
+  history.replaceState(null, '', '?' + params.toString());
   document.documentElement.setAttribute('data-lang', lang);
-  const isBi = lang === 'bi';
   const isEN = lang === 'en';
-  const isES = lang === 'es';
-
-  // Static labeled text — nav, badges, instructions, header meta, score panel, etc.
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
-    // Skip question text divs — handled separately below
-    if (el.classList.contains('question-text-es') || el.classList.contains('question-text-en')) return;
-    const esText  = el.getAttribute('data-es');
-    const enText  = el.getAttribute('data-en');
-    // Use HTML versions if available (preserves <strong> etc.)
-    const esHTML  = el.getAttribute('data-es-html') || esText;
-    const enHTML  = el.getAttribute('data-en-html') || enText;
-    if (isBi) {
-      // Two-line bilingual: ES full size on top, EN smaller/italic/muted below
-      el.innerHTML = esHTML + '<span class="bi-en-line">' + enText + '</span>';
-    } else if (isEN) {
+    if (el.classList.contains('question-text-es') || el.classList.contains('question-text-en') ||
+        el.classList.contains('radio-label-es') || el.classList.contains('radio-label-en')) return;
+    el.textContent = isEN ? el.getAttribute('data-en') : el.getAttribute('data-es');
+  });
+  document.querySelectorAll('.question-text-en, .radio-label-en').forEach(el => { el.style.display = isEN ? '' : 'none'; });
+  document.querySelectorAll('.question-text-es, .radio-label-es').forEach(el => { el.style.display = isEN ? 'none' : ''; });
+  const btnES = document.getElementById('btnES');
+  const btnEN = document.getElementById('btnEN');
+  if (btnES) btnES.classList.toggle('active', !isEN);
+  if (btnEN) btnEN.classList.toggle('active', isEN);
+  if (typeof generateNote === 'function') generateNote();
+  if (typeof updateScore === 'function') updateScore();
+  if (typeof setLangPartial === 'function') setLangPartial(lang);
+} else if (isEN) {
       el.innerHTML = enHTML;
     } else {
       el.innerHTML = esHTML;
@@ -1653,24 +1665,23 @@ function setLang(lang) {
 
   // Question primary text (Spanish)
   document.querySelectorAll('.question-text-es').forEach(el => {
-    el.style.display = (isES || isBi) ? 'block' : 'none';
+    el.style.display = (isES) ? 'block' : 'none';
   });
 
   // Question secondary text (English)
   document.querySelectorAll('.question-text-en').forEach(el => {
-    el.style.display = (isEN || isBi) ? 'block' : 'none';
+    el.style.display = (isEN) ? 'block' : 'none';
   });
 
   // Radio labels
   document.querySelectorAll('.radio-label-es').forEach(el => {
-    el.style.display = (isES || isBi) ? 'block' : 'none';
+    el.style.display = (isES) ? 'block' : 'none';
   });
   document.querySelectorAll('.radio-label-en').forEach(el => {
-    el.style.display = (isEN || isBi) ? 'block' : 'none';
+    el.style.display = (isEN) ? 'block' : 'none';
   });
 
   document.getElementById('btnES').classList.toggle('active', isES);
-  document.getElementById('btnBI').classList.toggle('active', isBi);
   document.getElementById('btnEN').classList.toggle('active', isEN);
 
   // Propagate lang to all navigation links

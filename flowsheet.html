@@ -316,7 +316,22 @@
       color: var(--faint); margin-top: 1px;
     }
     [data-lang="both"] .en.inline { display: inline !important; }
-  </style>
+  
+/* Fix phantom radio highlight after auto-scroll */
+.radio-option input[type="radio"]:focus + label {
+  outline: none;
+  box-shadow: none;
+}
+.radio-option input[type="radio"]:not(:checked) + label {
+  border-color: var(--color-border) !important;
+  background: var(--color-bg) !important;
+  box-shadow: none !important;
+}
+.radio-option input[type="radio"]:not(:checked) + label:hover {
+  border-color: var(--color-primary) !important;
+  background: var(--color-primary-bg) !important;
+}
+</style>
 </head>
 <body>
 
@@ -341,7 +356,7 @@
     <div class="lang-grp">
       <button id="btn-es"   class="lang-btn active">ES</button>
       <button id="btn-en"   class="lang-btn">EN</button>
-      <button id="btn-both" class="lang-btn">ES+EN</button>
+      
     </div>
     <button id="theme-btn" class="icon-btn"><span id="theme-lbl">☀️</span></button>
   </div>
@@ -713,13 +728,11 @@ function applyLang(l) {
   const p = new URLSearchParams(location.search);
   p.set('lang', l);
   history.replaceState(null, '', '?' + p.toString());
-  ['btn-es','btn-en','btn-both'].forEach(id =>
     document.getElementById(id).classList.toggle('active', id === 'btn-' + l)
   );
 }
 document.getElementById('btn-es').addEventListener('click',   () => applyLang('es'));
 document.getElementById('btn-en').addEventListener('click',   () => applyLang('en'));
-document.getElementById('btn-both').addEventListener('click', () => applyLang('both'));
 applyTheme('dark');
 applyLang(new URLSearchParams(location.search).get('lang') || 'es');
 </script>

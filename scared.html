@@ -1258,6 +1258,21 @@ a, button, [role='button'], input, select {
 }
 .copyright-footer strong { color: var(--color-text); }
 
+
+/* Fix phantom radio highlight after auto-scroll */
+.radio-option input[type="radio"]:focus + label {
+  outline: none;
+  box-shadow: none;
+}
+.radio-option input[type="radio"]:not(:checked) + label {
+  border-color: var(--color-border) !important;
+  background: var(--color-bg) !important;
+  box-shadow: none !important;
+}
+.radio-option input[type="radio"]:not(:checked) + label:hover {
+  border-color: var(--color-primary) !important;
+  background: var(--color-primary-bg) !important;
+}
 </style>
 </head>
 <body>
@@ -1283,7 +1298,6 @@ a, button, [role='button'], input, select {
       <div class="topbar-actions">
         <div class="lang-toggle">
           <button class="lang-btn active" id="btnES" onclick="setLang('es')">ES</button>
-          <button class="lang-btn" id="btnBI" onclick="setLang('bi')">ES+EN</button>
           <button class="lang-btn" id="btnEN" onclick="setLang('en')">EN</button>
         </div>
         <button class="theme-toggle" data-theme-toggle aria-label="Cambiar tema">
@@ -1323,8 +1337,7 @@ a, button, [role='button'], input, select {
         >Para cada oración, indica con qué frecuencia ha sido cierta en los ÚLTIMOS 3 MESES. Selecciona: Casi nunca/nunca (0), A veces (1), o Casi siempre/siempre (2).</p>
       </div>
 
-      <div class="subscale-legend">
-        <div class="legend-item"><div class="legend-dot PS"></div><span data-es="Pánico/Somático (PS) — ítems 1,6,9,12,15,18,19,22,24,27,30,34,38 | Corte: ≥7" data-en="Panic/Somatic (PS) — items 1,6,9,12,15,18,19,22,24,27,30,34,38 | Cutoff: ≥7">Pánico/Somático (PS) — ítems 1,6,9,12,15,18,19,22,24,27,30,34,38 | Corte: ≥7</span></div>
+      <span data-es="Pánico/Somático (PS) — ítems 1,6,9,12,15,18,19,22,24,27,30,34,38 | Corte: ≥7" data-en="Panic/Somatic (PS) — items 1,6,9,12,15,18,19,22,24,27,30,34,38 | Cutoff: ≥7">Pánico/Somático (PS) — ítems 1,6,9,12,15,18,19,22,24,27,30,34,38 | Corte: ≥7</span></div>
         <div class="legend-item"><div class="legend-dot SEP"></div><span data-es="Ans. Separación (SEP) — ítems 4,8,13,16,20,25,29,31 | Corte: ≥5" data-en="Separation Anxiety (SEP) — items 4,8,13,16,20,25,29,31 | Cutoff: ≥5">Ans. Separación (SEP) — ítems 4,8,13,16,20,25,29,31 | Corte: ≥5</span></div>
         <div class="legend-item"><div class="legend-dot GAD"></div><span data-es="Ans. Generalizada (GAD) — ítems 5,7,14,21,23,28,33,35,37 | Corte: ≥9" data-en="Generalized Anxiety (GAD) — items 5,7,14,21,23,28,33,35,37 | Cutoff: ≥9">Ans. Generalizada (GAD) — ítems 5,7,14,21,23,28,33,35,37 | Corte: ≥9</span></div>
         <div class="legend-item"><div class="legend-dot SOC"></div><span data-es="Ansiedad Social (SOC) — ítems 3,10,26,32,39,40,41 | Corte: ≥8" data-en="Social Anxiety (SOC) — items 3,10,26,32,39,40,41 | Cutoff: ≥8">Ansiedad Social (SOC) — ítems 3,10,26,32,39,40,41 | Corte: ≥8</span></div>
@@ -1335,7 +1348,9 @@ a, button, [role='button'], input, select {
       <form id="toolform" novalidate>
         <div id="questions-container"></div>
 
-        <div class="score-panel" id="scorePanel">
+        <div class="subscale-legend">
+        <div class="legend-item"><div class="legend-dot PS"></div>
+      <div class="score-panel" id="scorePanel">
           <div class="score-panel-title" data-es="Resultados" data-en="Results">Resultados</div>
 
           <div style="display:flex; align-items:flex-end; gap:var(--space-6); flex-wrap:wrap; margin-bottom:var(--space-4);">
@@ -1401,8 +1416,8 @@ a, button, [role='button'], input, select {
     </div><!-- /page-content -->
   
   <div class="copyright-footer">
-    <strong>Aviso de derechos de autor / Copyright Notice</strong><br>
-    Screen for Child Anxiety Related Emotional Disorders (SCARED) — Child Version. Copyright &copy; Boris Birmaher, M.D., 1997. University of Pittsburgh, Western Psychiatric Institute and Clinic. Reproducido para fines educativos y de detección clínica. / Reproduced for educational and clinical screening purposes.
+    <strong data-es="Derechos de autor:" data-en="Copyright:">Derechos de autor:</strong>
+    <span data-es=" SCARED (Screen for Child Anxiety Related Disorders). © Birmaher et al., University of Pittsburgh, 1997. Permitido el uso gratuito para fines clínicos y de investigación sin fines de lucro. No para distribución masiva ni uso comercial." data-en=" SCARED (Screen for Child Anxiety Related Disorders). © Birmaher et al., University of Pittsburgh, 1997. Free use permitted for non-profit clinical and research purposes. Not for mass distribution or commercial use."> SCARED (Screen for Child Anxiety Related Disorders). © Birmaher et al., University of Pittsburgh, 1997. Permitido el uso gratuito para fines clínicos y de investigación sin fines de lucro. No para distribución masiva ni uso comercial.</span>
   </div>
 
 </main>
@@ -1475,7 +1490,8 @@ function renderQuestions() {
     div.id = `qsec${q.n}`;
     const subClass = q.sub ? ` subscale-${q.sub}` : '';
     const numClass = `question-number${subClass}`;
-    const tagHtml = q.sub ? `<div class="subscale-tag subscale-${q.sub}">${q.sub}</div>` : '';
+    const tagHtml = q.sub ? `
+          ` : '';
     const riskHtml = q.risk ? `<div class="risk-flag" id="riskFlag${q.n}" style="display:none"></div>` : '';
     div.innerHTML = `
       <div class="question-row">
@@ -1550,7 +1566,7 @@ function updateScore() {
   const { total, answered, PS, SEP, GAD, SOC, SCH } = getScores();
   const complete = answered === 41;
   const lang = document.documentElement.getAttribute('data-lang') || 'es';
-  const isBi = lang === 'bi', isEN = lang === 'en';
+  isEN = lang === 'en';
 
   document.getElementById('totalScore').textContent = total;
   document.getElementById('score_subPS').textContent = PS;
@@ -1572,7 +1588,6 @@ function updateScore() {
     badge.className = 'score-result-badge ' + cls;
     text.setAttribute('data-es', esTxt);
     text.setAttribute('data-en', enTxt);
-    if (isBi) text.innerHTML = esTxt + '<span class="bi-en-line">' + enTxt + '</span>';
     else text.textContent = isEN ? enTxt : esTxt;
   }
 
@@ -1585,7 +1600,7 @@ function generateNote() {
   const { total, answered, PS, SEP, GAD, SOC, SCH } = getScores();
   const complete = answered === 41;
   const lang = document.documentElement.getAttribute('data-lang') || 'es';
-  const isBI = lang === 'bi', isEN = lang === 'en';
+   isEN = lang === 'en';
   const todayES = new Date().toLocaleDateString('es-HN', { year: 'numeric', month: 'long', day: 'numeric' });
   const todayEN = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
   const rES = !complete ? 'INCOMPLETO' : total >= 25 ? 'POSITIVO (≥25)' : 'NEGATIVO (<25)';
@@ -1619,7 +1634,7 @@ Subscales:
   • Social Anxiety (SOC):       ${SOC} / 14  ${SOC >= 8 ? '⚠ ≥8' : ''}
   • School Avoidance (SCH):     ${SCH} /  8  ${SCH >= 3 ? '⚠ ≥3' : ''}`;
 
-  let note = isBI ? noteES + '\n\n' + noteEN : isEN ? noteEN : noteES;
+  let note = isEN ? noteEN : noteES;
   document.getElementById('noteSummaryBox').textContent = note;
 }
 
@@ -1667,20 +1682,26 @@ function resetForm() {
 
 // ===== LANGUAGE =====
 function setLang(lang) {
+  const params = new URLSearchParams(location.search);
+  params.set('lang', lang);
+  history.replaceState(null, '', '?' + params.toString());
   document.documentElement.setAttribute('data-lang', lang);
-  const isBi = lang === 'bi';
   const isEN = lang === 'en';
-  const isES = lang === 'es';
-
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
-    if (el.classList.contains('question-text-es') || el.classList.contains('question-text-en')) return;
-    const esText  = el.getAttribute('data-es');
-    const enText  = el.getAttribute('data-en');
-    const esHTML  = el.getAttribute('data-es-html') || esText;
-    const enHTML  = el.getAttribute('data-en-html') || enText;
-    if (isBi) {
-      el.innerHTML = esHTML + '<span class="bi-en-line">' + enText + '</span>';
-    } else if (isEN) {
+    if (el.classList.contains('question-text-es') || el.classList.contains('question-text-en') ||
+        el.classList.contains('radio-label-es') || el.classList.contains('radio-label-en')) return;
+    el.textContent = isEN ? el.getAttribute('data-en') : el.getAttribute('data-es');
+  });
+  document.querySelectorAll('.question-text-en, .radio-label-en').forEach(el => { el.style.display = isEN ? '' : 'none'; });
+  document.querySelectorAll('.question-text-es, .radio-label-es').forEach(el => { el.style.display = isEN ? 'none' : ''; });
+  const btnES = document.getElementById('btnES');
+  const btnEN = document.getElementById('btnEN');
+  if (btnES) btnES.classList.toggle('active', !isEN);
+  if (btnEN) btnEN.classList.toggle('active', isEN);
+  if (typeof generateNote === 'function') generateNote();
+  if (typeof updateScore === 'function') updateScore();
+  if (typeof setLangPartial === 'function') setLangPartial(lang);
+} else if (isEN) {
       el.innerHTML = enHTML;
     } else {
       el.innerHTML = esHTML;
@@ -1688,20 +1709,19 @@ function setLang(lang) {
   });
 
   document.querySelectorAll('.question-text-es').forEach(el => {
-    el.style.display = (isES || isBi) ? 'block' : 'none';
+    el.style.display = (isES) ? 'block' : 'none';
   });
   document.querySelectorAll('.question-text-en').forEach(el => {
-    el.style.display = (isEN || isBi) ? 'block' : 'none';
+    el.style.display = (isEN) ? 'block' : 'none';
   });
   document.querySelectorAll('.radio-label-es').forEach(el => {
-    el.style.display = (isES || isBi) ? 'block' : 'none';
+    el.style.display = (isES) ? 'block' : 'none';
   });
   document.querySelectorAll('.radio-label-en').forEach(el => {
-    el.style.display = (isEN || isBi) ? 'block' : 'none';
+    el.style.display = (isEN) ? 'block' : 'none';
   });
 
   document.getElementById('btnES').classList.toggle('active', isES);
-  document.getElementById('btnBI').classList.toggle('active', isBi);
   document.getElementById('btnEN').classList.toggle('active', isEN);
 
   document.querySelectorAll('a[href]').forEach(function(a) {

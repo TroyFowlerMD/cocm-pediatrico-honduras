@@ -1211,8 +1211,9 @@ a, button, [role='button'], input, select {
 }
 .copyright-footer strong { color: var(--color-text); }
 
-</style>
-  <style>
+
+
+
 /* ===== Risk Flag ===== */
 .risk-flag {
   margin-top: var(--space-3);
@@ -1258,7 +1259,23 @@ a, button, [role='button'], input, select {
 [data-theme='dark'] .subscale-tag.subscale-IN  { background: #0c3a56; color: #7dd3fc; }
 [data-theme='dark'] .subscale-tag.subscale-HI  { background: #3d2e08; color: #fcd34d; }
 [data-theme='dark'] .subscale-tag.subscale-ODD { background: #4a1c1c; color: #fca5a5; }
+
+/* Fix phantom radio highlight after auto-scroll */
+.radio-option input[type="radio"]:focus + label {
+  outline: none;
+  box-shadow: none;
+}
+.radio-option input[type="radio"]:not(:checked) + label {
+  border-color: var(--color-border) !important;
+  background: var(--color-bg) !important;
+  box-shadow: none !important;
+}
+.radio-option input[type="radio"]:not(:checked) + label:hover {
+  border-color: var(--color-primary) !important;
+  background: var(--color-primary-bg) !important;
+}
 </style>
+  
 </head>
 <body>
 <div class="app-layout no-sidebar">
@@ -1281,7 +1298,6 @@ a, button, [role='button'], input, select {
       <div class="topbar-actions">
         <div class="lang-toggle">
           <button class="lang-btn active" id="btnES" onclick="setLang('es')">ES</button>
-          <button class="lang-btn" id="btnBI" onclick="setLang('bi')">ES+EN</button>
           <button class="lang-btn" id="btnEN" onclick="setLang('en')">EN</button>
         </div>
         <button class="theme-toggle" data-theme-toggle aria-label="Cambiar tema">
@@ -1314,8 +1330,7 @@ a, button, [role='button'], input, select {
       <p data-es="Para cada ítem, marca la columna que mejor describe a este niño/adolescente. Escala: Para nada (0), Sólo un poco (1), Bastante (2), Muy mucho (3)." data-en="For each item, check the column that best describes this child/adolescent. Scale: Not at all (0), Just a little (1), Pretty much (2), Very much (3).">Para cada ítem, marca la columna que mejor describe a este niño/adolescente. Escala: Para nada (0), Sólo un poco (1), Bastante (2), Muy mucho (3).</p>
     </div>
 
-    <div class="subscale-legend">
-        <div class="legend-item"><div class="legend-dot" style="background:#0369a1"></div><span data-es="Inatención (IN) — ítems 1–9 | Corte clínico: ≥13/27" data-en="Inattention (IN) — items 1–9 | Clinical cutoff: ≥13/27">Inatención (IN) — ítems 1–9 | Corte clínico: ≥13/27</span></div>
+    <span data-es="Inatención (IN) — ítems 1–9 | Corte clínico: ≥13/27" data-en="Inattention (IN) — items 1–9 | Clinical cutoff: ≥13/27">Inatención (IN) — ítems 1–9 | Corte clínico: ≥13/27</span></div>
         <div class="legend-item"><div class="legend-dot" style="background:#92400e"></div><span data-es="Hiperactividad/Impulsividad (HI) — ítems 10–18 | Corte clínico: ≥13/27" data-en="Hyperactivity/Impulsivity (HI) — items 10–18 | Clinical cutoff: ≥13/27">Hiperactividad/Impulsividad (HI) — ítems 10–18 | Corte clínico: ≥13/27</span></div>
         <div class="legend-item"><div class="legend-dot" style="background:#991b1b"></div><span data-es="Oposición/Desafío (ODD) — ítems 19–26 | Corte clínico: ≥8/24" data-en="ODD — items 19–26 | Clinical cutoff: ≥8/24">Oposición/Desafío (ODD) — ítems 19–26 | Corte clínico: ≥8/24</span></div>
       </div>
@@ -1323,6 +1338,8 @@ a, button, [role='button'], input, select {
     <form id="toolform" novalidate>
       <div id="questions-container"></div>
 
+      <div class="subscale-legend">
+        <div class="legend-item"><div class="legend-dot" style="background:#0369a1"></div>
       <div class="score-panel" id="scorePanel">
         <div class="score-panel-title" data-es="Resultados" data-en="Results">Resultados</div>
         <div style="display:flex; align-items:flex-end; gap:var(--space-6); flex-wrap:wrap; margin-bottom:var(--space-4);">
@@ -1372,8 +1389,8 @@ a, button, [role='button'], input, select {
   </div>
 
   <div class="copyright-footer">
-    <strong>Aviso de derechos de autor / Copyright Notice</strong><br>
-    SNAP-IV Rating Scale (Swanson, Nolan and Pelham). Desarrollado por James M. Swanson, Ph.D., University of California, Irvine. El SNAP-IV es de dominio público y puede utilizarse libremente para fines clínicos y de investigación. / The SNAP-IV is in the public domain and may be used freely for clinical and research purposes.
+    <strong data-es="Derechos de autor:" data-en="Copyright:">Derechos de autor:</strong>
+    <span data-es=" SNAP-IV. © James M. Swanson, PhD, University of California, Irvine. Reproducido con permiso del autor para uso clínico y de investigación sin fines de lucro. Todos los derechos reservados. No para distribución masiva ni uso comercial." data-en=" SNAP-IV. © James M. Swanson, PhD, University of California, Irvine. Reproduced with permission from the author for non-profit clinical and research use. All rights reserved. Not for mass distribution or commercial use."> SNAP-IV. © James M. Swanson, PhD, University of California, Irvine. Reproducido con permiso del autor para uso clínico y de investigación sin fines de lucro. Todos los derechos reservados. No para distribución masiva ni uso comercial.</span>
   </div>
 
 </main>
@@ -1431,7 +1448,6 @@ function renderQuestions() {
       <div class="question-row">
         <div class="question-number ${subClass}">${q.n}</div>
         <div class="question-body">
-          <div class="subscale-tag ${subClass}">${q.sub}</div>
           <div class="question-text-es">${q.es}</div>
           <div class="question-text-en">${q.en}</div>
           <div class="radio-group">
@@ -1488,7 +1504,7 @@ function updateScore() {
   const { total, answered, IN, HI, ODD } = getScores();
   const complete = answered === 26;
   const lang = document.documentElement.getAttribute('data-lang') || 'es';
-  const isBi = lang === 'bi', isEN = lang === 'en';
+  isEN = lang === 'en';
 
   document.getElementById('totalScore').textContent = total;
   document.getElementById('score_subIN').textContent  = IN;
@@ -1505,7 +1521,6 @@ function updateScore() {
     badge.className = 'score-result-badge ' + cls;
     text.setAttribute('data-es', esTxt);
     text.setAttribute('data-en', enTxt);
-    if (isBi) text.innerHTML = esTxt + '<span class="bi-en-line">' + enTxt + '</span>';
     else text.textContent = isEN ? enTxt : esTxt;
   }
 
@@ -1520,7 +1535,7 @@ function generateNote() {
   const { total, answered, IN, HI, ODD } = getScores();
   const complete = answered === 26;
   const lang = document.documentElement.getAttribute('data-lang') || 'es';
-  const isBI = lang === 'bi', isEN = lang === 'en';
+   isEN = lang === 'en';
   const todayES = new Date().toLocaleDateString('es-HN', { year:'numeric', month:'long', day:'numeric' });
   const todayEN = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
 
@@ -1550,7 +1565,7 @@ Subscales (cutoff: clinically significant symptoms):
   • Hyperactivity/Impulsivity (10–18): ${HI} / 27${flagHI}
   • ODD (19–26):                       ${ODD} / 24${flagODD}`;
 
-  document.getElementById('noteSummaryBox').textContent = isBI ? noteES + '\n\n' + noteEN : isEN ? noteEN : noteES;
+  document.getElementById('noteSummaryBox').textContent = isEN ? noteEN : noteES;
 }
 
 function copyNote() {
@@ -1594,27 +1609,33 @@ function resetForm() {
 })();
 
 function setLang(lang) {
+  const params = new URLSearchParams(location.search);
+  params.set('lang', lang);
+  history.replaceState(null, '', '?' + params.toString());
   document.documentElement.setAttribute('data-lang', lang);
-  const isBi = lang === 'bi', isEN = lang === 'en', isES = lang === 'es';
-
+  const isEN = lang === 'en';
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
-    if (el.classList.contains('question-text-es') || el.classList.contains('question-text-en')) return;
-    const esText = el.getAttribute('data-es');
-    const enText = el.getAttribute('data-en');
-    const esHTML = el.getAttribute('data-es-html') || esText;
-    const enHTML = el.getAttribute('data-en-html') || enText;
-    if (isBi) el.innerHTML = esHTML + '<span class="bi-en-line">' + enText + '</span>';
-    else if (isEN) el.innerHTML = enHTML;
-    else el.innerHTML = esHTML;
+    if (el.classList.contains('question-text-es') || el.classList.contains('question-text-en') ||
+        el.classList.contains('radio-label-es') || el.classList.contains('radio-label-en')) return;
+    el.textContent = isEN ? el.getAttribute('data-en') : el.getAttribute('data-es');
   });
+  document.querySelectorAll('.question-text-en, .radio-label-en').forEach(el => { el.style.display = isEN ? '' : 'none'; });
+  document.querySelectorAll('.question-text-es, .radio-label-es').forEach(el => { el.style.display = isEN ? 'none' : ''; });
+  const btnES = document.getElementById('btnES');
+  const btnEN = document.getElementById('btnEN');
+  if (btnES) btnES.classList.toggle('active', !isEN);
+  if (btnEN) btnEN.classList.toggle('active', isEN);
+  if (typeof generateNote === 'function') generateNote();
+  if (typeof updateScore === 'function') updateScore();
+  if (typeof setLangPartial === 'function') setLangPartial(lang);
+});
 
-  document.querySelectorAll('.question-text-es').forEach(el => el.style.display = (isES||isBi)?'block':'none');
-  document.querySelectorAll('.question-text-en').forEach(el => el.style.display = (isEN||isBi)?'block':'none');
-  document.querySelectorAll('.radio-label-es').forEach(el => el.style.display = (isES||isBi)?'block':'none');
-  document.querySelectorAll('.radio-label-en').forEach(el => el.style.display = (isEN||isBi)?'block':'none');
+  document.querySelectorAll('.question-text-es').forEach(el => el.style.display = (isES||)?'block':'none');
+  document.querySelectorAll('.question-text-en').forEach(el => el.style.display = (isEN)?'block':'none');
+  document.querySelectorAll('.radio-label-es').forEach(el => el.style.display = (isES||)?'block':'none');
+  document.querySelectorAll('.radio-label-en').forEach(el => el.style.display = (isEN)?'block':'none');
 
   document.getElementById('btnES').classList.toggle('active', isES);
-  document.getElementById('btnBI').classList.toggle('active', isBi);
   document.getElementById('btnEN').classList.toggle('active', isEN);
 
   document.querySelectorAll('a[href]').forEach(function(a) {

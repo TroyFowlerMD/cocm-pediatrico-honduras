@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ASRS v1.1 — CoCM Pediátrico</title>
+  <title>ASRS-5 — CoCM Pediátrico</title>
   <style>
 <style>
 /* ============================================================
@@ -1187,40 +1187,22 @@ a, button, [role='button'], input, select {
   display: none !important;
 }
   </style>
-/* ASRS Part colors */
-.question-number.subscale-A { background: var(--color-primary-bg); color: var(--color-primary); }
-.question-number.subscale-B { background: var(--color-surface-offset-2); color: var(--color-text-muted); }
-.subscale-tag.subscale-A { background: var(--color-primary-bg); color: var(--color-primary); }
-.subscale-tag.subscale-B { background: var(--color-surface-offset-2); color: var(--color-text-muted); }
-/* Part divider */
-.part-divider {
-  margin: var(--space-6) 0 var(--space-4);
-  padding: var(--space-3) var(--space-5);
-  background: var(--color-primary-bg);
-  border-left: 4px solid var(--color-primary);
-  border-radius: 0 var(--radius-md) var(--radius-md) 0;
-  font-weight: 700;
-  font-size: var(--text-base);
-  color: var(--color-primary);
-}
-.part-b-note {
-  margin-bottom: var(--space-4);
-  padding: var(--space-3) var(--space-4);
-  background: var(--color-surface-offset);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-  line-height: 1.5;
-}
-/* Positive (shaded) answer highlight */
-.radio-option.positive-threshold input[type="radio"]:checked + label {
-  border-color: var(--color-warning);
-  background: var(--color-warning-highlight);
-  box-shadow: 0 0 0 3px var(--color-warning-highlight);
-}
 /* No sidebar */
 .no-sidebar .main-content { margin-left: 0; width: 100%; }
+/* Fix phantom radio highlight after auto-scroll */
+.radio-option input[type="radio"]:focus + label {
+  outline: none;
+  box-shadow: none;
+}
+.radio-option input[type="radio"]:not(:checked) + label {
+  border-color: var(--color-border) !important;
+  background: var(--color-bg) !important;
+  box-shadow: none !important;
+}
+.radio-option input[type="radio"]:not(:checked) + label:hover {
+  border-color: var(--color-primary) !important;
+  background: var(--color-primary-bg) !important;
+}
 </style>
 </head>
 <body class="no-sidebar">
@@ -1232,14 +1214,13 @@ a, button, [role='button'], input, select {
       <div style="display:flex;align-items:center;gap:var(--space-3);">
         <a href="index.html" class="btn-ghost" style="padding:var(--space-2) var(--space-3);font-size:var(--text-sm);">← <span data-es="Inicio" data-en="Home">Inicio</span></a>
         <div>
-          <div class="topbar-title">ASRS v1.1</div>
-          <div class="topbar-subtitle" data-es="Escala de Autorreporte de TDAH del Adulto (≥18 años)" data-en="Adult ADHD Self-Report Scale (≥18 years)">Escala de Autorreporte de TDAH del Adulto (≥18 años)</div>
+          <div class="topbar-title">ASRS-5</div>
+          <div class="topbar-subtitle" data-es="Escala de Autorreporte de TDAH del Adulto — DSM-5 (≥18 años)" data-en="Adult ADHD Self-Report Scale for DSM-5 (≥18 years)">Escala de Autorreporte de TDAH del Adulto — DSM-5 (≥18 años)</div>
         </div>
       </div>
       <div class="topbar-actions">
         <div class="lang-toggle">
           <button class="lang-btn active" onclick="setLang('es')" id="btnES">ES</button>
-          <button class="lang-btn" onclick="setLang('bi')" id="btnBI">ES+EN</button>
           <button class="lang-btn" onclick="setLang('en')" id="btnEN">EN</button>
         </div>
         <button class="theme-toggle" data-theme-toggle aria-label="Toggle theme">
@@ -1248,88 +1229,54 @@ a, button, [role='button'], input, select {
       </div>
     </div>
 
-    <!-- PAGE CONTENT -->
     <div class="page-content" style="max-width:800px;margin:0 auto;">
 
-      <!-- Medical Disclaimer -->
       <div class="disclaimer-banner">
         <strong data-es="Aviso Médico:" data-en="Medical Disclaimer:">Aviso Médico:</strong>
-        <span data-es=" Esta herramienta es solo para uso clínico de apoyo. No reemplaza el juicio clínico, el diagnóstico médico ni la evaluación profesional. Los resultados deben interpretarse en el contexto clínico completo del paciente." data-en=" This tool is for clinical support use only. It does not replace clinical judgment, medical diagnosis, or professional evaluation. Results must be interpreted within the full clinical context of the patient."> Esta herramienta es solo para uso clínico de apoyo. No reemplaza el juicio clínico, el diagnóstico médico ni la evaluación profesional. Los resultados deben interpretarse en el contexto clínico completo del paciente.</span>
+        <span data-es=" Esta herramienta es solo para uso clínico de apoyo. No reemplaza el juicio clínico, el diagnóstico médico ni la evaluación profesional." data-en=" This tool is for clinical support use only. It does not replace clinical judgment, medical diagnosis, or professional evaluation."> Esta herramienta es solo para uso clínico de apoyo. No reemplaza el juicio clínico, el diagnóstico médico ni la evaluación profesional.</span>
       </div>
 
-      <!-- Tool Header -->
       <div class="tool-header-card">
-        <h1>ASRS v1.1</h1>
-        <p data-es="Escala de Autorreporte de TDAH del Adulto — OMS / Harvard Medical School" data-en="Adult ADHD Self-Report Scale — WHO / Harvard Medical School">Escala de Autorreporte de TDAH del Adulto — OMS / Harvard Medical School</p>
+        <h1>ASRS-5</h1>
+        <p data-es="Escala de Autorreporte de TDAH del Adulto para DSM-5 — OMS / Harvard Medical School" data-en="Adult ADHD Self-Report Scale for DSM-5 — WHO / Harvard Medical School">Escala de Autorreporte de TDAH del Adulto para DSM-5 — OMS / Harvard Medical School</p>
         <div class="tool-header-meta">
-          <span data-es="18 ítems" data-en="18 items">18 ítems</span>
+          <span data-es="6 ítems" data-en="6 items">6 ítems</span>
           <span data-es="Adultos ≥18 años" data-en="Adults ≥18 years">Adultos ≥18 años</span>
           <span data-es="Autoinforme" data-en="Self-report">Autoinforme</span>
-          <span data-es="Parte A = tamizaje (ítems 1–6)" data-en="Part A = screener (items 1–6)">Parte A = tamizaje (ítems 1–6)</span>
+          <span data-es="Corte ≥14" data-en="Cutoff ≥14">Corte ≥14</span>
         </div>
       </div>
 
-      <!-- Instructions -->
       <div class="instructions-box">
         <h3 data-es="Instrucciones" data-en="Instructions">Instrucciones</h3>
-        <p data-es="Por favor responda cada pregunta sobre cómo se ha sentido y comportado en los últimos 6 meses. La Parte A (ítems 1–6) es el tamizaje principal. Marque con qué frecuencia ocurre cada comportamiento." data-en="Please answer each question about how you have felt and conducted yourself in the past 6 months. Part A (items 1–6) is the primary screener. Mark how often each behavior occurs.">Por favor responda cada pregunta sobre cómo se ha sentido y comportado en los últimos 6 meses. La Parte A (ítems 1–6) es el tamizaje principal. Marque con qué frecuencia ocurre cada comportamiento.</p>
+        <p data-es="Para cada pregunta, seleccione con qué frecuencia ha tenido este problema durante los últimos 6 meses. Escala: 0 = Nunca, 1 = Raramente, 2 = A veces, 3 = A menudo, 4 = Muy frecuente." data-en="For each question, select how often you have experienced this problem over the past 6 months. Scale: 0 = Never, 1 = Rarely, 2 = Sometimes, 3 = Often, 4 = Very Often.">Para cada pregunta, seleccione con qué frecuencia ha tenido este problema durante los últimos 6 meses. Escala: 0 = Nunca, 1 = Raramente, 2 = A veces, 3 = A menudo, 4 = Muy frecuente.</p>
       </div>
 
-      <!-- Part A label -->
-      <div class="part-divider">
-        <span data-es="Parte A — Tamizaje (ítems 1–6)" data-en="Part A — Screener (items 1–6)">Parte A — Tamizaje (ítems 1–6)</span>
-      </div>
+      <div id="questions-container"></div>
 
-      <!-- Questions -->
-      <div id="questions-container-a"></div>
-
-      <!-- Part B label -->
-      <div class="part-divider" style="background:var(--color-surface-offset);border-left-color:var(--color-text-muted);color:var(--color-text-muted);">
-        <span data-es="Parte B — Ítems adicionales (7–18)" data-en="Part B — Additional items (7–18)">Parte B — Ítems adicionales (7–18)</span>
-      </div>
-      <div class="part-b-note">
-        <span data-es="La Parte B no tiene puntuación de corte. Cada ítem positivo es información clínica adicional. Los sombreados naranja indican umbrales de respuesta positiva para esos ítems." data-en="Part B has no cutoff score. Each positive item provides additional clinical information. Orange highlights indicate positive response thresholds for those items.">La Parte B no tiene puntuación de corte. Cada ítem positivo es información clínica adicional. Los sombreados naranja indican umbrales de respuesta positiva para esos ítems.</span>
-      </div>
-
-      <div id="questions-container-b"></div>
-
-      <!-- Score Panel (BOTTOM — not sticky) -->
+      <!-- Score Panel -->
       <div class="score-panel" id="scorePanel">
         <div class="score-panel-title" data-es="Resultado" data-en="Result">Resultado</div>
-
         <div class="score-display">
-          <div class="score-total" id="partAScore">0</div>
-          <div class="score-max" data-es="/ 6 positivos en Parte A" data-en="/ 6 positive in Part A">/ 6 positivos en Parte A</div>
+          <div class="score-total" id="totalScore">0</div>
+          <div class="score-max" data-es="/ 24 puntos" data-en="/ 24 points">/ 24 puntos</div>
         </div>
-
         <div class="score-result-badge incomplete" id="resultBadge">
-          <span id="resultText">0/6 respondidas</span>
+          <span id="resultText" data-es="0/6 respondidas" data-en="0/6 answered">0/6 respondidas</span>
         </div>
 
-        <!-- Subscale breakdown -->
-        <div class="subscale-grid" style="grid-template-columns: repeat(2,1fr);">
-          <div class="subscale-item" id="subPartA">
-            <div class="subscale-label" data-es="Parte A — Positivos" data-en="Part A — Positives">Parte A — Positivos</div>
-            <div class="subscale-score"><span id="score_partA">0</span><span style="font-size:var(--text-sm);color:var(--color-text-muted)">/6</span></div>
-            <div class="subscale-cutoff" data-es="Corte: ≥4 = tamizaje positivo" data-en="Cutoff: ≥4 = positive screen">Corte: ≥4 = tamizaje positivo</div>
-          </div>
-          <div class="subscale-item" id="subPartB">
-            <div class="subscale-label" data-es="Parte B — Positivos" data-en="Part B — Positives">Parte B — Positivos</div>
-            <div class="subscale-score"><span id="score_partB">0</span><span style="font-size:var(--text-sm);color:var(--color-text-muted)">/12</span></div>
-            <div class="subscale-cutoff" data-es="Sin corte — info adicional" data-en="No cutoff — additional info">Sin corte — info adicional</div>
-          </div>
+        <div style="background:var(--color-surface-offset);border-radius:var(--radius-lg);padding:var(--space-4);margin-bottom:var(--space-4);font-size:var(--text-xs);">
+          <div style="font-weight:700;margin-bottom:var(--space-2);" data-es="Interpretación (Ustun et al., 2017)" data-en="Interpretation (Ustun et al., 2017)">Interpretación (Ustun et al., 2017)</div>
+          <table style="width:100%;border-collapse:collapse;">
+            <tr><td style="padding:2px 6px;" data-es="Puntaje" data-en="Score">Puntaje</td><td style="padding:2px 6px;" data-es="Interpretación" data-en="Interpretation">Interpretación</td></tr>
+            <tr style="color:var(--color-success);"><td>0–13</td><td data-es="No consistente con TDAH" data-en="Not consistent with ADHD">No consistente con TDAH</td></tr>
+            <tr style="color:var(--color-warning);font-weight:700;"><td>≥14</td><td data-es="Consistente con TDAH — evaluación adicional indicada" data-en="Consistent with ADHD — further evaluation indicated">Consistente con TDAH — evaluación adicional indicada</td></tr>
+          </table>
+          <div style="margin-top:var(--space-2);color:var(--color-text-muted);" data-es="Sensibilidad 91.4% / Especificidad 96.0% (AUC 0.94)" data-en="Sensitivity 91.4% / Specificity 96.0% (AUC 0.94)">Sensibilidad 91.4% / Especificidad 96.0% (AUC 0.94)</div>
         </div>
 
-        <!-- Part A positive items list -->
-        <div id="posItemsBox" style="display:none;margin-bottom:var(--space-4);padding:var(--space-3) var(--space-4);background:var(--color-warning-highlight);border-radius:var(--radius-md);font-size:var(--text-sm);">
-          <div style="font-weight:700;color:var(--color-warning);margin-bottom:var(--space-1);" data-es="Ítems positivos Parte A:" data-en="Part A positive items:">Ítems positivos Parte A:</div>
-          <div id="posItemsList" style="color:var(--color-text);"></div>
-        </div>
-
-        <!-- Note summary -->
         <div id="noteSummaryBox" class="note-summary-box visible"></div>
 
-        <!-- Actions -->
         <div class="score-actions" style="margin-top:var(--space-4);">
           <button type="button" class="btn-secondary" onclick="copyNote()">
             <span id="copyBtnLabel" data-es="Copiar resumen" data-en="Copy summary">Copiar resumen</span>
@@ -1341,271 +1288,142 @@ a, button, [role='button'], input, select {
         </div>
       </div>
 
-      <!-- Copyright footer -->
       <div class="copyright-footer">
         <strong data-es="Derechos de autor:" data-en="Copyright:">Derechos de autor:</strong>
-        <span data-es=" ASRS v1.1 — Escala de Autorreporte de TDAH del Adulto. © Organización Mundial de la Salud y Harvard Medical School. Desarrollada por Kessler RC, et al. (2005). Psychological Medicine, 35(2), 245–256. Usada con permiso para fines clínicos sin fines de lucro." data-en=" ASRS v1.1 — Adult ADHD Self-Report Scale. © World Health Organization and Harvard Medical School. Developed by Kessler RC, et al. (2005). Psychological Medicine, 35(2), 245–256. Used with permission for non-commercial clinical purposes."> ASRS v1.1 — Escala de Autorreporte de TDAH del Adulto. © Organización Mundial de la Salud y Harvard Medical School. Desarrollada por Kessler RC, et al. (2005). Psychological Medicine, 35(2), 245–256. Usada con permiso para fines clínicos sin fines de lucro.</span>
+        <span data-es=" ASRS-5 — Adult ADHD Self-Report Scale for DSM-5. © Organización Mundial de la Salud y Harvard Medical School. Desarrollada por Ustun TB, Adler L, Rudin C, et al. (2017). JAMA Psychiatry, 74(5), 520–527. Reproducido con fines clínicos no comerciales. No para distribución masiva ni uso con fines de lucro." data-en=" ASRS-5 — Adult ADHD Self-Report Scale for DSM-5. © World Health Organization and Harvard Medical School. Developed by Ustun TB, Adler L, Rudin C, et al. (2017). JAMA Psychiatry, 74(5), 520–527. Reproduced for non-commercial clinical use. Not for mass distribution or use for profit."> ASRS-5 — Adult ADHD Self-Report Scale for DSM-5. © Organización Mundial de la Salud y Harvard Medical School. Desarrollada por Ustun TB, Adler L, Rudin C, et al. (2017). JAMA Psychiatry, 74(5), 520–527. Reproducido con fines clínicos no comerciales. No para distribución masiva ni uso con fines de lucro.</span>
       </div>
 
-    </div><!-- /page-content -->
-  </div><!-- /main-content -->
-</div><!-- /app-layout -->
+    </div>
+  </div>
+</div>
 
 <script>
-// ASRS v1.1 — 18 items
-// Part A: items 1–6 (screener)
-// Part B: items 7–18 (additional probes, no cutoff)
-
-// Threshold rules:
-// Items 1,2,3,9,12,16,18: positive if >= "Sometimes" (value >= 2)
-// Items 4,5,6,7,8,10,11,13,14,15,17: positive if >= "Often" (value >= 3)
-
-const FREQ_LABELS = {
-  es: ['Nunca', 'Raramente', 'A veces', 'A menudo', 'Muy frecuente'],
-  en: ['Never', 'Rarely', 'Sometimes', 'Often', 'Very Often']
-};
-const FREQ_VALUES = [0, 1, 2, 3, 4]; // 0=Never ... 4=Very Often
-
-// threshold: 2 = Sometimes+, 3 = Often+
 const QUESTIONS = [
-  // Part A
-  { n:1,  part:'A', threshold:2, es:'¿Con qué frecuencia tiene dificultad para terminar los últimos detalles de un proyecto una vez que las partes más difíciles ya están hechas?', en:'How often do you have trouble wrapping up the final details of a project, once the challenging parts have been done?' },
-  { n:2,  part:'A', threshold:2, es:'¿Con qué frecuencia tiene dificultad para organizar las cosas cuando tiene que hacer una tarea que requiere organización?', en:'How often do you have difficulty getting things in order when you have to do a task that requires organization?' },
-  { n:3,  part:'A', threshold:2, es:'¿Con qué frecuencia tiene problemas para recordar citas u obligaciones?', en:'How often do you have problems remembering appointments or obligations?' },
-  { n:4,  part:'A', threshold:3, es:'Cuando tiene una tarea que requiere mucho pensamiento, ¿con qué frecuencia evita o demora el empezarla?', en:'When you have a task that requires a lot of thought, how often do you avoid or delay getting started?' },
-  { n:5,  part:'A', threshold:3, es:'¿Con qué frecuencia mueve nerviosamente las manos o los pies o se retuerce en el asiento cuando tiene que estar sentado/a por mucho tiempo?', en:'How often do you fidget or squirm with your hands or feet when you have to sit down for a long time?' },
-  { n:6,  part:'A', threshold:3, es:'¿Con qué frecuencia se siente demasiado activo/a y obligado/a a hacer cosas, como si fuera manejado/a por un motor?', en:'How often do you feel overly active and compelled to do things, like you were driven by a motor?' },
-  // Part B
-  { n:7,  part:'B', threshold:3, es:'¿Con qué frecuencia comete errores por descuido cuando tiene que trabajar en un proyecto aburrido o difícil?', en:'How often do you make careless mistakes when you have to work on a boring or difficult project?' },
-  { n:8,  part:'B', threshold:3, es:'¿Con qué frecuencia tiene dificultad para mantener la atención cuando está haciendo un trabajo aburrido o repetitivo?', en:'How often do you have difficulty keeping your attention when you are doing boring or repetitive work?' },
-  { n:9,  part:'B', threshold:2, es:'¿Con qué frecuencia tiene dificultad para concentrarse en lo que le dicen, incluso cuando le hablan directamente?', en:'How often do you have difficulty concentrating on what people say to you, even when they are speaking directly to you?' },
-  { n:10, part:'B', threshold:3, es:'¿Con qué frecuencia pierde u olvida dónde pone las cosas en casa o en el trabajo?', en:'How often do you misplace or have difficulty finding things at home or at work?' },
-  { n:11, part:'B', threshold:3, es:'¿Con qué frecuencia se distrae por la actividad o el ruido a su alrededor?', en:'How often are you distracted by activity or noise around you?' },
-  { n:12, part:'B', threshold:2, es:'¿Con qué frecuencia se levanta de su asiento en reuniones u otras situaciones en que se espera que permanezca sentado/a?', en:'How often do you leave your seat in meetings or other situations in which you are expected to remain seated?' },
-  { n:13, part:'B', threshold:3, es:'¿Con qué frecuencia se siente inquieto/a o con nervios en el cuerpo?', en:'How often do you feel restless or fidgety?' },
-  { n:14, part:'B', threshold:3, es:'¿Con qué frecuencia tiene dificultad para relajarse cuando tiene tiempo libre?', en:'How often do you have difficulty unwinding and relaxing when you have time to yourself?' },
-  { n:15, part:'B', threshold:3, es:'¿Con qué frecuencia se encuentra hablando demasiado cuando está en situaciones sociales?', en:'How often do you find yourself talking too much when you are in social situations?' },
-  { n:16, part:'B', threshold:2, es:'En una conversación, ¿con qué frecuencia termina las oraciones de las personas con las que habla antes de que ellas puedan terminarlas?', en:'When you\'re in a conversation, how often do you find yourself finishing the sentences of the people you are talking to, before they can finish them?' },
-  { n:17, part:'B', threshold:3, es:'¿Con qué frecuencia tiene dificultad para esperar su turno en situaciones en que se requiere turnarse?', en:'How often do you have difficulty waiting your turn in situations when turn taking is required?' },
-  { n:18, part:'B', threshold:2, es:'¿Con qué frecuencia interrumpe a otros cuando están ocupados?', en:'How often do you interrupt others when they are busy?' },
+  { n:1, es:'¿Con qué frecuencia comete errores por descuido cuando tiene que trabajar en una tarea aburrida o difícil?', en:'How often do you make careless mistakes when you have to work on a boring or difficult task?' },
+  { n:2, es:'¿Con qué frecuencia tiene dificultad para mantener la atención cuando está haciendo un trabajo aburrido o repetitivo?', en:'How often do you have difficulty keeping your attention when doing boring or repetitive work?' },
+  { n:3, es:'¿Con qué frecuencia tiene dificultad para concentrarse en lo que le dicen, incluso cuando le hablan directamente?', en:'How often do you have difficulty concentrating on what people say to you, even when they speak to you directly?' },
+  { n:4, es:'¿Con qué frecuencia deja proyectos a medio terminar una vez superados los pasos más difíciles?', en:'How often do you leave projects half-done once the most difficult parts are done?' },
+  { n:5, es:'¿Con qué frecuencia tiene dificultad para hacer tareas que requieren organización?', en:'How often do you have difficulty doing tasks that require organization?' },
+  { n:6, es:'¿Con qué frecuencia evita o demora comenzar tareas que requieren mucho esfuerzo mental?', en:'How often do you avoid or delay starting tasks that require a lot of mental effort?' },
 ];
 
-const PART_A = QUESTIONS.filter(q => q.part === 'A');
-const PART_B = QUESTIONS.filter(q => q.part === 'B');
+const FREQ = {
+  es: ['Nunca','Raramente','A veces','A menudo','Muy frecuente'],
+  en: ['Never','Rarely','Sometimes','Often','Very Often']
+};
 
 function getTopbarHeight() {
   const tb = document.querySelector('.topbar');
   return tb ? tb.offsetHeight + 12 : 70;
 }
 
-function renderGroup(questions, containerId) {
-  const container = document.getElementById(containerId);
-  container.innerHTML = '';
-  questions.forEach((q, idx) => {
-    const globalIdx = QUESTIONS.indexOf(q);
-    const div = document.createElement('div');
-    div.className = 'question-section';
-    div.id = 'qsec' + q.n;
-    const subClass = 'subscale-' + q.part;
-
-    // Mark which options are "positive threshold" for visual cue
-    // threshold: 2 = options 2,3,4 are positive; 3 = options 3,4 are positive
-    const optionsHTML = FREQ_VALUES.map(v => {
-      const isPos = v >= q.threshold;
-      const posClass = isPos ? ' positive-threshold' : '';
-      return `
-        <div class="radio-option${posClass}">
-          <input type="radio" name="q${q.n}" id="q${q.n}_${v}" value="${v}"
-            onchange="onAnswerSelected(${q.n}, ${globalIdx})">
-          <label for="q${q.n}_${v}">
-            <span class="radio-score" style="font-size:var(--text-xs)">${v}</span>
-            <span class="radio-label-es">${FREQ_LABELS.es[v]}</span>
-            <span class="radio-label-en">${FREQ_LABELS.en[v]}</span>
-          </label>
-        </div>`;
-    }).join('');
-
-    div.innerHTML = `
+function renderQuestions() {
+  const c = document.getElementById('questions-container');
+  c.innerHTML = '';
+  QUESTIONS.forEach((q, idx) => {
+    const d = document.createElement('div');
+    d.className = 'question-section';
+    d.id = 'qsec' + q.n;
+    const opts = [0,1,2,3,4].map(v => `
+      <div class="radio-option">
+        <input type="radio" name="q${q.n}" id="q${q.n}_${v}" value="${v}"
+          onchange="onAnswer(${q.n}, ${idx})">
+        <label for="q${q.n}_${v}">
+          <span class="radio-score">${v}</span>
+          <span class="radio-label-es">${FREQ.es[v]}</span>
+          <span class="radio-label-en">${FREQ.en[v]}</span>
+        </label>
+      </div>`).join('');
+    d.innerHTML = `
       <div class="question-row">
-        <div class="question-number ${subClass}">${q.n}</div>
+        <div class="question-number">${q.n}</div>
         <div class="question-body">
-          <div class="subscale-tag ${subClass}">${q.part}</div>
           <div class="question-text-es">${q.es}</div>
           <div class="question-text-en">${q.en}</div>
-          <div class="radio-group options-wrap">${optionsHTML}</div>
+          <div class="radio-group">${opts}</div>
         </div>
       </div>`;
-    container.appendChild(div);
+    c.appendChild(d);
   });
 }
 
-function onAnswerSelected(qNum, globalIdx) {
+function onAnswer(qNum, idx) {
   updateScore();
   generateNote();
-  const nextGlobalIdx = globalIdx + 1;
-  if (nextGlobalIdx < QUESTIONS.length) {
-    const nextSec = document.getElementById('qsec' + QUESTIONS[nextGlobalIdx].n);
-    if (nextSec) window.scrollTo({ top: nextSec.getBoundingClientRect().top + window.scrollY - getTopbarHeight(), behavior: 'smooth' });
+  const next = idx + 1;
+  if (next < QUESTIONS.length) {
+    const el = document.getElementById('qsec' + QUESTIONS[next].n);
+    if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - getTopbarHeight(), behavior: 'smooth' });
   } else {
-    const panel = document.getElementById('scorePanel');
-    if (panel) window.scrollTo({ top: panel.getBoundingClientRect().top + window.scrollY - getTopbarHeight(), behavior: 'smooth' });
+    const p = document.getElementById('scorePanel');
+    if (p) window.scrollTo({ top: p.getBoundingClientRect().top + window.scrollY - getTopbarHeight(), behavior: 'smooth' });
   }
 }
 
-function getScores() {
-  let partAPositive = 0, partBPositive = 0;
-  let partAAnswered = 0, partBAnswered = 0;
-  const posItemsA = [];
-  const posItemsB = [];
-
+function getTotal() {
+  let total = 0, answered = 0;
   QUESTIONS.forEach(q => {
     const c = document.querySelector(`input[name="q${q.n}"]:checked`);
-    if (c !== null) {
-      const v = parseInt(c.value);
-      const isPos = v >= q.threshold;
-      if (q.part === 'A') {
-        partAAnswered++;
-        if (isPos) { partAPositive++; posItemsA.push(q.n); }
-      } else {
-        partBAnswered++;
-        if (isPos) { partBPositive++; posItemsB.push(q.n); }
-      }
-    }
+    if (c) { total += parseInt(c.value); answered++; }
   });
-  return { partAPositive, partBPositive, partAAnswered, partBAnswered, posItemsA, posItemsB };
+  return { total, answered };
 }
 
 function updateScore() {
-  const { partAPositive, partBPositive, partAAnswered, partBAnswered, posItemsA } = getScores();
+  const { total, answered } = getTotal();
   const lang = document.documentElement.getAttribute('data-lang') || 'es';
-  const isBi = lang === 'bi', isEN = lang === 'en';
-  const partAComplete = partAAnswered === 6;
-  const screenPositive = partAPositive >= 4;
-
-  document.getElementById('partAScore').textContent = partAPositive;
-  document.getElementById('score_partA').textContent = partAPositive;
-  document.getElementById('score_partB').textContent = partBPositive;
-
-  document.getElementById('subPartA').className = 'subscale-item' + (screenPositive ? ' concern' : '');
-
+  const isEN = lang === 'en';
+  document.getElementById('totalScore').textContent = total;
   const badge = document.getElementById('resultBadge');
   const text  = document.getElementById('resultText');
-  function setBadge(esTxt, enTxt, cls) {
+  function set(es, en, cls) {
     badge.className = 'score-result-badge ' + cls;
-    text.setAttribute('data-es', esTxt);
-    text.setAttribute('data-en', enTxt);
-    if (isBi) text.innerHTML = esTxt + '<span class="bi-en-line">' + enTxt + '</span>';
-    else text.textContent = isEN ? enTxt : esTxt;
+    text.setAttribute('data-es', es); text.setAttribute('data-en', en);
+    text.textContent = isEN ? en : es;
   }
-
-  if (!partAComplete) {
-    setBadge(`${partAAnswered}/6 Parte A respondidas`, `${partAAnswered}/6 Part A answered`, 'incomplete');
-  } else if (screenPositive) {
-    setBadge('⚠ Tamizaje POSITIVO — Evaluación adicional indicada', '⚠ Screen POSITIVE — Further evaluation indicated', 'positive');
-  } else {
-    setBadge('✓ Tamizaje NEGATIVO (Parte A < 4 positivos)', '✓ Screen NEGATIVE (Part A < 4 positives)', 'negative');
-  }
-
-  // Show positive items
-  const posBox = document.getElementById('posItemsBox');
-  const posList = document.getElementById('posItemsList');
-  if (posItemsA.length > 0) {
-    posBox.style.display = '';
-    posList.textContent = posItemsA.map(n => `#${n}`).join(', ');
-  } else {
-    posBox.style.display = 'none';
-  }
+  if (answered < 6)    set(`${answered}/6 respondidas`, `${answered}/6 answered`, 'incomplete');
+  else if (total >= 14) set('⚠ Consistente con TDAH (≥14) — evaluar', '⚠ Consistent with ADHD (≥14) — evaluate', 'positive');
+  else                  set('✓ No consistente con TDAH (<14)', '✓ Not consistent with ADHD (<14)', 'negative');
 }
 
 function generateNote() {
-  const { partAPositive, partBPositive, partAAnswered, partBAnswered, posItemsA, posItemsB } = getScores();
+  const { total, answered } = getTotal();
   const lang = document.documentElement.getAttribute('data-lang') || 'es';
-  const isBI = lang === 'bi', isEN = lang === 'en';
-  const todayES = new Date().toLocaleDateString('es-HN', { year:'numeric', month:'long', day:'numeric' });
-  const todayEN = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
-  const screenPositive = partAPositive >= 4;
-  const resultES = screenPositive ? '⚠ POSITIVO — evaluación adicional indicada' : '✓ NEGATIVO';
-  const resultEN = screenPositive ? '⚠ POSITIVE — further evaluation indicated' : '✓ NEGATIVE';
-  const posAstr = posItemsA.length > 0 ? posItemsA.map(n=>`#${n}`).join(', ') : 'ninguno/none';
-  const posBstr = posItemsB.length > 0 ? posItemsB.map(n=>`#${n}`).join(', ') : 'ninguno/none';
-
-  const noteES =
-`ASRS v1.1 — Resumen de Resultados — ${todayES}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Instrumento: Adult ADHD Self-Report Scale v1.1
-Fuente: OMS / Harvard Medical School (Kessler et al., 2005)
-Ítems completados: Parte A ${partAAnswered}/6 | Parte B ${partBAnswered}/12
-
-PARTE A — TAMIZAJE:
-  • Ítems positivos: ${partAPositive}/6
-  • Resultado: ${resultES}
-  • Ítems positivos: ${posItemsA.length > 0 ? posItemsA.map(n=>`ítem ${n}`).join(', ') : 'ninguno'}
-
-PARTE B — SONDAS ADICIONALES:
-  • Ítems positivos: ${partBPositive}/12
-  • Ítems positivos: ${posItemsB.length > 0 ? posItemsB.map(n=>`ítem ${n}`).join(', ') : 'ninguno'}
-
-Nota: Un tamizaje positivo (≥4/6 en Parte A) es altamente consistente con TDAH y justifica evaluación clínica completa.`;
-
-  const noteEN =
-`ASRS v1.1 — Results Summary — ${todayEN}
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Instrument: Adult ADHD Self-Report Scale v1.1
-Source: WHO / Harvard Medical School (Kessler et al., 2005)
-Items completed: Part A ${partAAnswered}/6 | Part B ${partBAnswered}/12
-
-PART A — SCREENER:
-  • Positive items: ${partAPositive}/6
-  • Result: ${resultEN}
-  • Positive items: ${posItemsA.length > 0 ? posItemsA.map(n=>`item ${n}`).join(', ') : 'none'}
-
-PART B — ADDITIONAL PROBES:
-  • Positive items: ${partBPositive}/12
-  • Positive items: ${posItemsB.length > 0 ? posItemsB.map(n=>`item ${n}`).join(', ') : 'none'}
-
-Note: A positive screen (≥4/6 on Part A) is highly consistent with ADHD and warrants full clinical evaluation.`;
-
-  const box = document.getElementById('noteSummaryBox');
-  box.textContent = isBI ? noteES + '\n\n' + noteEN : isEN ? noteEN : noteES;
+  const isEN = lang === 'en';
+  const today = new Date().toLocaleDateString(isEN ? 'en-US' : 'es-HN', { year:'numeric', month:'long', day:'numeric' });
+  const result = total >= 14
+    ? (isEN ? '⚠ POSITIVE SCREEN — Further evaluation indicated' : '⚠ TAMIZAJE POSITIVO — Evaluación adicional indicada')
+    : (isEN ? '✓ NEGATIVE SCREEN' : '✓ TAMIZAJE NEGATIVO');
+  const note = isEN
+    ? `ASRS-5 — Results — ${today}\nItems completed: ${answered}/6\nTotal score: ${total}/24\nResult: ${result}\n\nReference: Ustun et al. (2017). JAMA Psychiatry, 74(5), 520–527.\nCutoff ≥14: Sensitivity 91.4% / Specificity 96.0%`
+    : `ASRS-5 — Resultados — ${today}\nÍtems completados: ${answered}/6\nPuntaje total: ${total}/24\nResultado: ${result}\n\nReferencia: Ustun et al. (2017). JAMA Psychiatry, 74(5), 520–527.\nCorte ≥14: Sensibilidad 91.4% / Especificidad 96.0%`;
+  document.getElementById('noteSummaryBox').textContent = note;
 }
 
 function copyNote() {
-  const box = document.getElementById('noteSummaryBox');
-  const text = box.textContent;
-  if (!text) return;
-  navigator.clipboard.writeText(text).then(() => {
+  const t = document.getElementById('noteSummaryBox').textContent;
+  if (!t) return;
+  navigator.clipboard.writeText(t).then(() => {
     const fb = document.getElementById('copyFeedback');
     const lang = document.documentElement.getAttribute('data-lang') || 'es';
     fb.textContent = lang === 'en' ? 'Copied!' : '¡Copiado!';
     fb.classList.add('show');
     setTimeout(() => fb.classList.remove('show'), 2500);
-  }).catch(() => {});
+  });
 }
 
 function resetForm() {
-  QUESTIONS.forEach(q => {
-    document.querySelectorAll(`input[name="q${q.n}"]`).forEach(r => r.checked = false);
-  });
-  updateScore();
-  generateNote();
+  QUESTIONS.forEach(q => document.querySelectorAll(`input[name="q${q.n}"]`).forEach(r => r.checked = false));
+  updateScore(); generateNote();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
-// Theme toggle
-(function () {
+(function() {
   const t = document.querySelector('[data-theme-toggle]'), r = document.documentElement;
-  let d = 'dark';
-  r.setAttribute('data-theme', d);
+  let d = 'dark'; r.setAttribute('data-theme', d);
   const moonSVG = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
   const sunSVG  = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
-  if (t) {
-    t.innerHTML = sunSVG;
-    t.addEventListener('click', () => {
-      d = d === 'dark' ? 'light' : 'dark';
-      r.setAttribute('data-theme', d);
-      t.innerHTML = d === 'dark' ? sunSVG : moonSVG;
-    });
-  }
+  if (t) { t.innerHTML = sunSVG; t.addEventListener('click', () => { d = d==='dark'?'light':'dark'; r.setAttribute('data-theme', d); t.innerHTML = d==='dark'?sunSVG:moonSVG; }); }
 })();
 
 function setLang(lang) {
@@ -1613,33 +1431,25 @@ function setLang(lang) {
   params.set('lang', lang);
   history.replaceState(null, '', '?' + params.toString());
   document.documentElement.setAttribute('data-lang', lang);
-  const isBi = lang === 'bi', isEN = lang === 'en';
-
+  const isEN = lang === 'en';
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
-    const esTxt = el.getAttribute('data-es');
-    const enTxt = el.getAttribute('data-en');
-    if (isBi) el.innerHTML = esTxt + '<span class="bi-en-line">' + enTxt + '</span>';
-    else el.textContent = isEN ? enTxt : esTxt;
+    el.textContent = isEN ? el.getAttribute('data-en') : el.getAttribute('data-es');
   });
-
   document.querySelectorAll('.question-text-en, .radio-label-en').forEach(el => {
-    el.style.display = (isBi || isEN) ? '' : 'none';
+    el.style.display = isEN ? '' : 'none';
   });
-
-  document.getElementById('btnES').classList.toggle('active', lang === 'es');
-  document.getElementById('btnBI').classList.toggle('active', isBi);
+  document.querySelectorAll('.question-text-es, .radio-label-es').forEach(el => {
+    el.style.display = isEN ? 'none' : '';
+  });
+  document.getElementById('btnES').classList.toggle('active', !isEN);
   document.getElementById('btnEN').classList.toggle('active', isEN);
-
-  generateNote();
-  updateScore();
+  generateNote(); updateScore();
 }
 
-// Init
 (function() {
   const params = new URLSearchParams(location.search);
   const lang = params.get('lang') || 'es';
-  renderGroup(PART_A, 'questions-container-a');
-  renderGroup(PART_B, 'questions-container-b');
+  renderQuestions();
   setLang(lang);
 })();
 </script>

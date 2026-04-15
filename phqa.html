@@ -1258,6 +1258,21 @@ a, button, [role='button'], input, select {
 }
 .copyright-footer strong { color: var(--color-text); }
 
+
+/* Fix phantom radio highlight after auto-scroll */
+.radio-option input[type="radio"]:focus + label {
+  outline: none;
+  box-shadow: none;
+}
+.radio-option input[type="radio"]:not(:checked) + label {
+  border-color: var(--color-border) !important;
+  background: var(--color-bg) !important;
+  box-shadow: none !important;
+}
+.radio-option input[type="radio"]:not(:checked) + label:hover {
+  border-color: var(--color-primary) !important;
+  background: var(--color-primary-bg) !important;
+}
 </style>
 </head>
 <body>
@@ -1283,7 +1298,6 @@ a, button, [role='button'], input, select {
       <div class="topbar-actions">
         <div class="lang-toggle">
           <button class="lang-btn active" id="btnES" onclick="setLang('es')">ES</button>
-          <button class="lang-btn" id="btnBI" onclick="setLang('bi')">ES+EN</button>
           <button class="lang-btn" id="btnEN" onclick="setLang('en')">EN</button>
         </div>
         <button class="theme-toggle" data-theme-toggle aria-label="Cambiar tema">
@@ -1366,8 +1380,8 @@ a, button, [role='button'], input, select {
     </div><!-- /page-content -->
   
   <div class="copyright-footer">
-    <strong>Aviso de derechos de autor / Copyright Notice</strong><br>
-    Patient Health Questionnaire — Adolescent Version (PHQ-A). Desarrollado por los Drs. Robert L. Spitzer, Janet B.W. Williams, Kurt Kroenke y colaboradores. Copyright &copy; Pfizer Inc. Todos los derechos reservados. / All rights reserved. Reproducido con permiso. / Reproduced with permission.
+    <strong data-es="Derechos de autor:" data-en="Copyright:">Derechos de autor:</strong>
+    <span data-es=" PHQ-A (Patient Health Questionnaire — Adolescent version). © Pfizer Inc., 2001. Reproducción no restringida, sin cargos, con o sin permiso. No para uso comercial ni distribución masiva con fines de lucro." data-en=" PHQ-A (Patient Health Questionnaire — Adolescent version). © Pfizer Inc., 2001. Reproduction unrestricted, no charge, with or without permission. Not for commercial use or mass distribution for profit."> PHQ-A (Patient Health Questionnaire — Adolescent version). © Pfizer Inc., 2001. Reproducción no restringida, sin cargos, con o sin permiso. No para uso comercial ni distribución masiva con fines de lucro.</span>
   </div>
 
 </main>
@@ -1474,7 +1488,7 @@ function updateScore() {
   const { total, answered } = getScores();
   const complete = answered === 9;
   const lang = document.documentElement.getAttribute('data-lang') || 'es';
-  const isBi = lang === 'bi', isEN = lang === 'en';
+  isEN = lang === 'en';
 
   document.getElementById('totalScore').textContent = total;
 
@@ -1503,7 +1517,6 @@ function updateScore() {
     badge.className = 'score-result-badge ' + cls;
     text.setAttribute('data-es', esTxt);
     text.setAttribute('data-en', enTxt);
-    if (isBi) text.innerHTML = esTxt + '<span class="bi-en-line">' + enTxt + '</span>';
     else text.textContent = isEN ? enTxt : esTxt;
   }
 
@@ -1520,7 +1533,7 @@ function generateNote() {
   const { total, answered } = getScores();
   const complete = answered === 9;
   const lang = document.documentElement.getAttribute('data-lang') || 'es';
-  const isBI = lang === 'bi', isEN = lang === 'en';
+   isEN = lang === 'en';
   const riskQ = document.querySelector('input[name="q9"]:checked');
   const riskVal = riskQ ? parseInt(riskQ.value) : 0;
   const todayES = new Date().toLocaleDateString('es-HN', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -1551,7 +1564,7 @@ Total score: ${total} / 27
 Severity: ${sevEN}
 Clinical cutoff: ≥10 (Moderate or greater)${riskLineEN}`;
 
-  let note = isBI ? noteES + '\n\n' + noteEN : isEN ? noteEN : noteES;
+  let note = isEN ? noteEN : noteES;
   document.getElementById('noteSummaryBox').textContent = note;
 }
 
@@ -1599,20 +1612,26 @@ function resetForm() {
 
 // ===== LANGUAGE =====
 function setLang(lang) {
+  const params = new URLSearchParams(location.search);
+  params.set('lang', lang);
+  history.replaceState(null, '', '?' + params.toString());
   document.documentElement.setAttribute('data-lang', lang);
-  const isBi = lang === 'bi';
   const isEN = lang === 'en';
-  const isES = lang === 'es';
-
   document.querySelectorAll('[data-es][data-en]').forEach(el => {
-    if (el.classList.contains('question-text-es') || el.classList.contains('question-text-en')) return;
-    const esText  = el.getAttribute('data-es');
-    const enText  = el.getAttribute('data-en');
-    const esHTML  = el.getAttribute('data-es-html') || esText;
-    const enHTML  = el.getAttribute('data-en-html') || enText;
-    if (isBi) {
-      el.innerHTML = esHTML + '<span class="bi-en-line">' + enText + '</span>';
-    } else if (isEN) {
+    if (el.classList.contains('question-text-es') || el.classList.contains('question-text-en') ||
+        el.classList.contains('radio-label-es') || el.classList.contains('radio-label-en')) return;
+    el.textContent = isEN ? el.getAttribute('data-en') : el.getAttribute('data-es');
+  });
+  document.querySelectorAll('.question-text-en, .radio-label-en').forEach(el => { el.style.display = isEN ? '' : 'none'; });
+  document.querySelectorAll('.question-text-es, .radio-label-es').forEach(el => { el.style.display = isEN ? 'none' : ''; });
+  const btnES = document.getElementById('btnES');
+  const btnEN = document.getElementById('btnEN');
+  if (btnES) btnES.classList.toggle('active', !isEN);
+  if (btnEN) btnEN.classList.toggle('active', isEN);
+  if (typeof generateNote === 'function') generateNote();
+  if (typeof updateScore === 'function') updateScore();
+  if (typeof setLangPartial === 'function') setLangPartial(lang);
+} else if (isEN) {
       el.innerHTML = enHTML;
     } else {
       el.innerHTML = esHTML;
@@ -1620,20 +1639,19 @@ function setLang(lang) {
   });
 
   document.querySelectorAll('.question-text-es').forEach(el => {
-    el.style.display = (isES || isBi) ? 'block' : 'none';
+    el.style.display = (isES) ? 'block' : 'none';
   });
   document.querySelectorAll('.question-text-en').forEach(el => {
-    el.style.display = (isEN || isBi) ? 'block' : 'none';
+    el.style.display = (isEN) ? 'block' : 'none';
   });
   document.querySelectorAll('.radio-label-es').forEach(el => {
-    el.style.display = (isES || isBi) ? 'block' : 'none';
+    el.style.display = (isES) ? 'block' : 'none';
   });
   document.querySelectorAll('.radio-label-en').forEach(el => {
-    el.style.display = (isEN || isBi) ? 'block' : 'none';
+    el.style.display = (isEN) ? 'block' : 'none';
   });
 
   document.getElementById('btnES').classList.toggle('active', isES);
-  document.getElementById('btnBI').classList.toggle('active', isBi);
   document.getElementById('btnEN').classList.toggle('active', isEN);
 
   document.querySelectorAll('a[href]').forEach(function(a) {
