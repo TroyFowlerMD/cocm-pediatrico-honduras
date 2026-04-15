@@ -2890,6 +2890,8 @@ applyTheme(savedTheme);
 const urlLang = new URLSearchParams(location.search).get('lang') || 'es';
 applyLang(urlLang);
 renderScore();
+// Update back link with current lang
+document.querySelectorAll('a[href="index.html"]').forEach(a => a.href='index.html?lang='+urlLang);
 
 </script>
 </body>

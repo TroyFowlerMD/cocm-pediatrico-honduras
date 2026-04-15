@@ -1414,16 +1414,33 @@ function renderQuestions() {
   generateNote();
 }
 
+// ===== SMART AUTO-SCROLL =====
+var _answeredIdxs = new Set();
+function _tbH() { var t=document.querySelector('.topbar'); return t?t.getBoundingClientRect().height:50; }
+function _scrollTo(el) { window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - _tbH(), behavior:'smooth'}); }
+function _hasUnansweredVisible() {
+  var tbH=_tbH(), vh=window.innerHeight;
+  for (var i=0;i<QUESTIONS.length;i++) {
+    if (_answeredIdxs.has(i)) continue;
+    var el=document.getElementById('qsec'+QUESTIONS[i].n);
+    if (!el) continue;
+    var r=el.getBoundingClientRect();
+    if (r.top < vh && r.bottom > tbH) return true;
+  }
+  return false;
+}
 function onAnswerSelected(qNum, idx) {
+  _answeredIdxs.add(idx);
   updateScore();
   generateNote();
-  const nextIdx = idx + 1;
+  if (_hasUnansweredVisible()) return;
+  var nextIdx = idx + 1;
   if (nextIdx < QUESTIONS.length) {
-    const nextSec = document.getElementById('qsec' + QUESTIONS[nextIdx].n);
-    if (nextSec) window.scrollTo({ top: nextSec.getBoundingClientRect().top + window.scrollY - getTopbarHeight(), behavior: 'smooth' });
+    var nextEl = document.getElementById('qsec' + QUESTIONS[nextIdx].n);
+    if (nextEl) _scrollTo(nextEl);
   } else {
-    const panel = document.getElementById('scorePanel');
-    if (panel) window.scrollTo({ top: panel.getBoundingClientRect().top + window.scrollY - getTopbarHeight(), behavior: 'smooth' });
+    var panel = document.getElementById('scorePanel');
+    if (panel) _scrollTo(panel);
   }
 }
 
@@ -1596,6 +1613,8 @@ function setLang(lang) {
   const lang = params.get('lang') || 'es';
   renderQuestions();
   setLang(lang);
+  // Update back link with current lang
+  document.querySelectorAll('a[href="index.html"]').forEach(a => a.href = 'index.html?lang=' + lang);
 })();
 </script>
 </body>

@@ -1480,22 +1480,33 @@ function renderQuestions() {
 }
 
 // ===== ON ANSWER SELECTED =====
+// ===== SMART AUTO-SCROLL =====
+var _answeredIdxs = new Set();
+function _tbH() { var t=document.querySelector('.topbar'); return t?t.getBoundingClientRect().height:50; }
+function _scrollTo(el) { window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - _tbH(), behavior:'smooth'}); }
+function _hasUnansweredVisible() {
+  var tbH=_tbH(), vh=window.innerHeight;
+  for (var i=0;i<QUESTIONS.length;i++) {
+    if (_answeredIdxs.has(i)) continue;
+    var el=document.getElementById('qsec'+QUESTIONS[i].n);
+    if (!el) continue;
+    var r=el.getBoundingClientRect();
+    if (r.top < vh && r.bottom > tbH) return true;
+  }
+  return false;
+}
 function onAnswerSelected(qNum, idx) {
+  _answeredIdxs.add(idx);
   updateScore();
   generateNote();
-  const nextIdx = idx + 1;
+  if (_hasUnansweredVisible()) return;
+  var nextIdx = idx + 1;
   if (nextIdx < QUESTIONS.length) {
-    const nextSec = document.getElementById(`qsec${QUESTIONS[nextIdx].n}`);
-    if (nextSec) {
-      const offset = nextSec.getBoundingClientRect().top + window.scrollY - getTopbarHeight();
-      window.scrollTo({ top: offset, behavior: 'smooth' });
-    }
+    var nextEl = document.getElementById('qsec' + QUESTIONS[nextIdx].n);
+    if (nextEl) _scrollTo(nextEl);
   } else {
-    const panel = document.getElementById('scorePanel');
-    if (panel) {
-      const offset = panel.getBoundingClientRect().top + window.scrollY - getTopbarHeight();
-      window.scrollTo({ top: offset, behavior: 'smooth' });
-    }
+    var panel = document.getElementById('scorePanel');
+    if (panel) _scrollTo(panel);
   }
 }
 
@@ -1648,13 +1659,13 @@ function setLang(lang) {
   if (typeof setLangPartial === 'function') setLangPartial(lang);
 }
 // ===== RESTORE LANG FROM URL =====
-(function() {
-  var m = location.search.match(/[?&]lang=([^&]+)/);
-  if (m) setLang(decodeURIComponent(m[1]));
-})();
-
 // ===== INIT =====
 renderQuestions();
+(function() {
+  var lang = new URLSearchParams(location.search).get('lang') || 'es';
+  setLang(lang);
+  document.querySelectorAll('a[href="index.html"]').forEach(function(a){ a.href='index.html?lang='+lang; });
+})();
 </script>
 </body>
 </html>

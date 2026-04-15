@@ -1187,23 +1187,6 @@ a, button, [role='button'], input, select {
   display: none !important;
 }
   </style>
-/* No sidebar */
-.no-sidebar .main-content { margin-left: 0; width: 100%; }
-/* Fix phantom radio highlight after auto-scroll */
-.radio-option input[type="radio"]:focus + label {
-  outline: none;
-  box-shadow: none;
-}
-.radio-option input[type="radio"]:not(:checked) + label {
-  border-color: var(--color-border) !important;
-  background: var(--color-bg) !important;
-  box-shadow: none !important;
-}
-.radio-option input[type="radio"]:not(:checked) + label:hover {
-  border-color: var(--color-primary) !important;
-  background: var(--color-primary-bg) !important;
-}
-</style>
 </head>
 <body class="no-sidebar">
 <div class="app-layout">
@@ -1347,16 +1330,33 @@ function renderQuestions() {
   });
 }
 
+// ===== SMART AUTO-SCROLL =====
+var _answeredIdxs = new Set();
+function _tbH() { var t=document.querySelector('.topbar'); return t?t.getBoundingClientRect().height:50; }
+function _scrollTo(el) { window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - _tbH(), behavior:'smooth'}); }
+function _hasUnansweredVisible() {
+  var tbH=_tbH(), vh=window.innerHeight;
+  for (var i=0;i<QUESTIONS.length;i++) {
+    if (_answeredIdxs.has(i)) continue;
+    var el=document.getElementById('qsec'+QUESTIONS[i].n);
+    if (!el) continue;
+    var r=el.getBoundingClientRect();
+    if (r.top < vh && r.bottom > tbH) return true;
+  }
+  return false;
+}
 function onAnswer(qNum, idx) {
+  _answeredIdxs.add(idx);
   updateScore();
   generateNote();
-  const next = idx + 1;
-  if (next < QUESTIONS.length) {
-    const el = document.getElementById('qsec' + QUESTIONS[next].n);
-    if (el) window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - getTopbarHeight(), behavior: 'smooth' });
+  if (_hasUnansweredVisible()) return;
+  var nextIdx = idx + 1;
+  if (nextIdx < QUESTIONS.length) {
+    var nextEl = document.getElementById('qsec' + QUESTIONS[nextIdx].n);
+    if (nextEl) _scrollTo(nextEl);
   } else {
-    const p = document.getElementById('scorePanel');
-    if (p) window.scrollTo({ top: p.getBoundingClientRect().top + window.scrollY - getTopbarHeight(), behavior: 'smooth' });
+    var panel = document.getElementById('scorePanel');
+    if (panel) _scrollTo(panel);
   }
 }
 
@@ -1451,6 +1451,8 @@ function setLang(lang) {
   const lang = params.get('lang') || 'es';
   renderQuestions();
   setLang(lang);
+  // Update back link with current lang
+  document.querySelectorAll('a[href="index.html"]').forEach(a => a.href = 'index.html?lang=' + lang);
 })();
 </script>
 </body>
