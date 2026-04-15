@@ -1654,6 +1654,7 @@ function setLang(lang) {
   if (typeof generateNote === 'function') generateNote();
   if (typeof updateScore === 'function') updateScore();
   if (typeof setLangPartial === 'function') setLangPartial(lang);
+}
 // ===== RESTORE LANG FROM URL =====
 (function() {
   var m = location.search.match(/[?&]lang=([^&]+)/);

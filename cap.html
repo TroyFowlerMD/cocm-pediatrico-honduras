@@ -1468,7 +1468,7 @@ function updateScore() {
     badge.className = 'score-result-badge ' + cls;
     text.setAttribute('data-es', esTxt);
     text.setAttribute('data-en', enTxt);
-    else text.textContent = isEN ? enTxt : esTxt;
+    text.textContent = isEN ? enTxt : esTxt;
   }
 
   if (!complete) {
@@ -1588,17 +1588,6 @@ function setLang(lang) {
   if (typeof generateNote === 'function') generateNote();
   if (typeof updateScore === 'function') updateScore();
   if (typeof setLangPartial === 'function') setLangPartial(lang);
-});
-
-  document.querySelectorAll('.question-text-en, .radio-label-en').forEach(el => {
-    el.style.display = (isEN) ? '' : 'none';
-  });
-
-  document.getElementById('btnES').classList.toggle('active', lang === 'es');
-  document.getElementById('btnEN').classList.toggle('active', isEN);
-
-  generateNote();
-  updateScore();
 }
 
 // Init

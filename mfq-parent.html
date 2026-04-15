@@ -1541,7 +1541,7 @@ function updateScore() {
     badge.className = 'score-result-badge ' + cls;
     text.setAttribute('data-es', esTxt);
     text.setAttribute('data-en', enTxt);
-    else text.textContent = isEN ? enTxt : esTxt;
+    text.textContent = isEN ? enTxt : esTxt;
   }
 
   if (!complete) setBadge(`${answered}/33 respondidas`, `${answered}/33 answered`, 'incomplete');
@@ -1646,6 +1646,7 @@ function setLang(lang) {
   if (typeof generateNote === 'function') generateNote();
   if (typeof updateScore === 'function') updateScore();
   if (typeof setLangPartial === 'function') setLangPartial(lang);
+}
 // ===== RESTORE LANG FROM URL =====
 (function() {
   var m = location.search.match(/[?&]lang=([^&]+)/);
