@@ -1483,8 +1483,6 @@ function renderQuestions() {
 }
 
 // ===== SMART AUTO-SCROLL =====
-// On each answer: scroll so the first unanswered question sits at the top of the screen.
-// On last answer: scroll score panel to top.
 var _answeredQNums = new Set();
 function _tbH() { var t = document.querySelector('.topbar'); return t ? t.getBoundingClientRect().height + 8 : 58; }
 function _scrollToTop(el) {
@@ -1492,25 +1490,43 @@ function _scrollToTop(el) {
   var top = el.getBoundingClientRect().top + window.scrollY - _tbH();
   window.scrollTo({ top: top, behavior: 'smooth' });
 }
+function _isFullyVisible(el) {
+  var r = el.getBoundingClientRect();
+  var tbH = _tbH();
+  return r.top >= tbH && r.bottom <= window.innerHeight;
+}
 function onAnswerSelected(qNum, idx) {
   _answeredQNums.add(qNum);
   updateScore();
   generateNote();
-  // Find first unanswered question
-  var nextQ = null;
-  for (var i = 0; i < QUESTIONS.length; i++) {
-    if (!_answeredQNums.has(QUESTIONS[i].n)) {
-      nextQ = document.getElementById('qsec' + QUESTIONS[i].n);
-      break;
-    }
-  }
+
+  var allSections = Array.from(document.querySelectorAll('.question-section'));
+  var allAnswered = allSections.every(function(s) {
+    var n = parseInt(s.id.replace('qsec', ''));
+    return _answeredQNums.has(n);
+  });
+
   setTimeout(function() {
-    if (nextQ) {
-      _scrollToTop(nextQ);
-    } else {
+    // All questions answered — scroll to score panel
+    if (allAnswered) {
       var panel = document.getElementById('scorePanel');
       if (panel) _scrollToTop(panel);
+      return;
     }
+
+    // Check if any fully-visible section is still unanswered — if so, don't scroll
+    var visibleUnanswered = allSections.filter(function(s) {
+      var n = parseInt(s.id.replace('qsec', ''));
+      return !_answeredQNums.has(n) && _isFullyVisible(s);
+    });
+    if (visibleUnanswered.length > 0) return;
+
+    // All fully-visible questions answered — scroll so next unanswered is at top
+    var nextUnanswered = allSections.find(function(s) {
+      var n = parseInt(s.id.replace('qsec', ''));
+      return !_answeredQNums.has(n);
+    });
+    if (nextUnanswered) _scrollToTop(nextUnanswered);
   }, 80);
 }
 
