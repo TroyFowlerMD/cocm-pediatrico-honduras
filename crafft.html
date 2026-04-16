@@ -1544,22 +1544,33 @@ function renderPartB() {
 var _crafftAnsweredIdxs = new Set();
 function _tbH() { var t=document.querySelector('.topbar'); return t?t.getBoundingClientRect().height+8:58; }
 function _scrollTo(el) { if(!el) return; window.scrollTo({top: el.getBoundingClientRect().top + window.scrollY - _tbH(), behavior:'smooth'}); }
+function _isFullyVisible(el) {
+  var r = el.getBoundingClientRect();
+  return r.top >= _tbH() && r.bottom <= window.innerHeight;
+}
 function onPartBSelected(qNum, idx, total) {
   _crafftAnsweredIdxs.add(idx);
   updateScore();
   generateNote();
+
+  var container = document.getElementById('partB-container');
+  var allSections = Array.from(container.querySelectorAll('.question-section'));
+  var allAnswered = allSections.every(function(s, i) { return _crafftAnsweredIdxs.has(i); });
+
   setTimeout(function() {
-    var qs = document.getElementById('partB-container').querySelectorAll('.question-section');
-    var nextQ = null;
-    for (var i = 0; i < qs.length; i++) {
-      if (!_crafftAnsweredIdxs.has(i)) { nextQ = qs[i]; break; }
-    }
-    if (nextQ) {
-      _scrollTo(nextQ);
-    } else {
+    if (allAnswered) {
       var panel = document.getElementById('scorePanel');
       if (panel) _scrollTo(panel);
+      return;
     }
+    var visibleUnanswered = allSections.filter(function(s, i) {
+      return !_crafftAnsweredIdxs.has(i) && _isFullyVisible(s);
+    });
+    if (visibleUnanswered.length > 0) return;
+    var nextUnanswered = allSections.find(function(s, i) {
+      return !_crafftAnsweredIdxs.has(i);
+    });
+    if (nextUnanswered) _scrollTo(nextUnanswered);
   }, 80);
 }
 

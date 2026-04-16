@@ -1498,6 +1498,40 @@ function _scrollToTop(el) {
   var top = el.getBoundingClientRect().top + window.scrollY - _tbH();
   window.scrollTo({ top: top, behavior: 'smooth' });
 }
+function _isFullyVisible(el) {
+  var r = el.getBoundingClientRect();
+  var tbH = _tbH();
+  return r.top >= tbH && r.bottom <= window.innerHeight;
+}
+function onAnswerSelected(qNum, idx) {
+  _answeredQNums.add(qNum);
+  updateScore();
+  generateNote();
+
+  var allSections = Array.from(document.querySelectorAll('.question-section'));
+  var allAnswered = allSections.every(function(s) {
+    var n = parseInt(s.id.replace('qsec', ''));
+    return _answeredQNums.has(n);
+  });
+
+  setTimeout(function() {
+    if (allAnswered) {
+      var panel = document.getElementById('scorePanel');
+      if (panel) _scrollToTop(panel);
+      return;
+    }
+    var visibleUnanswered = allSections.filter(function(s) {
+      var n = parseInt(s.id.replace('qsec', ''));
+      return !_answeredQNums.has(n) && _isFullyVisible(s);
+    });
+    if (visibleUnanswered.length > 0) return;
+    var nextUnanswered = allSections.find(function(s) {
+      var n = parseInt(s.id.replace('qsec', ''));
+      return !_answeredQNums.has(n);
+    });
+    if (nextUnanswered) _scrollToTop(nextUnanswered);
+  }, 80);
+}
 function onAnswerSelected(qNum, idx) {
   _answeredQNums.add(qNum);
   updateScore();
