@@ -1244,67 +1244,241 @@ a, button, [role='button'], input, select {
       </div>
 
 
-      <!-- Workflow summary -->
+      <!-- Workflow flowchart (embedded) -->
       <div class="section-heading" data-es="Flujo de Trabajo CoCM" data-en="CoCM Workflow">Flujo de Trabajo CoCM</div>
-      <div style="background:var(--color-surface); border:1px solid var(--color-border); border-radius:var(--radius-xl); padding:var(--space-5) var(--space-6); margin-bottom:var(--space-3); overflow-x:auto;">
-        <table style="width:100%; font-size:var(--text-sm); border-collapse:collapse; min-width:540px;">
-          <thead>
-            <tr style="border-bottom:2px solid var(--color-border);">
-              <th style="text-align:left; padding:var(--space-3) var(--space-4); color:var(--color-text-muted); font-weight:600; width:22%;" data-es="Condición" data-en="Condition">Condición</th>
-              <th style="text-align:left; padding:var(--space-3) var(--space-4); color:var(--color-primary); font-weight:600; width:39%;" data-es="Jóvenes ≤11" data-en="Youth ≤11">Jóvenes ≤11</th>
-              <th style="text-align:left; padding:var(--space-3) var(--space-4); color:var(--color-primary); font-weight:600; border-left:1px solid var(--color-border); width:39%;" data-es="Adolescentes ≥12" data-en="Adolescents ≥12">Adolescentes ≥12</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr style="border-bottom:1px solid var(--color-divider);">
-              <td style="padding:var(--space-3) var(--space-4); font-weight:600;" data-es="Tamizaje universal" data-en="Universal screening">Tamizaje universal</td>
-              <td style="padding:var(--space-3) var(--space-4);" colspan="2"><a href="psc17.html" class="workflow-link">PSC-17</a></td>
-            </tr>
-            <tr style="border-bottom:1px solid var(--color-divider);">
-              <td style="padding:var(--space-3) var(--space-4); font-weight:500;" data-es="Depresión" data-en="Depression">Depresión</td>
-              <td style="padding:var(--space-3) var(--space-4);">
-                <a href="mfq.html" class="workflow-link">MFQ-C</a> + <a href="mfq-parent.html" class="workflow-link">MFQ-P</a>
-                <div style="font-size:var(--text-xs); color:var(--color-text-faint); margin-top:2px;" data-es="Monitoreo: MFQ (breve)" data-en="Monitoring: MFQ (brief)">Monitoreo: MFQ (breve)</div>
-              </td>
-              <td style="padding:var(--space-3) var(--space-4); border-left:1px solid var(--color-border);">
-                <a href="phqa.html" class="workflow-link">PHQ-A</a>
-                <div style="font-size:var(--text-xs); color:var(--color-text-faint); margin-top:2px;" data-es="Monitoreo: PHQ-A" data-en="Monitoring: PHQ-A">Monitoreo: PHQ-A</div>
-              </td>
-            </tr>
-            <tr style="border-bottom:1px solid var(--color-divider);">
-              <td style="padding:var(--space-3) var(--space-4); font-weight:500;">TDAH</td>
-              <td style="padding:var(--space-3) var(--space-4);">
-                <a href="vanderbilt-parent.html" class="workflow-link">Vanderbilt-P</a> + <a href="vanderbilt-teacher.html" class="workflow-link">Vanderbilt-T</a>
-                <div style="font-size:var(--text-xs); color:var(--color-text-faint); margin-top:2px;" data-es="Monitoreo: CAP Scale / Vanderbilt" data-en="Monitoring: CAP Scale / Vanderbilt">Monitoreo: CAP Scale / Vanderbilt</div>
-              </td>
-              <td style="padding:var(--space-3) var(--space-4); border-left:1px solid var(--color-border);">
-                <a href="snapiv.html" class="workflow-link">SNAP-IV</a> + <a href="asrs.html" class="workflow-link">ASRS</a>
-                <div style="font-size:var(--text-xs); color:var(--color-text-faint); margin-top:2px;" data-es="Monitoreo: SNAP-IV + ASRS" data-en="Monitoring: SNAP-IV + ASRS">Monitoreo: SNAP-IV + ASRS</div>
-              </td>
-            </tr>
-            <tr style="border-bottom:1px solid var(--color-divider);">
-              <td style="padding:var(--space-3) var(--space-4); font-weight:500;" data-es="Ansiedad" data-en="Anxiety">Ansiedad</td>
-              <td style="padding:var(--space-3) var(--space-4);">
-                <a href="scared.html" class="workflow-link">SCARED-N</a> + <a href="scared-parent.html" class="workflow-link">SCARED-P</a>
-                <div style="font-size:var(--text-xs); color:var(--color-text-faint); margin-top:2px;" data-es="Monitoreo: SCARED" data-en="Monitoring: SCARED">Monitoreo: SCARED</div>
-              </td>
-              <td style="padding:var(--space-3) var(--space-4); border-left:1px solid var(--color-border);">
-                <a href="gad7.html" class="workflow-link">GAD-7</a>
-                <div style="font-size:var(--text-xs); color:var(--color-text-faint); margin-top:2px;" data-es="Monitoreo: GAD-7" data-en="Monitoring: GAD-7">Monitoreo: GAD-7</div>
-              </td>
-            </tr>
-            <tr>
-              <td style="padding:var(--space-3) var(--space-4); font-weight:500;" data-es="Riesgo / SUD" data-en="Risk / SUD">Riesgo / SUD</td>
-              <td style="padding:var(--space-3) var(--space-4); color:var(--color-text-faint);" data-es="— No aplica —" data-en="— Not applicable —">— No aplica —</td>
-              <td style="padding:var(--space-3) var(--space-4); border-left:1px solid var(--color-border);">
-                <a href="crafft.html" class="workflow-link">CRAFFT</a>
-                <div style="font-size:var(--text-xs); color:var(--color-text-faint); margin-top:2px;" data-es="Monitoreo: DAST-10" data-en="Monitoring: DAST-10">Monitoreo: DAST-10</div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <p style="font-size:var(--text-xs); color:var(--color-text-faint); margin-bottom:var(--space-8); padding:0 var(--space-2);"><a href="flowsheet.html" style="color:var(--color-primary); text-decoration:none;" data-es="Ver flujo visual →" data-en="See visual flowchart →">Ver flujo visual →</a></p>
+
+      <!-- Flowchart CSS vars (shorthand aliases used by flowchart components) -->
+      <style>
+        .flow-embed { --teal:#4F98A3; --teal-dim:rgba(79,152,163,0.14); --teal-border:rgba(79,152,163,0.4); --gold:#c89b3c; --gold-dim:rgba(200,155,60,0.12); --gold-border:rgba(200,155,60,0.5); --green:#4a9e6b; --green-dim:rgba(74,158,107,0.13); --green-border:rgba(74,158,107,0.4); --soon:#5a5955; --soon-dim:rgba(90,89,85,0.18); --surface:#171614; --surface-2:#1e1d1b; --border:#2a2927; --text:#d0cfc9; --muted:#78766e; --faint:#3e3d3a; }
+        [data-theme="light"] .flow-embed { --surface:#ffffff; --surface-2:#ebebea; --border:#d8d7d3; --text:#1a1917; --muted:#6b6960; --faint:#c0bfba; --teal-dim:rgba(79,152,163,0.09); --gold-dim:rgba(200,155,60,0.08); --green-dim:rgba(74,158,107,0.09); --soon-dim:rgba(0,0,0,0.05); }
+
+        /* Scroll hint */
+        .flow-scroll-hint { font-size:11px; color:var(--color-text-muted); margin-bottom:6px; padding-left:2px; }
+
+        /* Flowchart container */
+        .flow-embed-wrap {
+          background: var(--color-surface);
+          border: 1px solid var(--color-border);
+          border-radius: var(--radius-xl);
+          overflow-x: auto;
+          overflow-y: visible;
+          margin-bottom: var(--space-8);
+          -webkit-overflow-scrolling: touch;
+        }
+        .flow-embed {
+          padding: 16px 16px 24px;
+          min-width: 780px;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+          font-size: 13px;
+          color: var(--text);
+        }
+
+        /* Nodes */
+        .fe-node { display:flex; align-items:center; justify-content:center; text-align:center; border-radius:8px; padding:8px 10px; font-weight:600; font-size:12px; line-height:1.35; position:relative; }
+        .fe-node-entry { background:var(--surface-2); border:2px solid var(--border); border-radius:20px; font-size:11px; color:var(--muted); }
+        .fe-node-psc   { background:var(--green-dim); border:2px solid var(--green-border); color:var(--green); }
+        .fe-node-review{ background:var(--surface-2); border:2px solid var(--border); font-size:11px; color:var(--muted); }
+        .fe-node-enroll{ background:var(--gold-dim); border:2px dashed var(--gold-border); border-radius:20px; font-size:11px; color:var(--gold); }
+
+        /* Diamonds */
+        .fe-diamond-wrap { display:flex; align-items:center; justify-content:center; }
+        .fe-diamond { width:84px; height:84px; transform:rotate(45deg); border:2px solid var(--gold-border); background:var(--gold-dim); display:flex; align-items:center; justify-content:center; border-radius:6px; }
+        .fe-diamond-inner { transform:rotate(-45deg); font-size:10px; font-weight:600; color:var(--gold); text-align:center; padding:4px; line-height:1.3; max-width:70px; }
+        .fe-diamond-sm { width:68px; height:68px; transform:rotate(45deg); border:2px solid var(--teal-border); background:var(--teal-dim); display:flex; align-items:center; justify-content:center; border-radius:5px; }
+        .fe-diamond-sm-inner { transform:rotate(-45deg); font-size:9px; font-weight:600; color:var(--teal); text-align:center; padding:2px; line-height:1.3; max-width:56px; }
+
+        /* Condition label */
+        .fe-cond { display:flex; align-items:center; justify-content:center; text-align:center; padding:8px 12px; font-weight:700; font-size:13px; border:2px solid var(--border); border-radius:8px; background:var(--surface); color:var(--text); }
+
+        /* Tool boxes */
+        .fe-tool-box { display:flex; flex-direction:column; gap:5px; padding:10px 12px; border-radius:8px; }
+        .fe-tool-box.teal { background:var(--teal-dim); border:1px solid var(--teal-border); }
+        .fe-tool-link { display:inline-flex; align-items:center; gap:5px; font-weight:700; font-size:12px; color:var(--teal); text-decoration:none; transition:opacity .15s; }
+        .fe-tool-link:hover { opacity:.75; text-decoration:underline; }
+        .fe-dot { width:5px; height:5px; border-radius:50%; background:var(--teal); flex-shrink:0; }
+        .fe-tool-sub { font-size:10px; color:var(--muted); line-height:1.3; }
+        .fe-age-badge { display:inline-block; font-size:9px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; color:var(--teal); background:rgba(79,152,163,0.10); border:1px solid rgba(79,152,163,0.25); border-radius:4px; padding:1px 5px; margin-bottom:5px; white-space:nowrap; }
+
+        /* Monitor boxes */
+        .fe-monitor-box { display:flex; flex-direction:column; gap:4px; padding:8px 10px; border-radius:8px; background:var(--teal-dim); border:1px solid var(--teal-border); }
+        .fe-monitor-label { font-size:10px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+
+        /* Col headers */
+        .fe-col-header { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); text-align:center; padding:4px 0 10px; }
+        .fe-col-header.accent { color:var(--teal); }
+
+        /* Abbreviations legend */
+        .fe-abbr { margin:20px 0 0; padding:14px 16px; background:var(--surface); border:1px solid var(--border); border-radius:10px; }
+        .fe-abbr-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:12px; }
+        .fe-abbr-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:8px 20px; font-size:11px; color:var(--muted); line-height:1.5; }
+
+        /* Language */
+        .flow-embed [data-lang="es"] .en, .flow-embed.lang-es .en { display:none !important; }
+        .flow-embed [data-lang="en"] .es, .flow-embed.lang-en .es { display:none !important; }
+      </style>
+
+      <p class="flow-scroll-hint">
+        <span class="es">← Desliza para ver el flujo completo →</span>
+        <span class="en">← Scroll to see the full workflow →</span>
+      </p>
+
+      <div class="flow-embed-wrap">
+        <div class="flow-embed lang-es" id="flowEmbed">
+
+          <!-- Column headers -->
+          <div style="display:grid; grid-template-columns:160px 110px 270px 80px 150px; padding:0 0 6px; column-gap:0;">
+            <div class="fe-col-header"></div>
+            <div class="fe-col-header"></div>
+            <div class="fe-col-header accent"><span class="es">Herramientas de Detección</span><span class="en">Focused Screening Tools</span></div>
+            <div class="fe-col-header"></div>
+            <div class="fe-col-header accent"><span class="es">Monitoreo</span><span class="en">Monitoring Tools</span></div>
+          </div>
+
+          <!-- Entry + PSC row -->
+          <div style="display:grid; grid-template-columns:160px 110px 270px 80px 150px; column-gap:0; align-items:center; row-gap:8px;">
+            <div style="padding:4px 8px 4px 0;">
+              <div class="fe-node fe-node-entry" style="height:40px;"><span class="es">Referencia del programa</span><span class="en">Program Reference</span></div>
+            </div>
+            <div style="display:flex; align-items:center; justify-content:center; padding:4px;">
+              <svg width="100%" height="40" viewBox="0 0 110 40" fill="none" style="overflow:visible;">
+                <line x1="0" y1="20" x2="95" y2="20" stroke="#4a4945" stroke-width="1.5"/>
+                <polygon points="95,14 110,20 95,26" fill="#4a4945"/>
+              </svg>
+            </div>
+            <div style="padding:4px 8px; grid-column:3/5;">
+              <div class="fe-tool-box teal" style="align-items:center; text-align:center;">
+                <a href="psc17.html" class="fe-tool-link" style="font-size:14px; font-weight:800;"><span class="fe-dot"></span>PSC-17</a>
+                <span class="fe-tool-sub"><span class="es">Lista de Síntomas Pediátricos · 17 ítems · Corte ≥15</span><span class="en">Pediatric Symptom Checklist · 17 items · Cutoff ≥15</span></span>
+              </div>
+            </div>
+            <div></div>
+
+            <div style="padding:4px 0;">
+              <div class="fe-node fe-node-review" style="height:52px; font-size:11px;">
+                <div><div style="font-weight:700;"><span class="es">Cuidado Gerente/<br>Caso Psiquiátrico</span><span class="en">Care Manager/<br>Psychiatric Case</span></div><div style="color:var(--muted); font-size:10px; margin-top:2px;"><span class="es">Revisión</span><span class="en">Review</span></div></div>
+              </div>
+            </div>
+            <div style="grid-column:2/6;"></div>
+
+            <div style="padding:4px 0;">
+              <div class="fe-node fe-node-enroll" style="height:40px; font-size:11px;"><span class="es">Programa Inscripción</span><span class="en">Program Enrollment</span></div>
+            </div>
+            <div style="grid-column:2/6;"></div>
+
+            <div style="display:flex; align-items:center; justify-content:center; padding:8px 0;">
+              <div class="fe-diamond-wrap"><div class="fe-diamond"><div class="fe-diamond-inner"><span class="es">¿Qué paciente cribado positivo ¿para qué?</span><span class="en">What did patient screen positive for?</span></div></div></div>
+            </div>
+            <div style="grid-column:2/6;"></div>
+          </div>
+
+          <!-- Condition rows -->
+          <div style="display:grid; grid-template-columns:160px 110px 270px 80px 150px; column-gap:0; row-gap:10px; align-items:start; margin-top:4px;">
+            <div style="grid-column:1; grid-row:1/5;"></div>
+
+            <!-- Depression -->
+            <div style="grid-column:2; grid-row:1; padding:4px 6px; display:flex; align-items:center; justify-content:center;">
+              <div class="fe-cond" style="width:100%;"><span class="es">Depresión</span><span class="en">Depression</span></div>
+            </div>
+            <div style="grid-column:3; grid-row:1; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+              <div class="fe-tool-box teal"><div><span class="fe-age-badge"><span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span></span></div><a href="mfq.html" class="fe-tool-link"><span class="fe-dot"></span>MFQ-C</a><a href="mfq-parent.html" class="fe-tool-link"><span class="fe-dot"></span>MFQ-P</a></div>
+              <div class="fe-tool-box teal"><div><span class="fe-age-badge"><span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span></span></div><a href="phqa.html" class="fe-tool-link"><span class="fe-dot"></span>PHQ-A (PHQ-9)</a></div>
+            </div>
+            <div style="grid-column:4; grid-row:1; display:flex; align-items:center; justify-content:center; padding:4px;">
+              <div class="fe-diamond-sm"><div class="fe-diamond-sm-inner"><span class="es">¿Qué herramienta monitorear?</span><span class="en">Which tool to monitor?</span></div></div>
+            </div>
+            <div style="grid-column:5; grid-row:1; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+              <div class="fe-monitor-box"><span class="fe-monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span><span class="fe-tool-sub" style="font-size:11px; font-weight:600; color:var(--teal);"><span class="es">Estado de breve MFQ</span><span class="en">MFQ Brief</span></span></div>
+              <div class="fe-monitor-box"><span class="fe-monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span><a href="phqa.html" class="fe-tool-link" style="font-size:11px;"><span class="fe-dot"></span>PHQ-A</a></div>
+            </div>
+
+            <!-- TDAH -->
+            <div style="grid-column:2; grid-row:2; padding:4px 6px; display:flex; align-items:center; justify-content:center;">
+              <div class="fe-cond" style="width:100%;">TDAH</div>
+            </div>
+            <div style="grid-column:3; grid-row:2; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+              <div class="fe-tool-box teal"><div><span class="fe-age-badge"><span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span></span></div><a href="vanderbilt-parent.html" class="fe-tool-link"><span class="fe-dot"></span>Vanderbilt-P</a><a href="vanderbilt-teacher.html" class="fe-tool-link"><span class="fe-dot"></span>Vanderbilt-T</a></div>
+              <div class="fe-tool-box teal"><div><span class="fe-age-badge"><span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span></span></div><a href="snapiv.html" class="fe-tool-link"><span class="fe-dot"></span>SNAP-IV</a><span style="font-size:11px; color:var(--muted);">+</span><a href="asrs.html" class="fe-tool-link"><span class="fe-dot"></span>ASRS-5</a></div>
+            </div>
+            <div style="grid-column:4; grid-row:2; display:flex; align-items:center; justify-content:center; padding:4px;">
+              <div class="fe-diamond-sm"><div class="fe-diamond-sm-inner"><span class="es">¿Qué herramienta monitorear?</span><span class="en">Which tool to monitor?</span></div></div>
+            </div>
+            <div style="grid-column:5; grid-row:2; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+              <div class="fe-monitor-box"><span class="fe-monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span><a href="cap.html" class="fe-tool-link" style="font-size:11px;"><span class="fe-dot"></span>CAP Scale</a><span class="fe-tool-sub"><span class="es">(prioridad)</span><span class="en">(priority)</span></span><a href="vanderbilt-parent.html" class="fe-tool-link" style="font-size:11px; margin-top:2px;"><span class="fe-dot"></span>Vanderbilt</a><span class="fe-tool-sub"><span class="es">(si CAP no es viable)</span><span class="en">(if CAP not viable)</span></span></div>
+              <div class="fe-monitor-box"><span class="fe-monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span><a href="snapiv.html" class="fe-tool-link" style="font-size:11px;"><span class="fe-dot"></span>SNAP-IV</a><span style="font-size:11px; color:var(--muted);">+</span><a href="asrs.html" class="fe-tool-link" style="font-size:11px;"><span class="fe-dot"></span>ASRS-5</a></div>
+            </div>
+
+            <!-- Ansiedad -->
+            <div style="grid-column:2; grid-row:3; padding:4px 6px; display:flex; align-items:center; justify-content:center;">
+              <div class="fe-cond" style="width:100%;"><span class="es">Ansiedad</span><span class="en">Anxiety</span></div>
+            </div>
+            <div style="grid-column:3; grid-row:3; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+              <div class="fe-tool-box teal"><div><span class="fe-age-badge"><span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span></span></div><a href="scared.html" class="fe-tool-link"><span class="fe-dot"></span>SCARED-N</a><a href="scared-parent.html" class="fe-tool-link"><span class="fe-dot"></span>SCARED-P</a></div>
+              <div class="fe-tool-box teal"><div><span class="fe-age-badge"><span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span></span></div><a href="gad7.html" class="fe-tool-link"><span class="fe-dot"></span>GAD-7</a></div>
+            </div>
+            <div style="grid-column:4; grid-row:3; display:flex; align-items:center; justify-content:center; padding:4px;">
+              <div class="fe-diamond-sm"><div class="fe-diamond-sm-inner"><span class="es">¿Qué herramienta monitorear?</span><span class="en">Which tool to monitor?</span></div></div>
+            </div>
+            <div style="grid-column:5; grid-row:3; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+              <div class="fe-monitor-box"><span class="fe-monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span><a href="scared.html" class="fe-tool-link" style="font-size:11px;"><span class="fe-dot"></span>SCARED</a></div>
+              <div class="fe-monitor-box"><span class="fe-monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span><a href="gad7.html" class="fe-tool-link" style="font-size:11px;"><span class="fe-dot"></span>GAD-7</a></div>
+            </div>
+
+            <!-- Riesgo / SUD -->
+            <div style="grid-column:2; grid-row:4; padding:4px 6px; display:flex; align-items:center; justify-content:center;">
+              <div class="fe-cond" style="width:100%;"><span class="es">Riesgo / SUD</span><span class="en">Risk / SUD</span></div>
+            </div>
+            <div style="grid-column:3; grid-row:4; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+              <div class="fe-tool-box" style="background:var(--surface-2); border:1px dashed var(--border); align-items:center; justify-content:center;"><div><span class="fe-age-badge" style="opacity:0.5;"><span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span></span></div><span style="font-size:11px; color:var(--faint);"><span class="es">— Ninguno —</span><span class="en">— None —</span></span></div>
+              <div class="fe-tool-box teal"><div><span class="fe-age-badge"><span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span></span></div><a href="crafft.html" class="fe-tool-link"><span class="fe-dot"></span>CRAFFT</a></div>
+            </div>
+            <div style="grid-column:4; grid-row:4; display:flex; align-items:center; justify-content:center; padding:4px;">
+              <div class="fe-diamond-sm"><div class="fe-diamond-sm-inner"><span class="es">¿Qué herramienta monitorear?</span><span class="en">Which tool to monitor?</span></div></div>
+            </div>
+            <div style="grid-column:5; grid-row:4; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+              <div style="background:var(--surface-2); border:1px dashed var(--border); border-radius:8px; padding:8px 10px; display:flex; align-items:center; justify-content:center;"><span style="font-size:10px; color:var(--faint);"><span class="es">— Ninguno —</span><span class="en">— None —</span></span></div>
+              <div class="fe-monitor-box"><span class="fe-monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span><a href="dast10.html" class="fe-tool-link" style="font-size:11px;"><span class="fe-dot"></span>DAST-10</a></div>
+            </div>
+          </div>
+
+          <!-- Abbreviations legend -->
+          <div class="fe-abbr">
+            <div class="fe-abbr-title"><span class="es">Siglas</span><span class="en">Abbreviations</span></div>
+            <div class="fe-abbr-grid">
+              <div><a href="psc17.html" style="color:var(--teal); font-weight:700; text-decoration:none;">PSC-17</a> — <span class="es">Tamizaje universal. 17 ítems. Edades 4–17.</span><span class="en">Universal behavioral health screening. 17 items. Ages 4–17.</span></div>
+              <div><a href="mfq.html" style="color:var(--teal); font-weight:700; text-decoration:none;">MFQ-C</a> / <a href="mfq-parent.html" style="color:var(--teal); font-weight:700; text-decoration:none;">MFQ-P</a> — <span class="es">Cribado de depresión. Niño/a (8–17) y padres (6–17).</span><span class="en">Depression screening. Child (8–17) and parent (6–17).</span></div>
+              <div><a href="phqa.html" style="color:var(--teal); font-weight:700; text-decoration:none;">PHQ-A</a> — <span class="es">Cribado de depresión. 0–27. Edades 12–17.</span><span class="en">Depression screening. 0–27 scale. Ages 12–17.</span></div>
+              <div><a href="cap.html" style="color:var(--teal); font-weight:700; text-decoration:none;">CAP</a> — <span class="es">Inatención y sobreactividad. 12 ítems. Edades 6–13.</span><span class="en">Inattention and overactivity. 12 items. Ages 6–13.</span></div>
+              <div><a href="vanderbilt-parent.html" style="color:var(--teal); font-weight:700; text-decoration:none;">Vand-P</a> / <a href="vanderbilt-teacher.html" style="color:var(--teal); font-weight:700; text-decoration:none;">Vand-T</a> — <span class="es">TDAH/TND. Padres (55 ítems) y maestros (43 ítems). Edades 6–12.</span><span class="en">ADHD/ODD. Parent (55 items) and teacher (43 items). Ages 6–12.</span></div>
+              <div><a href="snapiv.html" style="color:var(--teal); font-weight:700; text-decoration:none;">SNAP-IV</a> — <span class="es">TDAH e inatención. 26 ítems. Edades 6–18.</span><span class="en">ADHD and inattention. 26 items. Ages 6–18.</span></div>
+              <div><a href="asrs.html" style="color:var(--teal); font-weight:700; text-decoration:none;">ASRS-5</a> — <span class="es">Tamizaje TDAH adultos. 6 ítems. ≥18 años.</span><span class="en">Adult ADHD screener. 6 items. Ages ≥18.</span></div>
+              <div><a href="scared.html" style="color:var(--teal); font-weight:700; text-decoration:none;">SCARED-N</a> / <a href="scared-parent.html" style="color:var(--teal); font-weight:700; text-decoration:none;">SCARED-P</a> — <span class="es">Ansiedad. 5 subescalas. Niño/a y padres. Edades 8–17.</span><span class="en">Anxiety. 5 subscales. Child and parent versions. Ages 8–17.</span></div>
+              <div><a href="gad7.html" style="color:var(--teal); font-weight:700; text-decoration:none;">GAD-7</a> — <span class="es">Ansiedad. 7 ítems, 0–21. Edades 12+.</span><span class="en">Anxiety. 7 items, 0–21 scale. Ages 12+.</span></div>
+              <div><a href="crafft.html" style="color:var(--teal); font-weight:700; text-decoration:none;">CRAFFT</a> — <span class="es">Uso de sustancias. Edades 12–21.</span><span class="en">Substance use screening. Ages 12–21.</span></div>
+              <div><a href="dast10.html" style="color:var(--teal); font-weight:700; text-decoration:none;">DAST-10</a> — <span class="es">Uso problemático de drogas. 10 ítems. Edades 15+.</span><span class="en">Problematic drug use. 10 items. Ages 15+.</span></div>
+            </div>
+          </div>
+
+        </div><!-- /flow-embed -->
+      </div><!-- /flow-embed-wrap -->
+
+      <script>
+        // Keep flowchart language in sync with dashboard language toggle
+        (function() {
+          var embed = document.getElementById('flowEmbed');
+          if (!embed) return;
+          function syncFlowLang(lang) {
+            embed.classList.toggle('lang-es', lang === 'es');
+            embed.classList.toggle('lang-en', lang !== 'es');
+          }
+          // Observe data-lang changes on html element
+          var observer = new MutationObserver(function() {
+            syncFlowLang(document.documentElement.getAttribute('data-lang') || 'es');
+          });
+          observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-lang'] });
+          // Initial sync
+          syncFlowLang(document.documentElement.getAttribute('data-lang') || 'es');
+        })();
+      </script>
 
       <!-- Tool cards -->
       <div class="section-heading" data-es="Todas las Herramientas" data-en="All Tools">Todas las Herramientas</div>
