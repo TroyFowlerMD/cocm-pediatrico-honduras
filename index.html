@@ -1291,7 +1291,7 @@ a, button, [role='button'], input, select {
         .fe-cond { display:flex; align-items:center; justify-content:center; text-align:center; padding:8px 12px; font-weight:700; font-size:13px; border:2px solid var(--border); border-radius:8px; background:var(--surface); color:var(--text); }
 
         /* Tool boxes */
-        .fe-tool-box { display:flex; flex-direction:column; gap:5px; padding:10px 12px; border-radius:8px; }
+        .fe-tool-box { display:flex; flex-direction:column; gap:5px; padding:10px 12px; border-radius:8px; flex:1; }
         .fe-tool-box.teal { background:var(--teal-dim); border:1px solid var(--teal-border); }
         .fe-tool-link { display:inline-flex; align-items:center; gap:5px; font-weight:700; font-size:12px; color:var(--teal); text-decoration:none; transition:opacity .15s; }
         .fe-tool-link:hover { opacity:.75; text-decoration:underline; }
@@ -1300,7 +1300,7 @@ a, button, [role='button'], input, select {
         .fe-age-badge { display:inline-block; font-size:9px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; color:var(--teal); background:rgba(79,152,163,0.10); border:1px solid rgba(79,152,163,0.25); border-radius:4px; padding:1px 5px; margin-bottom:5px; white-space:nowrap; }
 
         /* Monitor boxes */
-        .fe-monitor-box { display:flex; flex-direction:column; gap:4px; padding:8px 10px; border-radius:8px; background:var(--teal-dim); border:1px solid var(--teal-border); }
+        .fe-monitor-box { display:flex; flex-direction:column; gap:4px; padding:8px 10px; border-radius:8px; background:var(--teal-dim); border:1px solid var(--teal-border); flex:1; }
         .fe-monitor-label { font-size:10px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
 
         /* Col headers */
@@ -1355,21 +1355,21 @@ a, button, [role='button'], input, select {
           <div style="border-top:1px solid var(--border); margin:4px 0 12px; opacity:0.4;"></div>
 
           <!-- Condition rows -->
-          <div style="display:grid; grid-template-columns:160px 110px 270px 80px 150px; column-gap:0; row-gap:10px; align-items:start; margin-top:4px;">
+          <div style="display:grid; grid-template-columns:160px 110px 270px 80px 150px; column-gap:0; row-gap:10px; align-items:stretch; margin-top:4px;">
             <div style="grid-column:1; grid-row:1/5;"></div>
 
             <!-- Depression -->
             <div style="grid-column:2; grid-row:1; padding:4px 6px; display:flex; align-items:center; justify-content:center;">
               <div class="fe-cond" style="width:100%;"><span class="es">Depresión</span><span class="en">Depression</span></div>
             </div>
-            <div style="grid-column:3; grid-row:1; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+            <div style="grid-column:3; grid-row:1; display:flex; flex-direction:column; gap:6px; padding:4px 6px; height:100%;">
               <div class="fe-tool-box teal"><div><span class="fe-age-badge"><span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span></span></div><a href="mfq.html" class="fe-tool-link"><span class="fe-dot"></span>MFQ-C</a><a href="mfq-parent.html" class="fe-tool-link"><span class="fe-dot"></span>MFQ-P</a></div>
               <div class="fe-tool-box teal"><div><span class="fe-age-badge"><span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span></span></div><a href="phqa.html" class="fe-tool-link"><span class="fe-dot"></span>PHQ-A (PHQ-9)</a></div>
             </div>
             <div style="grid-column:4; grid-row:1; display:flex; align-items:center; justify-content:center; padding:4px;">
               <div class="fe-diamond-sm"><div class="fe-diamond-sm-inner"><span class="es">¿Qué herramienta monitorear?</span><span class="en">Which tool to monitor?</span></div></div>
             </div>
-            <div style="grid-column:5; grid-row:1; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+            <div style="grid-column:5; grid-row:1; display:flex; flex-direction:column; gap:6px; padding:4px 6px; height:100%;">
               <div class="fe-monitor-box"><span class="fe-monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span><span class="fe-tool-sub" style="font-size:11px; font-weight:600; color:var(--teal);"><span class="es">MFQ Breve</span><span class="en">MFQ Brief</span></span></div>
               <div class="fe-monitor-box"><span class="fe-monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span><a href="phqa.html" class="fe-tool-link" style="font-size:11px;"><span class="fe-dot"></span>PHQ-A</a></div>
             </div>
@@ -1378,14 +1378,14 @@ a, button, [role='button'], input, select {
             <div style="grid-column:2; grid-row:2; padding:4px 6px; display:flex; align-items:center; justify-content:center;">
               <div class="fe-cond" style="width:100%;">TDAH</div>
             </div>
-            <div style="grid-column:3; grid-row:2; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+            <div style="grid-column:3; grid-row:2; display:flex; flex-direction:column; gap:6px; padding:4px 6px; height:100%;">
               <div class="fe-tool-box teal"><div><span class="fe-age-badge"><span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span></span></div><a href="vanderbilt-parent.html" class="fe-tool-link"><span class="fe-dot"></span>Vanderbilt-P</a><a href="vanderbilt-teacher.html" class="fe-tool-link"><span class="fe-dot"></span>Vanderbilt-T</a></div>
               <div class="fe-tool-box teal"><div><span class="fe-age-badge"><span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span></span></div><a href="snapiv.html" class="fe-tool-link"><span class="fe-dot"></span>SNAP-IV</a><span style="font-size:11px; color:var(--muted);">+</span><a href="asrs.html" class="fe-tool-link"><span class="fe-dot"></span>ASRS-5</a></div>
             </div>
             <div style="grid-column:4; grid-row:2; display:flex; align-items:center; justify-content:center; padding:4px;">
               <div class="fe-diamond-sm"><div class="fe-diamond-sm-inner"><span class="es">¿Qué herramienta monitorear?</span><span class="en">Which tool to monitor?</span></div></div>
             </div>
-            <div style="grid-column:5; grid-row:2; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+            <div style="grid-column:5; grid-row:2; display:flex; flex-direction:column; gap:6px; padding:4px 6px; height:100%;">
               <div class="fe-monitor-box"><span class="fe-monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span><a href="cap.html" class="fe-tool-link" style="font-size:11px;"><span class="fe-dot"></span>CAP Scale</a><span class="fe-tool-sub"><span class="es">(prioridad)</span><span class="en">(priority)</span></span><a href="vanderbilt-parent.html" class="fe-tool-link" style="font-size:11px; margin-top:2px;"><span class="fe-dot"></span>Vanderbilt</a><span class="fe-tool-sub"><span class="es">(si CAP no es viable)</span><span class="en">(if CAP not viable)</span></span></div>
               <div class="fe-monitor-box"><span class="fe-monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span><a href="snapiv.html" class="fe-tool-link" style="font-size:11px;"><span class="fe-dot"></span>SNAP-IV</a><span style="font-size:11px; color:var(--muted);">+</span><a href="asrs.html" class="fe-tool-link" style="font-size:11px;"><span class="fe-dot"></span>ASRS-5</a></div>
             </div>
@@ -1394,14 +1394,14 @@ a, button, [role='button'], input, select {
             <div style="grid-column:2; grid-row:3; padding:4px 6px; display:flex; align-items:center; justify-content:center;">
               <div class="fe-cond" style="width:100%;"><span class="es">Ansiedad</span><span class="en">Anxiety</span></div>
             </div>
-            <div style="grid-column:3; grid-row:3; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+            <div style="grid-column:3; grid-row:3; display:flex; flex-direction:column; gap:6px; padding:4px 6px; height:100%;">
               <div class="fe-tool-box teal"><div><span class="fe-age-badge"><span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span></span></div><a href="scared.html" class="fe-tool-link"><span class="fe-dot"></span>SCARED-N</a><a href="scared-parent.html" class="fe-tool-link"><span class="fe-dot"></span>SCARED-P</a></div>
               <div class="fe-tool-box teal"><div><span class="fe-age-badge"><span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span></span></div><a href="gad7.html" class="fe-tool-link"><span class="fe-dot"></span>GAD-7</a></div>
             </div>
             <div style="grid-column:4; grid-row:3; display:flex; align-items:center; justify-content:center; padding:4px;">
               <div class="fe-diamond-sm"><div class="fe-diamond-sm-inner"><span class="es">¿Qué herramienta monitorear?</span><span class="en">Which tool to monitor?</span></div></div>
             </div>
-            <div style="grid-column:5; grid-row:3; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
+            <div style="grid-column:5; grid-row:3; display:flex; flex-direction:column; gap:6px; padding:4px 6px; height:100%;">
               <div class="fe-monitor-box"><span class="fe-monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span><a href="scared.html" class="fe-tool-link" style="font-size:11px;"><span class="fe-dot"></span>SCARED</a></div>
               <div class="fe-monitor-box"><span class="fe-monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span><a href="gad7.html" class="fe-tool-link" style="font-size:11px;"><span class="fe-dot"></span>GAD-7</a></div>
             </div>
@@ -1410,15 +1410,15 @@ a, button, [role='button'], input, select {
             <div style="grid-column:2; grid-row:4; padding:4px 6px; display:flex; align-items:center; justify-content:center;">
               <div class="fe-cond" style="width:100%;"><span class="es">Riesgo / SUD</span><span class="en">Risk / SUD</span></div>
             </div>
-            <div style="grid-column:3; grid-row:4; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
-              <div class="fe-tool-box" style="background:var(--surface-2); border:1px dashed var(--border); align-items:center; justify-content:center;"><div><span class="fe-age-badge" style="opacity:0.5;"><span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span></span></div><span style="font-size:11px; color:var(--faint);"><span class="es">— Ninguno —</span><span class="en">— None —</span></span></div>
+            <div style="grid-column:3; grid-row:4; display:flex; flex-direction:column; gap:6px; padding:4px 6px; height:100%;">
+              <div class="fe-tool-box" style="background:var(--surface-2); border:1px dashed var(--border); align-items:center; justify-content:center; flex:1;"><div><span class="fe-age-badge" style="opacity:0.5;"><span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span></span></div><span style="font-size:11px; color:var(--faint);"><span class="es">— Ninguno —</span><span class="en">— None —</span></span></div>
               <div class="fe-tool-box teal"><div><span class="fe-age-badge"><span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span></span></div><a href="crafft.html" class="fe-tool-link"><span class="fe-dot"></span>CRAFFT</a></div>
             </div>
             <div style="grid-column:4; grid-row:4; display:flex; align-items:center; justify-content:center; padding:4px;">
               <div class="fe-diamond-sm"><div class="fe-diamond-sm-inner"><span class="es">¿Qué herramienta monitorear?</span><span class="en">Which tool to monitor?</span></div></div>
             </div>
-            <div style="grid-column:5; grid-row:4; display:flex; flex-direction:column; gap:6px; padding:4px 6px;">
-              <div style="background:var(--surface-2); border:1px dashed var(--border); border-radius:8px; padding:8px 10px; display:flex; align-items:center; justify-content:center;"><span style="font-size:10px; color:var(--faint);"><span class="es">— Ninguno —</span><span class="en">— None —</span></span></div>
+            <div style="grid-column:5; grid-row:4; display:flex; flex-direction:column; gap:6px; padding:4px 6px; height:100%;">
+              <div style="background:var(--surface-2); border:1px dashed var(--border); border-radius:8px; padding:8px 10px; display:flex; align-items:center; justify-content:center; flex:1;"><span style="font-size:10px; color:var(--faint);"><span class="es">— Ninguno —</span><span class="en">— None —</span></span></div>
               <div class="fe-monitor-box"><span class="fe-monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span><a href="dast10.html" class="fe-tool-link" style="font-size:11px;"><span class="fe-dot"></span>DAST-10</a></div>
             </div>
           </div>
