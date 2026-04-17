@@ -1274,6 +1274,8 @@ a, button, [role='button'], input, select {
   padding: 28px 28px 24px;
   width: 100%;
   max-width: 480px;
+  max-height: 90dvh;
+  overflow-y: auto;
   position: relative;
 }
 .send-modal-title {
@@ -2009,16 +2011,61 @@ function setLang(lang) {
     <div class="send-modal-actions">
       <button class="send-generate-btn" onclick="generateSendEmail()">
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
-        <span data-es="Generar correo" data-en="Generate email">Generar correo</span>
+        <span data-es="Abrir en app de correo" data-en="Open in email app">Abrir en app de correo</span>
       </button>
     </div>
+
+    <!-- Live copy box -->
+    <div style="margin-top:18px; border-top:1px solid var(--border,#2a2927); padding-top:16px;">
+      <div style="font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--muted,#78766e); margin-bottom:8px;">
+        <span data-es="O copie el mensaje manualmente" data-en="Or copy the message manually">O copie el mensaje manualmente</span>
+      </div>
+      <div style="font-size:0.75rem; color:var(--muted,#78766e); margin-bottom:10px; line-height:1.4;">
+        <span data-es="Pegue este texto en cualquier correo, WhatsApp u otro medio. Solo ajuste el destinatario y el asunto." data-en="Paste this text into any email, WhatsApp, or other channel. Just fill in the recipient and subject.">Pegue este texto en cualquier correo, WhatsApp u otro medio. Solo ajuste el destinatario y el asunto.</span>
+      </div>
+      <div style="position:relative;">
+        <pre id="sendMsgBox" style="
+          background:var(--surface,#171614);
+          border:1px solid var(--border,#2a2927);
+          border-radius:8px;
+          padding:12px 12px 40px;
+          font-size:0.78rem;
+          font-family:inherit;
+          color:var(--color-text,#d0cfc9);
+          white-space:pre-wrap;
+          word-break:break-word;
+          line-height:1.55;
+          margin:0;
+          min-height:80px;
+        "></pre>
+        <button id="sendMsgCopyBtn" onclick="copySendMsg()" style="
+          position:absolute;
+          bottom:8px; right:8px;
+          display:inline-flex;
+          align-items:center;
+          gap:5px;
+          background:var(--teal,#4F98A3);
+          color:#fff;
+          border:none;
+          border-radius:6px;
+          padding:5px 12px;
+          font-size:0.75rem;
+          font-weight:600;
+          cursor:pointer;
+          transition:opacity .15s;
+        ">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span id="sendMsgCopyLabel" data-es="Copiar" data-en="Copy">Copiar</span>
+        </button>
+      </div>
+    </div>
+
   </div>
 </div>
 
 <script>
 // ══ SEND MODAL LOGIC ══
 var _sendLang = 'es';
-var _sendPreselect = null;
 
 function openSendModal(preselect) {
   if (preselect) {
@@ -2027,10 +2074,10 @@ function openSendModal(preselect) {
       if (sel.options[i].value === preselect) { sel.selectedIndex = i; break; }
     }
   }
-  // Default lang to dashboard lang
   var dashLang = document.documentElement.getAttribute('data-lang') || 'es';
   setSendLang(dashLang);
   document.getElementById('sendModalBackdrop').classList.add('open');
+  updateSendMsgBox();
   setTimeout(function(){ document.getElementById('sendChildName').focus(); }, 80);
 }
 
@@ -2046,20 +2093,18 @@ function setSendLang(lang) {
   _sendLang = lang;
   document.getElementById('sendLangES').classList.toggle('active', lang === 'es');
   document.getElementById('sendLangEN').classList.toggle('active', lang === 'en');
+  updateSendMsgBox();
 }
 
-function generateSendEmail() {
-  var q    = document.getElementById('sendQSelect').value;
+function buildSendParts() {
+  var q     = document.getElementById('sendQSelect').value;
   var child = document.getElementById('sendChildName').value.trim();
   var email = document.getElementById('sendTherapistEmail').value.trim();
+  var base  = window.location.href.replace(/[^\/]*$/, '');
+  var url   = base + q + '?lang=' + _sendLang;
+  if (child) url += '&child='     + encodeURIComponent(child);
+  if (email) url += '&therapist=' + encodeURIComponent(email);
 
-  // Build URL
-  var base = window.location.href.replace(/[^\/]*$/, '');
-  var url  = base + q + '?lang=' + _sendLang;
-  if (child)  url += '&child='     + encodeURIComponent(child);
-  if (email)  url += '&therapist=' + encodeURIComponent(email);
-
-  // Build email text
   var qLabel = document.getElementById('sendQSelect').selectedOptions[0];
   var qName  = _sendLang === 'en'
     ? (qLabel.getAttribute('data-en') || qLabel.text)
@@ -2067,7 +2112,6 @@ function generateSendEmail() {
 
   var subjES = 'Cuestionario para completar' + (child ? ' — ' + child : '');
   var subjEN = 'Questionnaire to complete'   + (child ? ' — ' + child : '');
-  var subj   = _sendLang === 'en' ? subjEN : subjES;
 
   var bodyES =
     'Estimado/a,\n\n' +
@@ -2085,11 +2129,45 @@ function generateSendEmail() {
     'Once completed, please copy the results and send them back to this email.' +
     (email ? '\nMy email: ' + email : '') + '\n\nThank you.';
 
-  var body   = _sendLang === 'en' ? bodyEN : bodyES;
-  var mailto = 'mailto:?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(body);
-  window.open(mailto, '_self');
-  closeSendModal();
+  return {
+    subj: _sendLang === 'en' ? subjEN : subjES,
+    body: _sendLang === 'en' ? bodyEN : bodyES
+  };
 }
+
+function updateSendMsgBox() {
+  var box = document.getElementById('sendMsgBox');
+  if (!box) return;
+  box.textContent = buildSendParts().body;
+}
+
+function generateSendEmail() {
+  var parts  = buildSendParts();
+  var mailto = 'mailto:?subject=' + encodeURIComponent(parts.subj) + '&body=' + encodeURIComponent(parts.body);
+  window.open(mailto, '_self');
+}
+
+function copySendMsg() {
+  var box = document.getElementById('sendMsgBox');
+  var text = box ? box.textContent : '';
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(function() {
+    var lbl = document.getElementById('sendMsgCopyLabel');
+    if (lbl) {
+      var orig = lbl.getAttribute('data-' + _sendLang) || lbl.textContent;
+      lbl.textContent = _sendLang === 'en' ? '✓ Copied!' : '✓ Copiado!';
+      setTimeout(function() {
+        lbl.textContent = _sendLang === 'en' ? 'Copy' : 'Copiar';
+      }, 2200);
+    }
+  }).catch(function() { alert(text); });
+}
+
+// Live-update copy box on any field change
+['sendQSelect','sendChildName','sendTherapistEmail'].forEach(function(id) {
+  var el = document.getElementById(id);
+  if (el) { el.addEventListener('input', updateSendMsgBox); el.addEventListener('change', updateSendMsgBox); }
+});
 
 // Escape key closes modal
 document.addEventListener('keydown', function(e) {
