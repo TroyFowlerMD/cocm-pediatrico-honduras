@@ -1407,6 +1407,73 @@ a, button, [role='button'], input, select {
 }
 .tool-card-send-btn:hover { background: rgba(200,155,60,0.22); }
 
+/* ── HOW TO USE CARD ── */
+.howto-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  margin-bottom: var(--space-4);
+  overflow: hidden;
+}
+.howto-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 14px var(--space-5);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  min-height: 48px;
+}
+.howto-summary::-webkit-details-marker { display: none; }
+.howto-icon { font-size: 1rem; flex-shrink: 0; }
+.howto-title {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+.howto-chevron {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  transition: transform .2s;
+}
+.howto-card[open] .howto-chevron { transform: rotate(180deg); }
+.howto-body {
+  padding: 0 var(--space-5) var(--space-5);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.howto-section { padding-top: var(--space-4); }
+.howto-section-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-primary);
+  margin-bottom: var(--space-2);
+}
+.howto-section p {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+.howto-list {
+  padding-left: var(--space-5);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.howto-list li {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
 /* ── FEEDBACK SECTION ── */
 .feedback-section {
   margin-top: var(--space-12);
@@ -1571,22 +1638,52 @@ a, button, [role='button'], input, select {
       </div>
 
 
-      <!-- SEND QUESTIONNAIRE CARD -->
-      <div class="send-card" id="sendCard">
-        <div class="send-card-icon">✉️</div>
-        <div class="send-card-body">
-          <div class="send-card-title">
-            <span data-es="Enviar cuestionario a padre, madre o maestro" data-en="Send questionnaire to parent or teacher">Enviar cuestionario a padre, madre o maestro</span>
+      <!-- HOW TO USE CARD -->
+      <details class="howto-card" id="howtoCard">
+        <summary class="howto-summary">
+          <span class="howto-icon">&#x2139;&#xfe0f;</span>
+          <span class="howto-title">
+            <span data-es="Cómo usar este portal" data-en="How to use this portal">Cómo usar este portal</span>
+          </span>
+          <span class="howto-chevron" aria-hidden="true">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </span>
+        </summary>
+        <div class="howto-body">
+
+          <div class="howto-section">
+            <div class="howto-section-title" data-es="Para qué sirve" data-en="What this is">Para qué sirve</div>
+            <p data-es="Este portal contiene las herramientas de evaluación psicológica del programa CoCM Camasca. Cada herramienta es un cuestionario validado que calcula el puntaje automáticamente y muestra el resultado al final." data-en="This portal contains the psychological assessment tools for the CoCM Camasca program. Each tool is a validated questionnaire that calculates the score automatically and shows the result at the bottom.">Este portal contiene las herramientas de evaluación psicológica del programa CoCM Camasca. Cada herramienta es un cuestionario validado que calcula el puntaje automáticamente y muestra el resultado al final.</p>
           </div>
-          <div class="send-card-desc">
-            <span data-es="Genere un enlace personalizado y ábralo en su app de correo — listo para enviar. El padre, madre o maestro completa el cuestionario y le regresa los resultados." data-en="Generate a personalized link that opens in your email app — ready to send. The parent or teacher completes the questionnaire and returns the results to you.">Genere un enlace personalizado y ábralo en su app de correo — listo para enviar. El padre, madre o maestro completa el cuestionario y le regresa los resultados.</span>
+
+          <div class="howto-section">
+            <div class="howto-section-title" data-es="Cómo completar una evaluación" data-en="How to complete an assessment">Cómo completar una evaluación</div>
+            <ol class="howto-list">
+              <li><span data-es="Consulte el flujo de trabajo (debajo) para saber qué herramienta corresponde a cada paciente según su edad y diagnóstico." data-en="Refer to the workflow chart below to know which tool to use for each patient based on age and diagnosis.">Consulte el flujo de trabajo (debajo) para saber qué herramienta corresponde a cada paciente según su edad y diagnóstico.</span></li>
+              <li><span data-es="Seleccione la herramienta en la sección &lsquo;Todas las Herramientas&rsquo;." data-en="Select the tool from the &lsquo;All Tools&rsquo; section.">Seleccione la herramienta en la sección &lsquo;Todas las Herramientas&rsquo;.</span></li>
+              <li><span data-es="Lea cada pregunta en voz alta al paciente (o al padre/madre) y seleccione la respuesta." data-en="Read each question aloud to the patient (or parent) and select the answer.">Lea cada pregunta en voz alta al paciente (o al padre/madre) y seleccione la respuesta.</span></li>
+              <li><span data-es="El puntaje y la interpretación aparecen automáticamente al final de la página al completar todas las preguntas." data-en="The score and interpretation appear automatically at the bottom of the page once all questions are answered.">El puntaje y la interpretación aparecen automáticamente al final de la página al completar todas las preguntas.</span></li>
+              <li><span data-es="Use el botón de copiar para guardar el resultado y péguelo donde corresponda." data-en="Use the copy button to save the result and paste it where needed.">Use el botón de copiar para guardar el resultado y péguelo donde corresponda.</span></li>
+            </ol>
           </div>
-          <button class="send-card-btn" onclick="openSendModal()">
-            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
-            <span data-es="Enviar cuestionario" data-en="Send questionnaire">Enviar cuestionario</span>
-          </button>
+
+          <div class="howto-section">
+            <div class="howto-section-title" data-es="Enviar un cuestionario a distancia" data-en="Sending a questionnaire remotely">Enviar un cuestionario a distancia</div>
+            <p data-es="Algunos cuestionarios pueden ser completados por el padre, madre o maestro desde su propio teléfono. Use el botón &lsquo;Enviar cuestionario&rsquo; para generar un mensaje listo para enviar por WhatsApp, correo u otro medio. El enlace incluye el nombre del niño/a y redirige los resultados de vuelta a usted." data-en="Some questionnaires can be completed by the parent or teacher from their own phone. Use the &lsquo;Send questionnaire&rsquo; button to generate a message ready to share via WhatsApp, email, or any channel. The link includes the child&rsquo;s name and sends results back to you.">Algunos cuestionarios pueden ser completados por el padre, madre o maestro desde su propio teléfono. Use el botón &lsquo;Enviar cuestionario&rsquo; para generar un mensaje listo para enviar por WhatsApp, correo u otro medio. El enlace incluye el nombre del niño/a y redirige los resultados de vuelta a usted.</p>
+          </div>
+
+          <div class="howto-section">
+            <div class="howto-section-title" data-es="Consejos generales" data-en="General tips">Consejos generales</div>
+            <ul class="howto-list">
+              <li><span data-es="No es necesario crear una cuenta ni instalar nada. Solo guarde el enlace de este portal en la pantalla de inicio de su teléfono." data-en="No account or installation needed. Just save this portal&rsquo;s link to your phone&rsquo;s home screen.">No es necesario crear una cuenta ni instalar nada. Solo guarde el enlace de este portal en la pantalla de inicio de su teléfono.</span></li>
+              <li><span data-es="Puede usar ES o EN en la esquina superior derecha para cambiar el idioma de la interfaz." data-en="Use ES or EN in the top right corner to switch the interface language.">Puede usar ES o EN en la esquina superior derecha para cambiar el idioma de la interfaz.</span></li>
+              <li><span data-es="El icono de sol/luna cambia entre modo oscuro y modo claro." data-en="The sun/moon icon switches between dark and light mode.">El icono de sol/luna cambia entre modo oscuro y modo claro.</span></li>
+              <li><span data-es="Si tiene dudas o quiere sugerir mejoras, use el formulario de sugerencias al final de la página." data-en="If you have questions or want to suggest improvements, use the suggestions form at the bottom of the page.">Si tiene dudas o quiere sugerir mejoras, use el formulario de sugerencias al final de la página.</span></li>
+            </ul>
+          </div>
+
         </div>
-      </div>
+      </details>
 
       <!-- Workflow flowchart (embedded) -->
       <div class="section-heading" data-es="Flujo de Trabajo CoCM" data-en="CoCM Workflow">Flujo de Trabajo CoCM</div>
@@ -1845,6 +1942,23 @@ a, button, [role='button'], input, select {
           syncFlowLang(document.documentElement.getAttribute('data-lang') || 'es');
         })();
       </script>
+
+      <!-- SEND QUESTIONNAIRE CARD -->
+      <div class="send-card" id="sendCard">
+        <div class="send-card-icon">✉️</div>
+        <div class="send-card-body">
+          <div class="send-card-title">
+            <span data-es="Enviar cuestionario a padre, madre o maestro" data-en="Send questionnaire to parent or teacher">Enviar cuestionario a padre, madre o maestro</span>
+          </div>
+          <div class="send-card-desc">
+            <span data-es="Genere un enlace personalizado para compartir por correo, WhatsApp u otro medio. El padre, madre o maestro completa el cuestionario en su dispositivo y le regresa los resultados." data-en="Generate a personalized link to share by email, WhatsApp, or any other channel. The parent or teacher completes the questionnaire on their device and returns the results to you.">Genere un enlace personalizado para compartir por correo, WhatsApp u otro medio. El padre, madre o maestro completa el cuestionario en su dispositivo y le regresa los resultados.</span>
+          </div>
+          <button class="send-card-btn" onclick="openSendModal()">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
+            <span data-es="Enviar cuestionario" data-en="Send questionnaire">Enviar cuestionario</span>
+          </button>
+        </div>
+      </div>
 
       <!-- Tool cards -->
       <div class="section-heading" data-es="Todas las Herramientas" data-en="All Tools">Todas las Herramientas</div>
@@ -2149,7 +2263,7 @@ function setLang(lang) {
       <span data-es="Enviar cuestionario" data-en="Send questionnaire">Enviar cuestionario</span>
     </div>
     <div class="send-modal-subtitle">
-      <span data-es="Complete los campos y haga clic en &ldquo;Generar correo&rdquo;. Su app de correo se abrirá lista para enviar." data-en="Fill in the fields and click &ldquo;Generate email&rdquo;. Your email app will open ready to send.">Complete los campos y haga clic en &ldquo;Generar correo&rdquo;. Su app de correo se abrirá lista para enviar.</span>
+      <span data-es="Complete los campos para generar el mensaje. Luego enviélo por correo, WhatsApp u otro medio." data-en="Fill in the fields to generate the message. Then send it by email, WhatsApp, or any other channel.">Complete los campos para generar el mensaje. Luego enviélo por correo, WhatsApp u otro medio.</span>
     </div>
 
     <!-- Questionnaire select -->
@@ -2166,12 +2280,12 @@ function setLang(lang) {
       </select>
     </div>
 
-    <!-- Recipient email -->
+    <!-- Recipient contact -->
     <div class="send-field">
       <label class="send-label" for="sendRecipientEmail">
-        <span data-es="Correo del destinatario (padre/madre/maestro)" data-en="Recipient email (parent/teacher)">Correo del destinatario (padre/madre/maestro)</span>
+        <span data-es="Contacto del destinatario (correo o teléfono)" data-en="Recipient contact (email or phone)">Contacto del destinatario (correo o teléfono)</span>
       </label>
-      <input class="send-input" id="sendRecipientEmail" type="email" placeholder="destinatario@ejemplo.com" autocomplete="off">
+      <input class="send-input" id="sendRecipientEmail" type="text" placeholder="correo@ejemplo.com ó +504 9999-9999" autocomplete="off">
     </div>
 
     <!-- Child name -->
@@ -2206,6 +2320,9 @@ function setLang(lang) {
         <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
         <span data-es="Abrir en app de correo" data-en="Open in email app">Abrir en app de correo</span>
       </button>
+      <div style="font-size:0.75rem; color:var(--muted,#78766e); margin-top:6px;">
+        <span data-es="O copie el mensaje abajo y compártalo por WhatsApp u otro medio." data-en="Or copy the message below and share via WhatsApp or any other channel.">O copie el mensaje abajo y compártalo por WhatsApp u otro medio.</span>
+      </div>
     </div>
 
     <!-- Live copy box -->
@@ -2312,16 +2429,16 @@ function buildSendParts() {
     'Le solicito que complete el siguiente cuestionario para ' + (child || 'su hijo/a') + '.\n\n' +
     'Cuestionario: ' + qName + '\n' +
     'Enlace: ' + url + '\n\n' +
-    'Una vez completado, por favor copie los resultados y envíelos de vuelta a este correo.' +
-    (email ? '\nMi correo: ' + email : '') + '\n\nGracias.';
+    'Una vez completado, por favor copie los resultados y envíelos de vuelta por este mismo medio.' +
+    (email ? '\nContacto: ' + email : '') + '\n\nGracias.';
 
   var bodyEN =
     'Dear parent/teacher,\n\n' +
     'Please complete the following questionnaire for ' + (child || 'your child') + '.\n\n' +
     'Questionnaire: ' + qName + '\n' +
     'Link: ' + url + '\n\n' +
-    'Once completed, please copy the results and send them back to this email.' +
-    (email ? '\nMy email: ' + email : '') + '\n\nThank you.';
+    'Once completed, please copy the results and send them back through this same channel.' +
+    (email ? '\nContact: ' + email : '') + '\n\nThank you.';
 
   return {
     subj:      _sendLang === 'en' ? subjEN : subjES,
