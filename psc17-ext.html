@@ -1413,21 +1413,6 @@ a, button, [role='button'], input, select {
         >Por favor, marque la respuesta que mejor describe el comportamiento de su hijo/a en el <strong>ÚLTIMO MES</strong>. Para cada pregunta, seleccione: <strong>Nunca (0), A veces (1), o Siempre (2)</strong>.</p>
       </div>
 
-      <!-- Subscale legend -->
-      <div class="subscale-legend">
-        <div class="legend-item">
-          <div class="legend-dot A"></div>
-          <span data-es="Atención (A) — ítems 1,3,7,13,17 | Corte: ≥7" data-en="Attention (A) — items 1,3,7,13,17 | Cutoff: ≥7">Atención (A) — ítems 1,3,7,13,17 | Corte: ≥7</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-dot I"></div>
-          <span data-es="Internalizante (I) — ítems 2,6,9,11,15 | Corte: ≥5" data-en="Internalizing (I) — items 2,6,9,11,15 | Cutoff: ≥5">Internalizante (I) — ítems 2,6,9,11,15 | Corte: ≥5</span>
-        </div>
-        <div class="legend-item">
-          <div class="legend-dot E"></div>
-          <span data-es="Externalizante (E) — ítems 4,5,8,10,12,14,16 | Corte: ≥7" data-en="Externalizing (E) — items 4,5,8,10,12,14,16 | Cutoff: ≥7">Externalizante (E) — ítems 4,5,8,10,12,14,16 | Corte: ≥7</span>
-        </div>
-      </div>
 
       <!-- Questions -->
       <form id="psc17form" novalidate>
@@ -1830,13 +1815,13 @@ function setLang(lang) {
   if (typeof updateScore === 'function') updateScore();
   if (typeof setLangPartial === 'function') setLangPartial(lang);
 }
-// ===== RESTORE LANG FROM URL =====
 // ===== INIT =====
 renderQuestions();
 (function() {
   var lang = new URLSearchParams(location.search).get('lang') || 'es';
   setLang(lang);
-  });
+})();
+// End of main script
 })();
 </script>
 

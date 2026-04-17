@@ -1456,9 +1456,6 @@ a, button, [role='button'], input, select {
     <form id="toolform" novalidate>
       <div id="questions-container"></div>
 
-      <div class="subscale-legend">
-        <div class="legend-item"><div class="legend-dot" style="background:#0369a1"></div><span data-es="Inatención (IN) — ítems 1–9 | Corte clínico: ≥13/27" data-en="Inattention (IN) — items 1–9 | Clinical cutoff: ≥13/27">Inatención (IN) — ítems 1–9 | Corte clínico: ≥13/27</span></div>
-      </div>
       <div class="score-panel" id="scorePanel">
         <div class="score-panel-title" data-es="Resultados" data-en="Results">Resultados</div>
         <div style="display:flex; align-items:flex-end; gap:var(--space-6); flex-wrap:wrap; margin-bottom:var(--space-4);">
@@ -1816,7 +1813,7 @@ renderQuestions();
 (function() {
   var lang = new URLSearchParams(location.search).get('lang') || 'es';
   setLang(lang);
-  });
+})();
 })();
 </script>
 
