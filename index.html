@@ -1267,7 +1267,7 @@ a, button, [role='button'], input, select {
         }
         .flow-embed {
           padding: 16px 16px 24px;
-          min-width: 630px;
+          min-width: 520px;
           font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
           font-size: 13px;
           color: var(--text);
@@ -1310,7 +1310,7 @@ a, button, [role='button'], input, select {
         /* Abbreviations legend */
         .fe-abbr { margin:20px 0 0; padding:14px 16px; background:var(--surface); border:1px solid var(--border); border-radius:10px; }
         .fe-abbr-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:12px; }
-        .fe-abbr-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:8px 20px; font-size:11px; color:var(--muted); line-height:1.5; }
+        .fe-abbr-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:6px 16px; font-size:10.5px; color:var(--muted); line-height:1.4; }
 
         /* Language */
         .flow-embed [data-lang="es"] .en, .flow-embed.lang-es .en { display:none !important; }
@@ -1348,21 +1348,21 @@ a, button, [role='button'], input, select {
               <polygon points="2,14 8,24 14,14" fill="#4a4945"/>
             </svg>
 
-            <!-- Gold diamond + horizontal arrow + parallelogram (inline, centered) -->
-            <div style="display:flex; align-items:center; gap:0; justify-content:center;">
-              <div class="fe-diamond-wrap" style="width:110px; justify-content:center;">
-                <div class="fe-diamond"><div class="fe-diamond-inner"><span class="es">¿Herramienta de cribado apropiada?</span><span class="en">Is the screening tool appropriate?</span></div></div>
-              </div>
-              <div style="display:flex; align-items:center; width:80px;">
-                <svg width="100%" height="36" viewBox="0 0 110 36" fill="none" style="overflow:visible;">
-                  <line x1="0" y1="18" x2="95" y2="18" stroke="#4a4945" stroke-width="1.5"/>
-                  <polygon points="95,12 110,18 95,24" fill="#4a4945"/>
-                </svg>
-              </div>
-              <div style="width:220px;">
-                <div style="background:var(--teal-dim); border:1px solid var(--teal-border); border-radius:6px; padding:8px 14px; clip-path:polygon(6% 0%, 100% 0%, 94% 100%, 0% 100%); text-align:center;">
-                  <div style="font-size:11px; font-weight:700; color:var(--teal); line-height:1.35;"><span class="es">¿Qué paciente cribado positivo — para qué?</span><span class="en">What did the patient screen positive for?</span></div>
-                </div>
+            <!-- Gold diamond -->
+            <div class="fe-diamond-wrap">
+              <div class="fe-diamond"><div class="fe-diamond-inner"><span class="es">¿Herramienta de cribado apropiada?</span><span class="en">Is the screening tool appropriate?</span></div></div>
+            </div>
+
+            <!-- Short down arrow -->
+            <svg width="16" height="24" viewBox="0 0 16 24" fill="none" style="flex-shrink:0; margin:2px 0;">
+              <line x1="8" y1="0" x2="8" y2="16" stroke="#4a4945" stroke-width="1.5"/>
+              <polygon points="2,14 8,24 14,14" fill="#4a4945"/>
+            </svg>
+
+            <!-- Parallelogram -->
+            <div style="width:260px;">
+              <div style="background:var(--teal-dim); border:1px solid var(--teal-border); border-radius:6px; padding:8px 14px; clip-path:polygon(6% 0%, 100% 0%, 94% 100%, 0% 100%); text-align:center;">
+                <div style="font-size:11px; font-weight:700; color:var(--teal); line-height:1.35;"><span class="es">¿Qué paciente cribado positivo — para qué?</span><span class="en">What did the patient screen positive for?</span></div>
               </div>
             </div>
 
@@ -1375,7 +1375,7 @@ a, button, [role='button'], input, select {
           </div>
 
           <!-- Column headers -->
-          <div style="display:grid; grid-template-columns:140px 90px 180px 90px 130px; padding:0 0 6px; column-gap:0;">
+          <div style="display:grid; grid-template-columns:60px 90px 180px 90px 130px; padding:0 0 6px; column-gap:0;">
             <div class="fe-col-header"></div>
             <div class="fe-col-header"></div>
             <div class="fe-col-header accent"><span class="es">Herramientas de Detección</span><span class="en">Focused Screening Tools</span></div>
@@ -1384,7 +1384,7 @@ a, button, [role='button'], input, select {
           </div>
 
           <!-- Condition rows -->
-          <div style="display:grid; grid-template-columns:140px 90px 180px 90px 130px; column-gap:0; row-gap:6px; align-items:stretch; margin-top:4px;">
+          <div style="display:grid; grid-template-columns:60px 90px 180px 90px 130px; column-gap:0; row-gap:6px; align-items:stretch; margin-top:4px;">
             <div style="grid-column:1; grid-row:1/5;"></div>
 
             <!-- Depression -->
