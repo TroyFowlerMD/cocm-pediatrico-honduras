@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="es" data-lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CoCM Camasca — Registro de Pacientes</title>
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* ================================================================
+       REGISTRO DASHBOARD — inherits portal design tokens from style.css
+       ================================================================ */
+
+    /* ── Top banner (safety) ─────────────────────────────────────── */
+    .safety-banner {
+      background: var(--color-error);
+      color: white;
+      padding: var(--space-3) var(--space-5);
+      border-radius: var(--radius-md);
+      margin-bottom: var(--space-5);
+      display: none;
+      align-items: center;
+      gap: var(--space-3);
+      font-weight: 600;
+    }
+    .safety-banner.show { display: flex; }
+    .safety-banner .count { background: rgba(255,255,255,0.25); padding: 2px 8px; border-radius: var(--radius-full); font-size: var(--text-xs); }
+    .safety-banner a { color: white; text-decoration: underline; }
+
+    /* ── Toolbar ─────────────────────────────────────────────────── */
+    .reg-toolbar {
+      display: flex; flex-wrap: wrap; gap: var(--space-3);
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+      margin-bottom: var(--space-5);
+      align-items: center;
+    }
+    .reg-toolbar label { font-size: var(--text-xs); color: var(--color-text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .reg-toolbar select, .reg-toolbar input[type=text], .reg-toolbar input[type=search] {
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: var(--space-2) var(--space-3);
+      font-size: var(--text-sm);
+      color: var(--color-text);
+      min-width: 140px;
+    }
+    .reg-toolbar input[type=search] { min-width: 200px; }
+    .reg-toolbar .spacer { flex: 1; }
+    .reg-toolbar button.primary {
+      background: var(--color-primary); color: white;
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-md); font-weight: 600; font-size: var(--text-sm);
+      border: none;
+    }
+    .reg-toolbar button.primary:hover { background: var(--color-primary-hover); }
+    .reg-toolbar button.ghost {
+      background: transparent;
+      border: 1px solid var(--color-border);
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-md); font-weight: 500; font-size: var(--text-sm);
+      color: var(--color-text);
+    }
+    .reg-toolbar button.ghost:hover { background: var(--color-surface-offset); }
+
+    /* User identity chip */
+    .user-chip {
+      display: flex; align-items: center; gap: var(--space-2);
+      background: var(--color-primary-bg); color: var(--color-primary);
+      padding: var(--space-2) var(--space-3);
+      border-radius: var(--radius-full);
+      font-size: var(--text-sm); font-weight: 600;
+    }
+
+    /* ── Section titles ─────────────────────────────────────────── */
+    .reg-section {
+      margin-top: var(--space-8);
+    }
+    .reg-section-header {
+      display: flex; align-items: baseline; justify-content: space-between;
+      margin-bottom: var(--space-3);
+      border-bottom: 1px solid var(--color-divider);
+      padding-bottom: var(--space-2);
+    }
+    .reg-section-title { font-size: var(--text-lg); font-weight: 700; color: var(--color-text); }
+    .reg-section-count { font-size: var(--text-sm); color: var(--color-text-muted); }
+
+    /* Severity tier blocks */
+    .tier-block { margin-top: var(--space-5); }
+    .tier-pill {
+      display: inline-flex; align-items: center; gap: var(--space-2);
+      padding: var(--space-1) var(--space-3);
+      border-radius: var(--radius-full);
+      font-size: var(--text-xs); font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.06em;
+      margin-bottom: var(--space-3);
+    }
+    .tier-severe   { background: var(--color-error);  color: white; }
+    .tier-moderate { background: var(--color-warning); color: white; }
+    .tier-mild     { background: var(--color-primary); color: white; }
+    .tier-remission { background: var(--color-success); color: white; }
+    .tier-nodata   { background: var(--color-surface-offset-2); color: var(--color-text-muted); }
+
+    /* ── Patient table ──────────────────────────────────────────── */
+    .pat-table-wrap { overflow-x: auto; border: 1px solid var(--color-border); border-radius: var(--radius-lg); background: var(--color-surface); }
+    table.pat-table { width: 100%; border-collapse: collapse; font-size: var(--text-sm); }
+    table.pat-table thead th {
+      background: var(--color-surface-offset);
+      text-align: left;
+      padding: var(--space-3) var(--space-4);
+      font-weight: 700; color: var(--color-text-muted);
+      font-size: var(--text-xs); text-transform: uppercase; letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--color-border);
+      white-space: nowrap;
+    }
+    table.pat-table tbody tr {
+      border-bottom: 1px solid var(--color-divider);
+      cursor: pointer;
+      transition: background var(--transition-interactive);
+    }
+    table.pat-table tbody tr:hover { background: var(--color-surface-offset); }
+    table.pat-table tbody tr.pinned { background: oklch(from var(--color-error) l c h / 0.08); }
+    table.pat-table tbody tr.pinned:hover { background: oklch(from var(--color-error) l c h / 0.14); }
+    table.pat-table td {
+      padding: var(--space-3) var(--space-4);
+      vertical-align: middle;
+    }
+    table.pat-table td .pat-name { font-weight: 600; color: var(--color-text); }
+    table.pat-table td .pat-meta { font-size: var(--text-xs); color: var(--color-text-muted); margin-top: 2px; }
+    .pat-row-safety {
+      display: inline-block; font-size: var(--text-xs); font-weight: 700;
+      padding: 2px 8px; border-radius: var(--radius-full);
+      background: var(--color-error); color: white; margin-right: 6px;
+    }
+    .cond-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+    .cond-chip {
+      font-size: var(--text-xs);
+      padding: 2px 8px;
+      background: var(--color-surface-offset-2);
+      color: var(--color-text-muted);
+      border-radius: var(--radius-full);
+    }
+    .tool-chip {
+      font-size: var(--text-xs); font-family: ui-monospace, monospace;
+      padding: 2px 6px;
+      background: var(--color-primary-bg);
+      color: var(--color-primary);
+      border-radius: var(--radius-sm);
+      margin-right: 4px;
+    }
+    .score-cell { font-family: ui-monospace, monospace; font-weight: 600; }
+    .score-delta-down { color: var(--color-success); font-weight: 600; font-size: var(--text-xs); }
+    .score-delta-up   { color: var(--color-error);  font-weight: 600; font-size: var(--text-xs); }
+    .score-delta-flat { color: var(--color-text-muted); font-size: var(--text-xs); }
+
+    .trend-spark { width: 80px; height: 24px; }
+
+    /* Flag pill */
+    .flag-notimp {
+      font-size: var(--text-xs); font-weight: 700;
+      padding: 2px 8px;
+      background: var(--color-warning-highlight); color: var(--color-warning);
+      border-radius: var(--radius-full);
+      white-space: nowrap;
+      display: inline-block;
+    }
+    .pat-row-safety { white-space: nowrap; }
+    /* Banderas column: stack flags vertically on narrow */
+    table.pat-table td:last-child { display: flex; flex-wrap: wrap; gap: 4px; padding-top: var(--space-3); padding-bottom: var(--space-3); }
+    @media (max-width: 700px) { table.pat-table td:last-child { display: block; } }
+
+    /* ── Stat cards ─────────────────────────────────────────────── */
+    .stat-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: var(--space-4); margin-bottom: var(--space-6);
+    }
+    .stat-card {
+      background: var(--color-surface);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-4);
+    }
+    .stat-card .stat-label { font-size: var(--text-xs); color: var(--color-text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; }
+    .stat-card .stat-value { font-size: var(--text-xl); font-weight: 700; color: var(--color-text); margin-top: var(--space-2); font-family: var(--font-display); }
+    .stat-card .stat-sub { font-size: var(--text-xs); color: var(--color-text-muted); margin-top: 2px; }
+
+    /* Config / connection banner */
+    .conn-banner {
+      background: var(--color-surface-offset);
+      border: 1px dashed var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-3) var(--space-4);
+      font-size: var(--text-sm); color: var(--color-text-muted);
+      margin-bottom: var(--space-4);
+      display: flex; align-items: center; gap: var(--space-3); flex-wrap: wrap;
+    }
+    .conn-banner strong { color: var(--color-text); }
+    .conn-banner .ok { color: var(--color-success); font-weight: 700; }
+    .conn-banner .warn { color: var(--color-warning); font-weight: 700; }
+    .conn-banner .err { color: var(--color-error); font-weight: 700; }
+    .conn-banner input[type=text] {
+      flex: 1; min-width: 260px;
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 6px 10px;
+      font-family: ui-monospace, monospace; font-size: var(--text-xs);
+      color: var(--color-text);
+    }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center; padding: var(--space-8);
+      color: var(--color-text-muted);
+      background: var(--color-surface); border: 1px dashed var(--color-border);
+      border-radius: var(--radius-lg);
+    }
+
+    /* Mobile adjustments */
+    @media (max-width: 700px) {
+      .reg-toolbar { flex-direction: column; align-items: stretch; }
+      .reg-toolbar .spacer { display: none; }
+      table.pat-table thead { display: none; }
+      table.pat-table, table.pat-table tbody, table.pat-table tr, table.pat-table td { display: block; width: 100%; }
+      table.pat-table tr { padding: var(--space-3) var(--space-4); }
+      table.pat-table td { padding: 4px 0; border: none; }
+      table.pat-table td[data-label]::before {
+        content: attr(data-label) ': ';
+        font-weight: 600; color: var(--color-text-muted); font-size: var(--text-xs); text-transform: uppercase;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div class="app-layout no-sidebar">
+  <main class="main-content">
+
+    <!-- Topbar -->
+    <div class="topbar">
+      <div style="display:flex; align-items:center; gap:var(--space-3);">
+        <div>
+          <div class="topbar-title" data-es="CoCM Camasca — Registro" data-en="CoCM Camasca — Registry">CoCM Camasca — Registro</div>
+          <div class="topbar-subtitle" data-es="Panel clínico · Monitoreo longitudinal de pacientes" data-en="Clinical dashboard · Longitudinal patient monitoring">Panel clínico · Monitoreo longitudinal de pacientes</div>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <div class="lang-toggle">
+          <button class="lang-btn active" id="btnES" onclick="setLang('es')">Español</button>
+          <button class="lang-btn" id="btnEN" onclick="setLang('en')">English</button>
+        </div>
+        <button class="theme-toggle" data-theme-toggle aria-label="Cambiar tema">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="page-content">
+
+      <!-- Safety alert banner (dynamic) -->
+      <div class="safety-banner" id="safetyBanner">
+        <span style="font-size: 1.3em;">⚠️</span>
+        <span data-es="Pacientes con bandera de seguridad activa:" data-en="Patients with active safety flag:">Pacientes con bandera de seguridad activa:</span>
+        <span class="count" id="safetyCount">0</span>
+        <a href="#safetySection" data-es="Ver abajo" data-en="View below">Ver abajo</a>
+      </div>
+
+      <!-- Connection / config banner -->
+      <div class="conn-banner" id="connBanner">
+        <span><strong data-es="Fuente de datos:" data-en="Data source:">Fuente de datos:</strong></span>
+        <span id="connStatus" class="warn" data-es="Configurando…" data-en="Configuring…">Configurando…</span>
+        <span class="spacer" style="flex:1;"></span>
+        <button class="ghost" onclick="openConfigModal()" data-es="Configurar" data-en="Configure">Configurar</button>
+        <button class="ghost" onclick="reloadData()" data-es="Recargar" data-en="Reload">Recargar</button>
+      </div>
+
+      <!-- Identity + Action Bar -->
+      <div class="reg-toolbar">
+        <div class="user-chip">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <select id="userSelect" onchange="setUser(this.value)" style="background:transparent;border:none;color:inherit;font-weight:600;padding:0;min-width:auto;">
+            <option value="">—</option>
+          </select>
+          <button onclick="addMeModal()" class="ghost" style="padding: 2px 8px; font-size: var(--text-xs); border-color: var(--color-primary);" title="Agregar usuario">+</button>
+        </div>
+
+        <label data-es="Terapeuta" data-en="Therapist">Terapeuta</label>
+        <select id="filterTherapist" onchange="renderAll()"><option value="">—</option></select>
+
+        <label data-es="Condición" data-en="Condition">Condición</label>
+        <select id="filterCondition" onchange="renderAll()"><option value="">—</option></select>
+
+        <label data-es="Estado" data-en="Status">Estado</label>
+        <select id="filterStatus" onchange="renderAll()">
+          <option value="active" data-es="Activos" data-en="Active">Activos</option>
+          <option value="all" data-es="Todos" data-en="All">Todos</option>
+          <option value="Activo">Activo</option>
+          <option value="Prioridad Baja" data-es="Prioridad Baja" data-en="Low Priority">Prioridad Baja</option>
+          <option value="Inactivo">Inactivo</option>
+          <option value="Transferido" data-es="Transferido" data-en="Transferred">Transferido</option>
+        </select>
+
+        <input type="search" id="searchBox" placeholder="Buscar paciente…" oninput="renderAll()" />
+
+        <span class="spacer"></span>
+
+        <button class="ghost" onclick="location.href='registro-sugerencias.html'" data-es="Sugerencias" data-en="Suggestions">Sugerencias</button>
+        <button class="primary" onclick="newPatientModal()">
+          <span data-es="+ Paciente nuevo" data-en="+ New patient">+ Paciente nuevo</span>
+        </button>
+      </div>
+
+      <!-- Stat cards -->
+      <div class="stat-grid" id="statGrid"></div>
+
+      <!-- Patient sections -->
+      <div id="patientSections"></div>
+
+      <!-- Empty state -->
+      <div class="empty-state" id="emptyState" style="display:none;">
+        <p data-es="No hay pacientes que coincidan con los filtros." data-en="No patients match the current filters.">No hay pacientes que coincidan con los filtros.</p>
+      </div>
+
+      <!-- Medical disclaimer -->
+      <div class="dashboard-disclaimer" style="margin-top: var(--space-10);">
+        <strong data-es="Aviso:" data-en="Notice:">Aviso:</strong>
+        <span data-es="Este registro es una herramienta clínica interna. Toda información es confidencial y debe manejarse según políticas locales de protección de datos." data-en="This registry is an internal clinical tool. All information is confidential and must be handled per local data protection policies.">Este registro es una herramienta clínica interna. Toda información es confidencial y debe manejarse según políticas locales de protección de datos.</span>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     Config modal
+     ══════════════════════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="configModal" style="display:none;">
+  <div class="modal" style="max-width:640px;">
+    <div class="modal-header">
+      <h3 data-es="Configurar fuente de datos" data-en="Configure data source">Configurar fuente de datos</h3>
+      <button class="modal-close" onclick="closeConfigModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <p data-es="El panel necesita leer del Google Sheet. Elija uno de los dos métodos:" data-en="The dashboard needs to read from the Google Sheet. Choose one of two methods:">El panel necesita leer del Google Sheet. Elija uno de los dos métodos:</p>
+      <h4 style="margin-top: var(--space-4);" data-es="Opción 1 — Apps Script (recomendado)" data-en="Option 1 — Apps Script (recommended)">Opción 1 — Apps Script (recomendado)</h4>
+      <p data-es="Permite lecturas y escrituras. Pegue la URL del Web App desplegado:" data-en="Enables reads and writes. Paste the deployed Web App URL:">Permite lecturas y escrituras. Pegue la URL del Web App desplegado:</p>
+      <input type="text" id="cfgAppsScriptUrl" style="width:100%;padding:8px;font-family:ui-monospace,monospace;font-size:var(--text-xs);background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);" placeholder="https://script.google.com/macros/s/.../exec" />
+
+      <h4 style="margin-top: var(--space-4);" data-es="Opción 2 — CSV publicado (solo lectura)" data-en="Option 2 — Published CSV (read-only)">Opción 2 — CSV publicado (solo lectura)</h4>
+      <p style="font-size: var(--text-xs); color: var(--color-text-muted);" data-es="En el Sheet, use Archivo › Compartir › Publicar en la web › CSV. Pegue la URL base (sin &gid):" data-en="In the Sheet, use File › Share › Publish to web › CSV. Paste the base URL (without &gid):">En el Sheet, use Archivo › Compartir › Publicar en la web › CSV. Pegue la URL base (sin &gid):</p>
+      <input type="text" id="cfgCsvBaseUrl" style="width:100%;padding:8px;font-family:ui-monospace,monospace;font-size:var(--text-xs);background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);" placeholder="https://docs.google.com/spreadsheets/d/e/XXX/pub?output=csv" />
+
+      <p style="margin-top: var(--space-4); font-size: var(--text-xs); color: var(--color-text-muted);" data-es="Sin configurar, el panel usa datos de ejemplo (demo)." data-en="Without configuration, the dashboard uses demo data.">Sin configurar, el panel usa datos de ejemplo (demo).</p>
+    </div>
+    <div class="modal-footer">
+      <button class="ghost" onclick="closeConfigModal()" data-es="Cancelar" data-en="Cancel">Cancelar</button>
+      <button class="primary" onclick="saveConfig()" data-es="Guardar" data-en="Save">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     Add Me modal
+     ══════════════════════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="addMeModal" style="display:none;">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <h3 data-es="Agregarme al equipo" data-en="Add me to the team">Agregarme al equipo</h3>
+      <button class="modal-close" onclick="closeAddMeModal()">×</button>
+    </div>
+    <div class="modal-body">
+      <label style="display:block;font-size:var(--text-xs);color:var(--color-text-muted);font-weight:600;text-transform:uppercase;margin-bottom:4px;" data-es="Nombre completo" data-en="Full name">Nombre completo</label>
+      <input type="text" id="addMeName" style="width:100%;padding:8px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);" placeholder="Dr. Jane Doe" />
+
+      <label style="display:block;font-size:var(--text-xs);color:var(--color-text-muted);font-weight:600;text-transform:uppercase;margin-top:12px;margin-bottom:4px;" data-es="Rol" data-en="Role">Rol</label>
+      <select id="addMeRole" style="width:100%;padding:8px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);">
+        <option value="therapist" data-es="Terapeuta" data-en="Therapist">Terapeuta</option>
+        <option value="psychiatrist" data-es="Psiquiatra" data-en="Psychiatrist">Psiquiatra</option>
+        <option value="other" data-es="Otro" data-en="Other">Otro</option>
+      </select>
+    </div>
+    <div class="modal-footer">
+      <button class="ghost" onclick="closeAddMeModal()" data-es="Cancelar" data-en="Cancel">Cancelar</button>
+      <button class="primary" onclick="submitAddMe()" data-es="Agregar" data-en="Add">Agregar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     New Patient modal
+     ══════════════════════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="newPatientModal" style="display:none;">
+  <div class="modal" style="max-width:680px;">
+    <div class="modal-header">
+      <h3 data-es="Nuevo paciente" data-en="New patient">Nuevo paciente</h3>
+      <button class="modal-close" onclick="closeNewPatientModal()">×</button>
+    </div>
+    <div class="modal-body" id="newPatientForm">
+      <!-- rendered by JS -->
+    </div>
+    <div class="modal-footer">
+      <button class="ghost" onclick="closeNewPatientModal()" data-es="Cancelar" data-en="Cancel">Cancelar</button>
+      <button class="primary" onclick="submitNewPatient()" data-es="Guardar" data-en="Save">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════════
+     SHARED MODAL STYLES
+     ══════════════════════════════════════════════════════════════ -->
+<style>
+  .modal-backdrop {
+    position: fixed; inset: 0; background: rgba(0,0,0,0.5);
+    display: flex; align-items: center; justify-content: center;
+    z-index: 200; padding: var(--space-4);
+  }
+  .modal {
+    background: var(--color-surface);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-height: 90vh; overflow-y: auto;
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-lg);
+  }
+  .modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: var(--space-4) var(--space-5);
+    border-bottom: 1px solid var(--color-border);
+  }
+  .modal-header h3 { font-size: var(--text-lg); font-weight: 700; color: var(--color-text); }
+  .modal-close {
+    background: transparent; border: none; font-size: 1.6rem;
+    color: var(--color-text-muted); cursor: pointer; line-height: 1;
+  }
+  .modal-body { padding: var(--space-5); }
+  .modal-footer {
+    padding: var(--space-3) var(--space-5);
+    display: flex; gap: var(--space-2); justify-content: flex-end;
+    border-top: 1px solid var(--color-border);
+  }
+  .modal-footer button { padding: var(--space-2) var(--space-4); border-radius: var(--radius-md); font-weight: 600; font-size: var(--text-sm); }
+  .modal-footer button.primary { background: var(--color-primary); color: white; border: none; }
+  .modal-footer button.ghost { background: transparent; border: 1px solid var(--color-border); color: var(--color-text); }
+</style>
+
+<script src="registro-data.js"></script>
+<script src="registro-app.js"></script>
+
+</body>
+</html>

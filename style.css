@@ -1168,3 +1168,35 @@ a, button, [role='button'], input, select {
     gap: var(--space-2);
   }
 }
+
+/* ============================================================
+   REGISTRO (dashboard) helpers — added for registro.html and
+   related pages. Safe for existing tool pages (scoped to classes
+   that aren't used elsewhere).
+   ============================================================ */
+
+/* When a page has no sidebar, remove sidebar reservation */
+.app-layout.no-sidebar .main-content { margin-left: 0; }
+.app-layout.no-sidebar .sidebar { display: none; }
+
+/* Medical disclaimer block used across registry pages */
+.dashboard-disclaimer {
+  background: var(--color-surface-offset);
+  border-left: 3px solid var(--color-primary);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin-top: var(--space-6);
+}
+.dashboard-disclaimer strong { color: var(--color-text); margin-right: 4px; }
+
+/* Page content default padding (mirrors index.html layout) */
+.app-layout.no-sidebar .page-content {
+  padding: var(--space-6) var(--space-8);
+  max-width: 1400px;
+  margin: 0 auto;
+}
+@media (max-width: 700px) {
+  .app-layout.no-sidebar .page-content { padding: var(--space-4); }
+}
