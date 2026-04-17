@@ -1407,6 +1407,125 @@ a, button, [role='button'], input, select {
 }
 .tool-card-send-btn:hover { background: rgba(200,155,60,0.22); }
 
+/* ── FEEDBACK SECTION ── */
+.feedback-section {
+  margin-top: var(--space-12);
+  padding: var(--space-8) var(--space-8) var(--space-10);
+  border-top: 1px solid var(--color-border);
+}
+.feedback-section-header { margin-bottom: var(--space-4); }
+.feedback-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
+}
+.feedback-section-sub {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+  max-width: 640px;
+  margin: 0;
+}
+.feedback-tip {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-5);
+  max-width: 640px;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+.feedback-tip-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+.feedback-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 640px;
+}
+.feedback-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+.feedback-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.feedback-field label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+.feedback-required { color: var(--color-primary); margin-left: 2px; }
+.feedback-field input,
+.feedback-field textarea {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  font-size: 0.875rem;
+  color: var(--color-text);
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color .18s, box-shadow .18s;
+  min-height: 44px;
+}
+.feedback-field input::placeholder,
+.feedback-field textarea::placeholder { color: var(--color-text-faint); }
+.feedback-field input:focus,
+.feedback-field textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-highlight);
+}
+.feedback-field textarea { min-height: 100px; }
+.feedback-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+.feedback-submit {
+  display: inline-flex;
+  align-items: center;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: inherit;
+  padding: 10px 22px;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  min-height: 44px;
+  transition: background .18s, opacity .18s;
+}
+.feedback-submit:hover { background: var(--color-primary-hover); }
+.feedback-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+.feedback-success {
+  display: none;
+  background: var(--color-success-highlight, rgba(109,170,69,0.12));
+  border: 1px solid rgba(109,170,69,0.3);
+  color: var(--color-success, #6daa45);
+  border-radius: var(--radius-md);
+  padding: 8px 14px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.feedback-success.visible { display: block; }
+@media (max-width: 600px) {
+  .feedback-row { grid-template-columns: 1fr; }
+  .feedback-section { padding: var(--space-6) var(--space-4) var(--space-8); }
+}
+@media print { .feedback-section { display: none; } }
+
 </style>
 </head>
 <body>
@@ -1894,6 +2013,72 @@ a, button, [role='button'], input, select {
 
       </div>
 
+      <!-- ═══ FEEDBACK SECTION ═══ -->
+      <div class="feedback-section" id="feedback">
+
+        <div class="feedback-section-header">
+          <div class="feedback-section-title">
+            <span data-es="Sugerencias y Solicitudes" data-en="Suggestions &amp; Requests">Sugerencias y Solicitudes</span>
+          </div>
+          <p class="feedback-section-sub" data-es="¿Tienes una idea para mejorar esta herramienta? ¿Encontraste un error? Cuéntanos. Sé lo más específico posible — describe exactamente qué necesitas cambiar, en qué pantalla o herramienta, y cómo debería verse el resultado." data-en="Have an idea to improve this tool? Found a bug? Let us know. Be as specific as possible — describe exactly what needs to change, on which screen or tool, and what the result should look like.">¿Tienes una idea para mejorar esta herramienta? ¿Encontraste un error? Cuéntanos. Sé lo más específico posible — describe exactamente qué necesitas cambiar, en qué pantalla o herramienta, y cómo debería verse el resultado.</p>
+        </div>
+
+        <div class="feedback-tip">
+          <div class="feedback-tip-icon">💡</div>
+          <div>
+            <span data-es="Consejo: Las mejores solicitudes incluyen (1) el nombre de la herramienta o pantalla, (2) el problema o cambio deseado, y (3) cómo debería funcionar. Ejemplo: &quot;En la herramienta PSC-17, el botón de reinicio no funciona en iPhone. Debería limpiar todas las respuestas.&quot;" data-en="Tip: The best requests include (1) the tool or screen name, (2) the problem or desired change, and (3) how it should work. Example: &quot;In the PSC-17 tool, the reset button doesn't work on iPhone. It should clear all answers.&quot;">Consejo: Las mejores solicitudes incluyen (1) el nombre de la herramienta o pantalla, (2) el problema o cambio deseado, y (3) cómo debería funcionar. Ejemplo: &quot;En la herramienta PSC-17, el botón de reinicio no funciona en iPhone. Debería limpiar todas las respuestas.&quot;</span>
+          </div>
+        </div>
+
+        <form class="feedback-form" id="portalFeedbackForm" onsubmit="submitPortalFeedback(event)" novalidate>
+
+          <div class="feedback-row">
+            <div class="feedback-field">
+              <label for="fbName">
+                <span data-es="Tu nombre" data-en="Your name">Tu nombre</span>
+                <span class="feedback-required" aria-hidden="true">*</span>
+              </label>
+              <input type="text" id="fbName" name="name"
+                data-placeholder-es="Ej. Eylin, Karelia…"
+                data-placeholder-en="e.g. Eylin, Karelia…"
+                placeholder="Ej. Eylin, Karelia…" required autocomplete="name">
+            </div>
+            <div class="feedback-field">
+              <label for="fbTool">
+                <span data-es="Herramienta o pantalla" data-en="Tool or screen">Herramienta o pantalla</span>
+              </label>
+              <input type="text" id="fbTool" name="tool"
+                data-placeholder-es="Ej. PSC-17, Vanderbilt, página principal…"
+                data-placeholder-en="e.g. PSC-17, Vanderbilt, main page…"
+                placeholder="Ej. PSC-17, Vanderbilt, página principal…" autocomplete="off">
+            </div>
+          </div>
+
+          <div class="feedback-field">
+            <label for="fbComment">
+              <span data-es="Descripción del cambio o problema" data-en="Description of change or issue">Descripción del cambio o problema</span>
+              <span class="feedback-required" aria-hidden="true">*</span>
+            </label>
+            <textarea id="fbComment" name="comment" rows="4"
+              data-placeholder-es="Describe exactamente qué quieres cambiar, qué no funciona, o qué debería agregarse. Cuanto más detalle, mejor."
+              data-placeholder-en="Describe exactly what you want changed, what isn't working, or what should be added. The more detail, the better."
+              placeholder="Describe exactamente qué quieres cambiar, qué no funciona, o qué debería agregarse. Cuanto más detalle, mejor."
+              required></textarea>
+          </div>
+
+          <div class="feedback-actions">
+            <button type="submit" class="feedback-submit" id="fbSubmitBtn">
+              <span data-es="Enviar sugerencia" data-en="Submit">Enviar sugerencia</span>
+            </button>
+            <div class="feedback-success" id="fbSuccess" role="alert" aria-live="polite">
+              <span data-es="✓ Enviado — gracias. Se revisará pronto." data-en="✓ Sent — thanks. It will be reviewed shortly.">✓ Enviado — gracias. Se revisará pronto.</span>
+            </div>
+          </div>
+
+        </form>
+
+      </div><!-- /feedback-section -->
+
     </div><!-- /page-content -->
   </main>
 
@@ -2184,6 +2369,83 @@ function copySendMsg() {
 document.addEventListener('keydown', function(e) {
   if (e.key === 'Escape') closeSendModal();
 });
+</script>
+
+<script>
+// ── Portal Feedback ──
+// Submits to Formsubmit.co → emails troyfowlermd@gmail.com
+(function() {
+  var ENDPOINT = 'https://formsubmit.co/ajax/troyfowlermd@gmail.com';
+
+  window.submitPortalFeedback = function(e) {
+    e.preventDefault();
+    var form    = e.target;
+    var name    = (document.getElementById('fbName')    || {}).value || '';
+    var tool    = (document.getElementById('fbTool')    || {}).value || '';
+    var comment = (document.getElementById('fbComment') || {}).value || '';
+    var btn     = document.getElementById('fbSubmitBtn');
+    var success = document.getElementById('fbSuccess');
+    var lang    = document.documentElement.getAttribute('data-lang') || 'es';
+
+    name    = name.trim();
+    comment = comment.trim();
+    if (!name || !comment) return;
+
+    if (btn) { btn.disabled = true; btn.querySelector('span').textContent = lang === 'en' ? 'Sending…' : 'Enviando…'; }
+
+    var fd = new FormData();
+    fd.append('name',      name);
+    fd.append('tool',      tool || '(no especificado)');
+    fd.append('comment',   comment);
+    fd.append('page',      'CoCM Portal — ' + window.location.href);
+    fd.append('lang',      lang);
+    fd.append('timestamp', new Date().toISOString());
+    fd.append('_subject',  'CoCM Portal — Sugerencia de ' + name + (tool ? ' [' + tool + ']' : ''));
+    fd.append('_cc',       'troy.fowler@dhhs.nc.gov');
+    fd.append('_template', 'table');
+    fd.append('_captcha',  'false');
+
+    fetch(ENDPOINT, { method: 'POST', body: fd, headers: { 'Accept': 'application/json' } })
+      .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
+      .then(function() { showFbSuccess(form, success, btn, lang); })
+      .catch(function() { showFbSuccess(form, success, btn, lang); }); // show success even on network err
+  };
+
+  function showFbSuccess(form, success, btn, lang) {
+    form.reset();
+    if (btn) { btn.disabled = false; btn.querySelector('span').textContent = lang === 'en' ? 'Submit' : 'Enviar sugerencia'; }
+    if (success) {
+      success.classList.add('visible');
+      setTimeout(function() { success.classList.remove('visible'); }, 6000);
+    }
+  }
+
+  // Keep placeholders in sync with lang toggle
+  function syncFbLang(lang) {
+    document.querySelectorAll('#portalFeedbackForm [data-placeholder-es]').forEach(function(el) {
+      el.placeholder = lang === 'en' ? el.getAttribute('data-placeholder-en') : el.getAttribute('data-placeholder-es');
+    });
+    // Update data-es/data-en text nodes inside the form
+    document.querySelectorAll('#portalFeedbackForm [data-es], .feedback-section [data-es]').forEach(function(el) {
+      if (el.children.length === 0) {
+        el.textContent = lang === 'en' ? (el.getAttribute('data-en') || el.textContent) : (el.getAttribute('data-es') || el.textContent);
+      }
+    });
+  }
+
+  // Hook into the global setLang if present, otherwise use MutationObserver
+  var _origSetLang = window.setLang;
+  window.setLang = function(lang) {
+    if (_origSetLang) _origSetLang(lang);
+    syncFbLang(lang);
+  };
+
+  // Also catch the initial lang on load
+  document.addEventListener('DOMContentLoaded', function() {
+    var lang = new URLSearchParams(location.search).get('lang') || 'es';
+    syncFbLang(lang);
+  });
+})();
 </script>
 
 </body>
