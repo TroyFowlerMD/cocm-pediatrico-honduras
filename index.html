@@ -1322,6 +1322,58 @@ a, button, [role='button'], input, select {
       <div class="flow-embed-wrap">
         <div class="flow-embed lang-es" id="flowEmbed">
 
+          <!-- Universal screening intro: pill → PSC-17 → diamond → parallelogram (all centered above grid) -->
+          <div style="display:flex; flex-direction:column; align-items:center; margin-bottom:10px;">
+
+            <!-- Tamizaje Universal pill -->
+            <div class="fe-node fe-node-entry" style="font-size:11px; padding:7px 22px; width:auto; white-space:nowrap;">
+              <span class="es">Tamizaje Universal</span><span class="en">Universal Screening</span>
+            </div>
+
+            <!-- Short down arrow -->
+            <svg width="16" height="24" viewBox="0 0 16 24" fill="none" style="flex-shrink:0; margin:2px 0;">
+              <line x1="8" y1="0" x2="8" y2="16" stroke="#4a4945" stroke-width="1.5"/>
+              <polygon points="2,14 8,24 14,14" fill="#4a4945"/>
+            </svg>
+
+            <!-- PSC-17 box -->
+            <div class="fe-tool-box teal" style="align-items:center; text-align:center; flex-direction:row; gap:10px; justify-content:center; width:260px;">
+              <a href="psc17.html" class="fe-tool-link" style="font-size:13px; font-weight:800;"><span class="fe-dot"></span>PSC-17</a>
+              <span class="fe-tool-sub" style="font-size:10px;"><span class="es">Todos · 17 ítems · Corte ≥15</span><span class="en">All patients · 17 items · Cutoff ≥15</span></span>
+            </div>
+
+            <!-- Short down arrow -->
+            <svg width="16" height="24" viewBox="0 0 16 24" fill="none" style="flex-shrink:0; margin:2px 0;">
+              <line x1="8" y1="0" x2="8" y2="16" stroke="#4a4945" stroke-width="1.5"/>
+              <polygon points="2,14 8,24 14,14" fill="#4a4945"/>
+            </svg>
+
+            <!-- Gold diamond + horizontal arrow + parallelogram (inline, centered) -->
+            <div style="display:flex; align-items:center; gap:0; justify-content:center;">
+              <div class="fe-diamond-wrap" style="width:110px; justify-content:center;">
+                <div class="fe-diamond"><div class="fe-diamond-inner"><span class="es">¿Herramienta de cribado apropiada?</span><span class="en">Is the screening tool appropriate?</span></div></div>
+              </div>
+              <div style="display:flex; align-items:center; width:80px;">
+                <svg width="100%" height="36" viewBox="0 0 110 36" fill="none" style="overflow:visible;">
+                  <line x1="0" y1="18" x2="95" y2="18" stroke="#4a4945" stroke-width="1.5"/>
+                  <polygon points="95,12 110,18 95,24" fill="#4a4945"/>
+                </svg>
+              </div>
+              <div style="width:220px;">
+                <div style="background:var(--teal-dim); border:1px solid var(--teal-border); border-radius:6px; padding:8px 14px; clip-path:polygon(6% 0%, 100% 0%, 94% 100%, 0% 100%); text-align:center;">
+                  <div style="font-size:11px; font-weight:700; color:var(--teal); line-height:1.35;"><span class="es">¿Qué paciente cribado positivo — para qué?</span><span class="en">What did the patient screen positive for?</span></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Short down arrow into grid -->
+            <svg width="16" height="24" viewBox="0 0 16 24" fill="none" style="flex-shrink:0; margin:2px 0;">
+              <line x1="8" y1="0" x2="8" y2="16" stroke="#4a4945" stroke-width="1.5"/>
+              <polygon points="2,14 8,24 14,14" fill="#4a4945"/>
+            </svg>
+
+          </div>
+
           <!-- Column headers -->
           <div style="display:grid; grid-template-columns:140px 90px 180px 90px 130px; padding:0 0 6px; column-gap:0;">
             <div class="fe-col-header"></div>
@@ -1329,46 +1381,6 @@ a, button, [role='button'], input, select {
             <div class="fe-col-header accent"><span class="es">Herramientas de Detección</span><span class="en">Focused Screening Tools</span></div>
             <div class="fe-col-header"></div>
             <div class="fe-col-header accent"><span class="es">Monitoreo</span><span class="en">Monitoring Tools</span></div>
-          </div>
-
-          <!-- PSC-17 universal row -->
-          <div style="display:grid; grid-template-columns:140px 90px 180px 90px 130px; column-gap:0; align-items:center; margin-bottom:10px;">
-            <div style="grid-column:1; padding:4px 8px 4px 0;">
-              <div class="fe-node fe-node-entry" style="height:36px; font-size:11px;"><span class="es">Tamizaje Universal</span><span class="en">Universal Screening</span></div>
-            </div>
-            <div style="grid-column:2; display:flex; align-items:center; justify-content:center; padding:4px;">
-              <svg width="100%" height="36" viewBox="0 0 110 36" fill="none" style="overflow:visible;">
-                <line x1="0" y1="18" x2="95" y2="18" stroke="#4a4945" stroke-width="1.5"/>
-                <polygon points="95,12 110,18 95,24" fill="#4a4945"/>
-              </svg>
-            </div>
-            <div style="grid-column:3/5; padding:4px 8px;">
-              <div class="fe-tool-box teal" style="align-items:center; text-align:center; flex-direction:row; gap:10px; justify-content:center;">
-                <a href="psc17.html" class="fe-tool-link" style="font-size:13px; font-weight:800;"><span class="fe-dot"></span>PSC-17</a>
-                <span class="fe-tool-sub" style="font-size:10px;"><span class="es">Todos · 17 ítems · Corte ≥15</span><span class="en">All patients · 17 items · Cutoff ≥15</span></span>
-              </div>
-            </div>
-            <div style="grid-column:5;"></div>
-          </div>
-
-          <!-- Intermediate step: appropriateness check diamond + decision parallelogram -->
-          <div style="display:grid; grid-template-columns:140px 90px 180px 90px 130px; column-gap:0; align-items:center; margin:8px 0 10px;">
-            <div style="grid-column:1; display:flex; align-items:center; justify-content:center; padding:4px 0;">
-              <div class="fe-diamond-wrap"><div class="fe-diamond"><div class="fe-diamond-inner"><span class="es">¿Herramienta de cribado apropiada?</span><span class="en">Is the screening tool appropriate?</span></div></div></div>
-            </div>
-            <div style="grid-column:2; display:flex; align-items:center; justify-content:center; padding:4px;">
-              <svg width="100%" height="36" viewBox="0 0 110 36" fill="none" style="overflow:visible;">
-                <line x1="0" y1="18" x2="95" y2="18" stroke="#4a4945" stroke-width="1.5"/>
-                <polygon points="95,12 110,18 95,24" fill="#4a4945"/>
-              </svg>
-            </div>
-            <div style="grid-column:3/5; padding:4px 8px;">
-              <!-- Parallelogram: ¿Qué paciente cribado positivo para qué? -->
-              <div style="background:var(--teal-dim); border:1px solid var(--teal-border); border-radius:6px; padding:8px 14px; clip-path:polygon(6% 0%, 100% 0%, 94% 100%, 0% 100%); text-align:center;">
-                <div style="font-size:11px; font-weight:700; color:var(--teal); line-height:1.35;"><span class="es">¿Qué paciente cribado positivo — para qué?</span><span class="en">What did the patient screen positive for?</span></div>
-              </div>
-            </div>
-            <div style="grid-column:5;"></div>
           </div>
 
           <!-- Condition rows -->
