@@ -820,6 +820,12 @@ a, button, [role='button'], input, select {
   background: var(--color-surface-offset);
   color: var(--color-text-muted);
 }
+.score-result-badge.incomplete-partial {
+  background: var(--color-error-highlight);
+  color: var(--color-error);
+  font-weight: 800;
+}
+
 
 /* Subscale bars */
 .subscale-grid {
@@ -1561,7 +1567,7 @@ function updateScore() {
     text.textContent = isEN ? enTxt : esTxt;
   }
 
-  if (!complete) setBadge(`${answered}/13 respondidas`, `${answered}/13 answered`, 'incomplete');
+  if (!complete) setBadge(`${answered}/13 respondidas`, `${answered}/13 answered`, 'incomplete incomplete-partial');
   else if (total >= 8) setBadge('⚠ POSITIVO — Puntuación ≥ 8', '⚠ POSITIVE — Score ≥ 8', 'positive');
   else setBadge('✓ NEGATIVO — Puntuación < 8', '✓ NEGATIVE — Score < 8', 'negative');
 }

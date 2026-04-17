@@ -2401,7 +2401,7 @@ document.addEventListener('keydown', function(e) {
     fd.append('lang',      lang);
     fd.append('timestamp', new Date().toISOString());
     fd.append('_subject',  'CoCM Portal — Sugerencia de ' + name + (tool ? ' [' + tool + ']' : ''));
-    fd.append('_cc',       'troy.fowler@dhhs.nc.gov');
+    // No CC — Honduras work is not associated with DHHS
     fd.append('_template', 'table');
     fd.append('_captcha',  'false');
 

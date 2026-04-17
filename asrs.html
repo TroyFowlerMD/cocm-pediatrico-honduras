@@ -820,6 +820,12 @@ a, button, [role='button'], input, select {
   background: var(--color-surface-offset);
   color: var(--color-text-muted);
 }
+.score-result-badge.incomplete-partial {
+  background: var(--color-error-highlight);
+  color: var(--color-error);
+  font-weight: 800;
+}
+
 
 /* Subscale bars */
 .subscale-grid {
@@ -1425,7 +1431,7 @@ function updateScore() {
     text.setAttribute('data-es', es); text.setAttribute('data-en', en);
     text.textContent = isEN ? en : es;
   }
-  if (answered < 6)    set(`${answered}/6 respondidas`, `${answered}/6 answered`, 'incomplete');
+  if (answered < 6)    set(`${answered}/6 respondidas`, `${answered}/6 answered`, 'incomplete incomplete-partial');
   else if (total >= 14) set('⚠ Consistente con TDAH (≥14) — evaluar', '⚠ Consistent with ADHD (≥14) — evaluate', 'positive');
   else                  set('✓ No consistente con TDAH (<14)', '✓ Not consistent with ADHD (<14)', 'negative');
 }

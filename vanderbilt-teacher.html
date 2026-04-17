@@ -820,6 +820,12 @@ a, button, [role='button'], input, select {
   background: var(--color-surface-offset);
   color: var(--color-text-muted);
 }
+.score-result-badge.incomplete-partial {
+  background: var(--color-error-highlight);
+  color: var(--color-error);
+  font-weight: 800;
+}
+
 
 /* Subscale bars */
 .subscale-grid {
@@ -2812,6 +2818,7 @@ function renderScore() {
 
   document.getElementById('progress-bar').style.width = r.pct + '%';
   document.getElementById('progress-text').textContent = r.done + ' / ' + TOTAL;
+  document.getElementById('progress-text').classList.toggle('incomplete-partial', r.done < TOTAL);
 
   const rows = [
     { label_es: 'Inatención (1–9)',       label_en: 'Inattention (1–9)',        score: r.IN,    max: 9,  cut: 6 },

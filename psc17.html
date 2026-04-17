@@ -820,6 +820,12 @@ a, button, [role='button'], input, select {
   background: var(--color-surface-offset);
   color: var(--color-text-muted);
 }
+.score-result-badge.incomplete-partial {
+  background: var(--color-error-highlight);
+  color: var(--color-error);
+  font-weight: 800;
+}
+
 
 /* Subscale bars */
 .subscale-grid {
@@ -1577,7 +1583,7 @@ function updateScore() {
   }
 
   if (!complete) {
-    badge.className = 'score-result-badge incomplete';
+    badge.className = 'score-result-badge incomplete incomplete-partial';
     setBadgeText(`${answeredCount}/17 respondidas`, `${answeredCount}/17 answered`);
   } else if (total >= 15) {
     badge.className = 'score-result-badge positive';
