@@ -516,6 +516,10 @@ a, button, [role='button'], input, select {
   color: var(--color-primary);
 }
 
+/* ===================== LANGUAGE VISIBILITY ===================== */
+[data-lang='en'] .es { display: none !important; }
+[data-lang='es'] .en { display: none !important; }
+
 /* ===================== TOOL PAGE — PSC-17 ===================== */
 
 .tool-header-card {
@@ -1530,7 +1534,10 @@ a, button, [role='button'], input, select {
             <div class="tool-card-icon">😔</div>
           </div>
           <div class="tool-card-name">MFQ-C <span style="font-weight:400; font-size:var(--text-sm);" data-es="Niño/a — Corta" data-en="Child — Short">Niño/a — Corta</span></div>
-          <div class="tool-card-desc" data-es="Estado de Ánimo y Sentimientos — versión corta autoinforme. Disponible para información más detallada si se desea; no forma parte del flujo estándar CoCM." data-en="Mood &amp; Feelings Questionnaire — child short version. Available for more detailed information if desired; not part of the standard CoCM workflow.">Estado de Ánimo y Sentimientos — versión corta autoinforme. Disponible si se desea información más detallada; no es parte del flujo estándar CoCM.</div>
+          <div class="tool-card-desc">
+            <span class="es">Estado de Ánimo y Sentimientos — versión corta autoinforme. <strong><u>No</u> forma parte del flujo estándar CoCM; disponible para información más detallada si se desea.</strong></span>
+            <span class="en">Mood &amp; Feelings Questionnaire — child short version. <strong><u>Not</u> part of the standard CoCM workflow; available for more detailed information if desired.</strong></span>
+          </div>
         </a>
 
         <!-- MFQ-P — optional detailed use -->
@@ -1539,7 +1546,10 @@ a, button, [role='button'], input, select {
             <div class="tool-card-icon">👨‍👩‍👦</div>
           </div>
           <div class="tool-card-name">MFQ-P <span style="font-weight:400; font-size:var(--text-sm);" data-es="Padres — Larga" data-en="Parent — Long">Padres — Larga</span></div>
-          <div class="tool-card-desc" data-es="Estado de Ánimo y Sentimientos — versión larga para padres. Disponible para información más detallada si se desea; no forma parte del flujo estándar CoCM." data-en="Mood &amp; Feelings Questionnaire — parent long version. Available for more detailed information if desired; not part of the standard CoCM workflow.">Estado de Ánimo y Sentimientos — versión larga para padres. Disponible si se desea información más detallada; no es parte del flujo estándar CoCM.</div>
+          <div class="tool-card-desc">
+            <span class="es">Estado de Ánimo y Sentimientos — versión larga para padres. <strong><u>No</u> forma parte del flujo estándar CoCM; disponible para información más detallada si se desea.</strong></span>
+            <span class="en">Mood &amp; Feelings Questionnaire — parent long version. <strong><u>Not</u> part of the standard CoCM workflow; available for more detailed information if desired.</strong></span>
+          </div>
         </a>
 
         <!-- PHQ-A — READY -->
