@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MFQ-P — CoCM Pediátrico</title>
+  <title>MFQ-PC — CoCM Pediátrico</title>
   <style>
 /* ============================================================
    CoCM Pediátrico — Shared Stylesheet
@@ -1343,16 +1343,16 @@ a, button, [role='button'], input, select {
       <div class="breadcrumb">
         <a href="index.html" data-es="Panel Principal" data-en="Dashboard">Panel Principal</a>
         <span class="breadcrumb-sep">›</span>
-        <span>MFQ-P</span>
+        <span>MFQ-PC</span>
       </div>
 
       <!-- Header card -->
       <div class="tool-header-card">
-        <h1>MFQ-P</h1>
-        <p data-es="Cuestionario de Estado de Ánimo y Sentimientos — Versión Larga para Padres/Madres (MFQ-P). Cribado de depresión infantil desde la perspectiva del cuidador." data-en="Mood and Feelings Questionnaire — Parent Long Version (MFQ-P). Depression screening in children from the parent/caregiver perspective.">Cuestionario de Estado de Ánimo y Sentimientos — Versión Larga para Padres/Madres (MFQ-P). Cribado de depresión infantil desde la perspectiva del cuidador.</p>
+        <h1>MFQ-PC</h1>
+        <p data-es="Cuestionario de Estado de Ánimo y Sentimientos — Versión Corta para Padres/Madres (MFQ-PC). Cribado de depresión infantil desde la perspectiva del cuidador." data-en="Mood and Feelings Questionnaire — Parent Short Version (MFQ-PC). Depression screening in children from the parent/caregiver perspective.">Cuestionario de Estado de Ánimo y Sentimientos — Versión Corta para Padres/Madres (MFQ-PC). Cribado de depresión infantil desde la perspectiva del cuidador.</p>
         <div class="tool-header-meta">
-          <span>33 ítems</span>
-          <span data-es="Corte: ≥27" data-en="Cutoff: ≥27">Corte: ≥27</span>
+          <span data-es="13 ítems" data-en="13 items">13 ítems</span>
+          <span data-es="Corte: ≥12" data-en="Cutoff: ≥12">Corte: ≥12</span>
           <span data-es="Escala: 0–2" data-en="Scale: 0–2">Escala: 0–2</span>
         </div>
       </div>
@@ -1380,11 +1380,11 @@ a, button, [role='button'], input, select {
               <div style="font-size:var(--text-xs); color:var(--color-text-muted); margin-bottom:var(--space-1);" data-es="Puntuación Total" data-en="Total Score">Puntuación Total</div>
               <div class="score-display">
                 <span class="score-total" id="totalScore">0</span>
-                <span class="score-max">/ 66</span>
+                <span class="score-max">/ 26</span>
               </div>
             </div>
             <div id="resultBadge" class="score-result-badge incomplete">
-              <span id="resultText" data-es="0 / 66" data-en="0 / 66">0 / 66</span>
+              <span id="resultText" data-es="0 / 26" data-en="0 / 26">0 / 26</span>
             </div>
           </div>
 
@@ -1419,39 +1419,19 @@ a, button, [role='button'], input, select {
 
 <script>
 const QUESTIONS = [
-  { n:  1, es: 'Se ha sentido triste o infeliz.',                                         en: 'S/he has felt miserable or unhappy.' },
-  { n:  2, es: 'No ha disfrutado nada.',                                                  en: 'S/he has not enjoyed anything at all.' },
-  { n:  3, es: 'Ha tenido menos hambre de lo normal.',                                    en: 'His/her appetite has been less than usual.' },
-  { n:  4, es: 'Ha comido más de lo normal.',                                             en: 'S/he has been eating more than usual.' },
-  { n:  5, es: 'Se ha sentido tan cansado/a que no tenía ganas de hacer nada.',           en: 'S/he has been so tired that s/he just sat around and did nothing.' },
-  { n:  6, es: 'Se ha movido y ha andado más despacio de lo normal.',                     en: 'S/he has been moving and walking more slowly than usual.' },
-  { n:  7, es: 'Ha estado muy inquieto/a.',                                               en: 'S/he has been very restless.' },
-  { n:  8, es: 'Ha sentido que ya no hacía nada bien.',                                   en: 'S/he has felt s/he was no good anymore.' },
-  { n:  9, es: 'Se ha culpado de cosas que no eran culpa suya.',                          en: 'S/he has blamed him/herself for things that were not his/her fault.' },
-  { n: 10, es: 'Le ha costado tomar decisiones.',                                         en: 'It has been hard for him/her to make up his/her mind.' },
-  { n: 11, es: 'Ha estado de mal humor o enfadado/a con sus padres.',                     en: 'S/he has been grumpy or in a bad mood with his/her parents.' },
-  { n: 12, es: 'Ha tenido menos ganas de hablar de lo normal.',                           en: 'S/he has not wanted to talk to other people.' },
-  { n: 13, es: 'Ha hablado más despacio que de costumbre.',                               en: 'S/he has been talking more slowly than usual.' },
-  { n: 14, es: 'Ha llorado mucho.',                                                       en: 'S/he has been crying a lot.' },
-  { n: 15, es: 'Ha pensado que no había nada bueno en su futuro.',                        en: 'S/he has thought that there was nothing good for him/her in the future.' },
-  { n: 16, es: 'Ha pensado que no valía la pena vivir.',                                  en: 'S/he has thought that life was not worth living.' },
-  { n: 17, es: 'Ha pensado en morirse o en la muerte.',                                   en: 'S/he has thought about death or dying.' },
-  { n: 18, es: 'Ha pensado que su familia estaría mejor sin él/ella.',                    en: 'S/he has thought that his/her family would be better off without him/her.' },
-  { n: 19, es: 'Ha pensado en quitarse la vida.',                                         en: 'S/he has thought about killing him/herself.', risk: true },
-  { n: 20, es: 'No le ha apetecido ver a sus amigos/as.',                                 en: 'S/he has not wanted to see his/her friends.' },
-  { n: 21, es: 'Le ha costado pensar o concentrarse.',                                    en: 'S/he has found it hard to think properly or concentrate.' },
-  { n: 22, es: 'Ha pensado que le iban a pasar cosas malas.',                             en: 'S/he has thought that bad things were going to happen to him/her.' },
-  { n: 23, es: 'Se ha odiado a sí mismo/a.',                                              en: 'S/he has hated him/herself.' },
-  { n: 24, es: 'Se ha sentido una mala persona.',                                         en: 'S/he has felt s/he was a bad person.' },
-  { n: 25, es: 'Ha pensado que era feo/a.',                                               en: 'S/he has thought s/he looked ugly.' },
-  { n: 26, es: 'Se ha preocupado por molestias y dolores.',                               en: 'S/he has been worried by aches and pains.' },
-  { n: 27, es: 'Se ha sentido solo/a.',                                                   en: 'S/he has felt lonely.' },
-  { n: 28, es: 'Ha pensado que nadie le quería.',                                         en: 'S/he has thought nobody really loved him/her.' },
-  { n: 29, es: 'No lo ha pasado bien en la escuela.',                                     en: 'S/he has not had fun at school.' },
-  { n: 30, es: 'Ha pensado que nunca podría ser tan bueno/a como los demás.',             en: 'S/he has thought s/he could never be as good as other kids.' },
-  { n: 31, es: 'Ha sentido que todo lo hacía mal.',                                       en: 'S/he has done everything wrong.' },
-  { n: 32, es: 'No ha dormido tan bien como normalmente duerme.',                         en: 'S/he has not slept as well as s/he usually sleeps.' },
-  { n: 33, es: 'Ha dormido más de lo normal.',                                            en: 'S/he has slept much more than usual.' },
+  { n:  1, es: 'Se ha sentido triste o infeliz.',                                                      en: 'S/he felt miserable or unhappy.' },
+  { n:  2, es: 'No ha disfrutado nada en absoluto.',                                                   en: "S/he didn't enjoy anything at all." },
+  { n:  3, es: 'Se ha sentido tan cansado/a que solo se quedaba sentado/a sin hacer nada.',            en: 'S/he felt so tired that s/he just sat around and did nothing.' },
+  { n:  4, es: 'Ha estado muy inquieto/a.',                                                            en: 'S/he was very restless.' },
+  { n:  5, es: 'Ha sentido que ya no valía para nada.',                                                en: 'S/he felt s/he was no good anymore.' },
+  { n:  6, es: 'Ha llorado mucho.',                                                                    en: 'S/he cried a lot.' },
+  { n:  7, es: 'Le ha costado pensar bien o concentrarse.',                                            en: 'S/he found it hard to think properly or concentrate.' },
+  { n:  8, es: 'Se ha odiado a sí mismo/a.',                                                          en: 'S/he hated him/herself.' },
+  { n:  9, es: 'Se ha sentido una mala persona.',                                                      en: 'S/he felt s/he was a bad person.' },
+  { n: 10, es: 'Se ha sentido solo/a.',                                                                en: 'S/he felt lonely.' },
+  { n: 11, es: 'Ha pensado que nadie le quería realmente.',                                            en: 'S/he thought nobody really loved him/her.' },
+  { n: 12, es: 'Ha pensado que nunca podría ser tan bueno/a como los demás.',                          en: 'S/he thought s/he could never be as good as other kids.' },
+  { n: 13, es: 'Ha sentido que hacía todo mal.',                                                       en: 'S/he felt s/he did everything wrong.' },
 ];
 const RADIO_VALUES = [0, 1, 2];
 
@@ -1585,7 +1565,7 @@ function getScores() {
 
 function updateScore() {
   const { total, answered } = getScores();
-  const complete = answered === 33;
+  const complete = answered === 13;
   const lang = document.documentElement.getAttribute('data-lang') || 'es';
   isEN = lang === 'en';
 
@@ -1619,40 +1599,36 @@ function updateScore() {
     text.textContent = isEN ? enTxt : esTxt;
   }
 
-  if (!complete) setBadge(`${answered}/33 respondidas`, `${answered}/33 answered`, 'incomplete');
-  else if (total >= 27) setBadge('⚠ POSITIVO — Puntuación ≥ 27', '⚠ POSITIVE — Score ≥ 27', 'positive');
-  else setBadge('✓ NEGATIVO — Puntuación < 27', '✓ NEGATIVE — Score < 27', 'negative');
+  if (!complete) setBadge(`${answered}/13 respondidas`, `${answered}/13 answered`, 'incomplete');
+  else if (total >= 12) setBadge('⚠ POSITIVO — Puntuación ≥ 12', '⚠ POSITIVE — Score ≥ 12', 'positive');
+  else setBadge('✓ NEGATIVO — Puntuación < 12', '✓ NEGATIVE — Score < 12', 'negative');
 }
 
 function generateNote() {
   const { total, answered } = getScores();
-  const complete = answered === 33;
+  const complete = answered === 13;
   const lang = document.documentElement.getAttribute('data-lang') || 'es';
    isEN = lang === 'en';
-  const riskQ = document.querySelector('input[name="q19"]:checked');
-  const riskVal = riskQ ? parseInt(riskQ.value) : 0;
   const todayES = new Date().toLocaleDateString('es-HN', { year: 'numeric', month: 'long', day: 'numeric' });
   const todayEN = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
-  const rES = !complete ? 'INCOMPLETO' : total >= 27 ? 'POSITIVO (≥27)' : 'NEGATIVO (<27)';
-  const rEN = !complete ? 'INCOMPLETE' : total >= 27 ? 'POSITIVE (≥27)' : 'NEGATIVE (<27)';
-  const riskLineES = riskVal >= 1 ? '\n⚠ RIESGO: Ítem 19 positivo — evaluación de suicidio requerida de inmediato' : '';
-  const riskLineEN = riskVal >= 1 ? '\n⚠ RISK: Item 19 positive — immediate suicide assessment required' : '';
+  const rES = !complete ? 'INCOMPLETO' : total >= 12 ? 'POSITIVO (≥12)' : 'NEGATIVO (<12)';
+  const rEN = !complete ? 'INCOMPLETE' : total >= 12 ? 'POSITIVE (≥12)' : 'NEGATIVE (<12)';
 
   const noteES =
-`MFQ-P (Versión Larga) — Resumen de Resultados — ${todayES}
+`MFQ-PC (Versión Corta) — Resumen de Resultados — ${todayES}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Respondido por: padre/madre/tutor
-Puntuación total: ${total} / 66
+Puntuación total: ${total} / 26
 Resultado: ${rES}
-Corte: ≥27 sugiere presencia de síntomas depresivos${riskLineES}`;
+Corte: ≥12 sugiere presencia de síntomas depresivos`;
 
   const noteEN =
-`MFQ-P (Long Version) — Results Summary — ${todayEN}
+`MFQ-PC (Short Version) — Results Summary — ${todayEN}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Completed by: parent/guardian
-Total score: ${total} / 66
+Total score: ${total} / 26
 Result: ${rEN}
-Cutoff: ≥27 suggests presence of depressive symptoms${riskLineEN}`;
+Cutoff: ≥12 suggests presence of depressive symptoms`;
 
   let note = isEN ? noteEN : noteES;
   document.getElementById('noteSummaryBox').textContent = note;
