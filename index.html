@@ -1539,8 +1539,8 @@ a, button, [role='button'], input, select {
     <div class="topbar">
       <div style="display:flex; align-items:center; gap:var(--space-3);">
         <div>
-          <div class="topbar-title" data-es="Portal CoCM" data-en="CoCM Portal">Portal CoCM</div>
-          <div class="topbar-subtitle" data-es="Herramientas de Evaluación Pediátrica" data-en="Pediatric Screening Tools">Herramientas de Evaluación Pediátrica</div>
+          <div class="topbar-title" data-es="CoCM Camasca" data-en="CoCM Camasca">CoCM Camasca</div>
+          <div class="topbar-subtitle" data-es="Herramientas de Tamizaje y Monitoreo" data-en="Child/Adolescent Screening &amp; Monitoring Tools">Herramientas de Tamizaje y Monitoreo</div>
         </div>
       </div>
       <div class="topbar-actions">
@@ -1560,7 +1560,7 @@ a, button, [role='button'], input, select {
 
       <!-- Welcome banner -->
       <div class="tool-header-card" style="margin-bottom:var(--space-8);">
-        <h1 data-es="Herramientas de Evaluación Pediátrica" data-en="Pediatric Screening Tools">Herramientas de Evaluación Pediátrica</h1>
+        <h1 data-es="CoCM Camasca" data-en="CoCM Camasca">CoCM Camasca</h1>
         <p data-es="Modelo de Atención Colaborativa (CoCM) — Honduras. Seleccione una herramienta para iniciar la evaluación." data-en="Collaborative Care Model (CoCM) — Honduras. Select a tool to begin the assessment.">Modelo de Atención Colaborativa (CoCM) — Honduras. Seleccione una herramienta para iniciar la evaluación.</p>
 
       </div>
@@ -2397,10 +2397,10 @@ document.addEventListener('keydown', function(e) {
     fd.append('name',      name);
     fd.append('tool',      tool || '(no especificado)');
     fd.append('comment',   comment);
-    fd.append('page',      'CoCM Portal — ' + window.location.href);
+    fd.append('page',      'CoCM Camasca — ' + window.location.href);
     fd.append('lang',      lang);
     fd.append('timestamp', new Date().toISOString());
-    fd.append('_subject',  'CoCM Portal — Sugerencia de ' + name + (tool ? ' [' + tool + ']' : ''));
+    fd.append('_subject',  'CoCM Camasca — Sugerencia de ' + name + (tool ? ' [' + tool + ']' : ''));
     // No CC — Honduras work is not associated with DHHS
     fd.append('_template', 'table');
     fd.append('_captcha',  'false');
