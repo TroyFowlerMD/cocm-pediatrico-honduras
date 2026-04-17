@@ -713,12 +713,12 @@ a, button, [role='button'], input, select {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-1) var(--space-3);
   border: 2px solid var(--color-border);
   border-radius: var(--radius-md);
   cursor: pointer;
   text-align: center;
-  gap: var(--space-1);
+  gap: 2px;
   transition: all var(--transition-interactive);
   background: var(--color-bg);
 }
@@ -749,7 +749,7 @@ a, button, [role='button'], input, select {
 }
 
 .radio-label-en {
-  font-size: 0.65rem;
+  font-size: 0.78rem;
   color: var(--color-text-muted);
   font-style: italic;
   display: none; /* shown only in EN or Bilingual mode */
@@ -1137,7 +1137,7 @@ a, button, [role='button'], input, select {
   }
   .radio-label-es,
   .radio-label-en {
-    font-size: 0.55rem !important;
+    font-size: 0.7rem !important;
     line-height: 1.1 !important;
     word-break: break-word !important;
     hyphens: auto !important;
@@ -1320,7 +1320,7 @@ a, button, [role='button'], input, select {
     <div class="topbar">
       <div style="display:flex; align-items:center; gap:var(--space-3);">
         <div>
-          <div class="topbar-title">MFQ-C</div>
+          <div class="topbar-title">MFQ Breve</div>
           <div class="topbar-subtitle" data-es="Estado de Ánimo — Versión Niño/a (Corta)" data-en="Mood & Feelings — Child Short Version">Estado de Ánimo — Versión Niño/a (Corta)</div>
         </div>
       </div>
@@ -1410,7 +1410,7 @@ a, button, [role='button'], input, select {
   
   <div class="copyright-footer">
     <strong data-es="Derechos de autor:" data-en="Copyright:">Derechos de autor:</strong>
-    <span data-es=" MFQ-C (Mood and Feelings Questionnaire — Child version). © Angold & Costello, 1987. Desarrollado en la Universidad de Duke. Reproducido con fines clínicos no comerciales. No para distribución masiva ni uso con fines de lucro." data-en=" MFQ-C (Mood and Feelings Questionnaire — Child version). © Angold & Costello, 1987. Developed at Duke University. Reproduced for non-commercial clinical use. Not for mass distribution or use for profit."> MFQ-C (Mood and Feelings Questionnaire — Child version). © Angold & Costello, 1987. Desarrollado en la Universidad de Duke. Reproducido con fines clínicos no comerciales. No para distribución masiva ni uso con fines de lucro.</span>
+    <span data-es=" SMFQ / MFQ Breve (Short Mood and Feelings Questionnaire). © Angold & Costello, 1987. Desarrollado en la Universidad de Duke. Reproducido con fines clínicos no comerciales. No para distribución masiva ni uso con fines de lucro." data-en=" SMFQ / MFQ Brief (Short Mood and Feelings Questionnaire). © Angold & Costello, 1987. Developed at Duke University. Reproduced for non-commercial clinical use. Not for mass distribution or use for profit."> SMFQ / MFQ Breve (Short Mood and Feelings Questionnaire). © Angold & Costello, 1987. Desarrollado en la Universidad de Duke. Reproducido con fines clínicos no comerciales. No para distribución masiva ni uso con fines de lucro.</span>
   </div>
 
 </main>
@@ -1532,27 +1532,7 @@ function onAnswerSelected(qNum, idx) {
     if (nextUnanswered) _scrollToTop(nextUnanswered);
   }, 80);
 }
-function onAnswerSelected(qNum, idx) {
-  _answeredQNums.add(qNum);
-  updateScore();
-  generateNote();
-  // Find first unanswered question
-  var nextQ = null;
-  for (var i = 0; i < QUESTIONS.length; i++) {
-    if (!_answeredQNums.has(QUESTIONS[i].n)) {
-      nextQ = document.getElementById('qsec' + QUESTIONS[i].n);
-      break;
-    }
-  }
-  setTimeout(function() {
-    if (nextQ) {
-      _scrollToTop(nextQ);
-    } else {
-      var panel = document.getElementById('scorePanel');
-      if (panel) _scrollToTop(panel);
-    }
-  }, 80);
-}
+
 
 function getScores() {
   let total = 0, answered = 0;
