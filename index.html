@@ -1981,6 +1981,14 @@ function setLang(lang) {
       </select>
     </div>
 
+    <!-- Recipient email -->
+    <div class="send-field">
+      <label class="send-label" for="sendRecipientEmail">
+        <span data-es="Correo del destinatario (padre/madre/maestro)" data-en="Recipient email (parent/teacher)">Correo del destinatario (padre/madre/maestro)</span>
+      </label>
+      <input class="send-input" id="sendRecipientEmail" type="email" placeholder="destinatario@ejemplo.com" autocomplete="off">
+    </div>
+
     <!-- Child name -->
     <div class="send-field">
       <label class="send-label" for="sendChildName">
@@ -2097,9 +2105,10 @@ function setSendLang(lang) {
 }
 
 function buildSendParts() {
-  var q     = document.getElementById('sendQSelect').value;
-  var child = document.getElementById('sendChildName').value.trim();
-  var email = document.getElementById('sendTherapistEmail').value.trim();
+  var q         = document.getElementById('sendQSelect').value;
+  var child     = document.getElementById('sendChildName').value.trim();
+  var email     = document.getElementById('sendTherapistEmail').value.trim();
+  var recipient = document.getElementById('sendRecipientEmail').value.trim();
   var base  = window.location.href.replace(/[^\/]*$/, '');
   var url   = base + q + '?lang=' + _sendLang;
   if (child) url += '&child='     + encodeURIComponent(child);
@@ -2130,8 +2139,9 @@ function buildSendParts() {
     (email ? '\nMy email: ' + email : '') + '\n\nThank you.';
 
   return {
-    subj: _sendLang === 'en' ? subjEN : subjES,
-    body: _sendLang === 'en' ? bodyEN : bodyES
+    subj:      _sendLang === 'en' ? subjEN : subjES,
+    body:      _sendLang === 'en' ? bodyEN : bodyES,
+    recipient: recipient
   };
 }
 
@@ -2143,7 +2153,8 @@ function updateSendMsgBox() {
 
 function generateSendEmail() {
   var parts  = buildSendParts();
-  var mailto = 'mailto:?subject=' + encodeURIComponent(parts.subj) + '&body=' + encodeURIComponent(parts.body);
+  var to     = parts.recipient ? encodeURIComponent(parts.recipient) : '';
+  var mailto = 'mailto:' + to + '?subject=' + encodeURIComponent(parts.subj) + '&body=' + encodeURIComponent(parts.body);
   window.open(mailto, '_self');
 }
 
@@ -2164,7 +2175,7 @@ function copySendMsg() {
 }
 
 // Live-update copy box on any field change
-['sendQSelect','sendChildName','sendTherapistEmail'].forEach(function(id) {
+['sendQSelect','sendChildName','sendTherapistEmail','sendRecipientEmail'].forEach(function(id) {
   var el = document.getElementById(id);
   if (el) { el.addEventListener('input', updateSendMsgBox); el.addEventListener('change', updateSendMsgBox); }
 });
