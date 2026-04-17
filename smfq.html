@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MFQ Breve — CoCM Pediátrico</title>
+  <title>SMFQ — CoCM Pediátrico</title>
   <style>
 /* ============================================================
    CoCM Pediátrico — Shared Stylesheet
@@ -1320,8 +1320,8 @@ a, button, [role='button'], input, select {
     <div class="topbar">
       <div style="display:flex; align-items:center; gap:var(--space-3);">
         <div>
-          <div class="topbar-title">MFQ Breve</div>
-          <div class="topbar-subtitle" data-es="Estado de Ánimo — Versión Niño/a (Corta)" data-en="Mood & Feelings — Child Short Version">Estado de Ánimo — Versión Niño/a (Corta)</div>
+          <div class="topbar-title">SMFQ</div>
+          <div class="topbar-subtitle" data-es="Short Mood and Feelings Questionnaire" data-en="Short Mood and Feelings Questionnaire">Short Mood and Feelings Questionnaire</div>
         </div>
       </div>
       <div class="topbar-actions">
@@ -1343,13 +1343,13 @@ a, button, [role='button'], input, select {
       <div class="breadcrumb">
         <a href="index.html" data-es="Panel Principal" data-en="Dashboard">Panel Principal</a>
         <span class="breadcrumb-sep">›</span>
-        <span>MFQ Breve</span>
+        <span>SMFQ</span>
       </div>
 
       <!-- Header card -->
       <div class="tool-header-card">
-        <h1>MFQ Breve</h1>
-        <p data-es="Cuestionario Breve de Estado de Ánimo y Sentimientos. Herramienta estándar de cribado y monitoreo de depresión en el flujo CoCM. Autoinforme del niño/a, jóvenes ≤11 años." data-en="Brief Mood and Feelings Questionnaire. Standard depression screening and monitoring tool in the CoCM workflow. Child self-report, youth ≤11 years.">Cuestionario Breve de Estado de Ánimo y Sentimientos. Herramienta estándar de cribado y monitoreo de depresión en el flujo CoCM. Autoinforme del niño/a, jóvenes ≤11 años.</p>
+        <h1>SMFQ</h1>
+        <p data-es="Short Mood and Feelings Questionnaire (SMFQ). Herramienta estándar de cribado y monitoreo de depresión en el flujo CoCM. Autoinforme del niño/a, jóvenes ≤11 años." data-en="Short Mood and Feelings Questionnaire (SMFQ). Standard depression screening and monitoring tool in the CoCM workflow. Child self-report, youth ≤11 years.">Short Mood and Feelings Questionnaire (SMFQ). Herramienta estándar de cribado y monitoreo de depresión en el flujo CoCM. Autoinforme del niño/a, jóvenes ≤11 años.</p>
         <div class="tool-header-meta">
           <span>13 ítems</span>
           <span data-es="Corte: ≥8" data-en="Cutoff: ≥8">Corte: ≥8</span>
@@ -1577,7 +1577,7 @@ function generateNote() {
   const rEN = !complete ? 'INCOMPLETE' : total >= 8 ? 'POSITIVE (≥8)' : 'NEGATIVE (<8)';
 
   const noteES =
-`MFQ Breve — Resumen de Resultados — ${todayES}
+`SMFQ — Resumen de Resultados — ${todayES}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Respondido por: niño/a
 Puntuación total: ${total} / 26
@@ -1585,7 +1585,7 @@ Resultado: ${rES}
 Corte: ≥8 sugiere presencia de síntomas depresivos`;
 
   const noteEN =
-`MFQ Brief — Results Summary — ${todayEN}
+`SMFQ — Results Summary — ${todayEN}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Completed by: child
 Total score: ${total} / 26

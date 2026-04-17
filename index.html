@@ -1406,14 +1406,14 @@ a, button, [role='button'], input, select {
               <div class="fe-cond" style="width:100%;"><span class="es">Depresión</span><span class="en">Depression</span></div>
             </div>
             <div style="grid-column:2; grid-row:1; display:flex; flex-direction:column; gap:4px; padding:3px 4px; height:100%;">
-              <div class="fe-tool-box teal" style="padding:8px 10px;"><div><span class="fe-age-badge"><span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span></span></div><a href="mfq-brief.html" class="fe-tool-link"><span class="fe-dot"></span>MFQ Breve</a></div>
+              <div class="fe-tool-box teal" style="padding:8px 10px;"><div><span class="fe-age-badge"><span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span></span></div><a href="smfq.html" class="fe-tool-link"><span class="fe-dot"></span>SMFQ</a></div>
               <div class="fe-tool-box teal" style="padding:8px 10px;"><div><span class="fe-age-badge"><span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span></span></div><a href="phqa.html" class="fe-tool-link"><span class="fe-dot"></span>PHQ-A (PHQ-9)</a></div>
             </div>
             <div style="grid-column:3; grid-row:1; display:flex; align-items:center; justify-content:center; padding:4px;">
               <div class="fe-diamond-sm"><div class="fe-diamond-sm-inner"><span class="es">¿Qué herramienta monitorear?</span><span class="en">Which tool to monitor?</span></div></div>
             </div>
             <div style="grid-column:4; grid-row:1; display:flex; flex-direction:column; gap:4px; padding:3px 4px; height:100%;">
-              <div class="fe-monitor-box"><span class="fe-monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span><a href="mfq-brief.html" class="fe-tool-link" style="font-size:11px;"><span class="fe-dot"></span>MFQ Breve</a></div>
+              <div class="fe-monitor-box"><span class="fe-monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span><a href="smfq.html" class="fe-tool-link" style="font-size:11px;"><span class="fe-dot"></span>SMFQ</a></div>
               <div class="fe-monitor-box"><span class="fe-monitor-label"><span class="es">Monitoreo</span><span class="en">Monitoring</span></span><a href="phqa.html" class="fe-tool-link" style="font-size:11px;"><span class="fe-dot"></span>PHQ-A</a></div>
             </div>
 
@@ -1471,7 +1471,7 @@ a, button, [role='button'], input, select {
             <div class="fe-abbr-title"><span class="es">Siglas</span><span class="en">Abbreviations</span></div>
             <div class="fe-abbr-grid">
               <div><a href="psc17.html" style="color:var(--teal); font-weight:700; text-decoration:none;">PSC-17</a> — <span class="es">Tamizaje universal. 17 ítems. Edades 4–17.</span><span class="en">Universal behavioral health screening. 17 items. Ages 4–17.</span></div>
-              <div><a href="mfq-brief.html" style="color:var(--teal); font-weight:700; text-decoration:none;">MFQ Breve</a> — <span class="es">Cuestionario breve de estado de ánimo. Cribado/monitoreo de depresión. Jóvenes ≤11.</span><span class="en">Brief mood questionnaire. Depression screening/monitoring. Youth ≤11.</span></div>
+              <div><a href="smfq.html" style="color:var(--teal); font-weight:700; text-decoration:none;">MFQ Breve</a> — <span class="es">Cuestionario breve de estado de ánimo. Cribado/monitoreo de depresión. Jóvenes ≤11.</span><span class="en">Brief mood questionnaire. Depression screening/monitoring. Youth ≤11.</span></div>
               <div><a href="phqa.html" style="color:var(--teal); font-weight:700; text-decoration:none;">PHQ-A</a> — <span class="es">Cribado de depresión. 0–27. Edades 12–17.</span><span class="en">Depression screening. 0–27 scale. Ages 12–17.</span></div>
               <div><a href="cap.html" style="color:var(--teal); font-weight:700; text-decoration:none;">CAP</a> — <span class="es">Inatención y sobreactividad. 12 ítems. Edades 6–13.</span><span class="en">Inattention and overactivity. 12 items. Ages 6–13.</span></div>
               <div><a href="vanderbilt-parent.html" style="color:var(--teal); font-weight:700; text-decoration:none;">Vand-P</a> / <a href="vanderbilt-teacher.html" style="color:var(--teal); font-weight:700; text-decoration:none;">Vand-T</a> — <span class="es">TDAH/TND. Padres (55 ítems) y maestros (43 ítems). Edades 6–12.</span><span class="en">ADHD/ODD. Parent (55 items) and teacher (43 items). Ages 6–12.</span></div>
@@ -1519,25 +1519,15 @@ a, button, [role='button'], input, select {
           <div class="tool-card-desc" data-es="Lista de Síntomas Pediátricos — tamizaje universal de salud mental conductual. Edades 4–17." data-en="Pediatric Symptom Checklist — universal behavioral health screening. Ages 4–17.">Lista de Síntomas Pediátricos — tamizaje universal de salud mental conductual.</div>
         </a>
 
-        <!-- MFQ Brief — READY (standard CoCM workflow) -->
-        <a href="mfq-brief.html" class="tool-card ready">
+        <!-- SMFQ — READY (standard CoCM workflow) -->
+        <a href="smfq.html" class="tool-card ready">
           <div class="tool-card-header">
             <div class="tool-card-icon">😔</div>
           </div>
-          <div class="tool-card-name">MFQ Breve <span style="font-weight:400; font-size:var(--text-sm);" data-es="Niño/a" data-en="Child">Niño/a</span></div>
-          <div class="tool-card-desc" data-es="Cuestionario breve de estado de ánimo — cribado y monitoreo de depresión en el flujo CoCM estándar. Jóvenes ≤11." data-en="Brief Mood &amp; Feelings Questionnaire — depression screening and monitoring in the standard CoCM workflow. Youth ≤11.">Cuestionario breve de estado de ánimo — cribado y monitoreo de depresión en el flujo CoCM estándar. Jóvenes ≤11.</div>
+          <div class="tool-card-name">SMFQ <span style="font-weight:400; font-size:var(--text-sm);" data-es="Niño/a" data-en="Child">Niño/a</span></div>
+          <div class="tool-card-desc" data-es="Short Mood and Feelings Questionnaire — cribado y monitoreo de depresión en el flujo CoCM estándar. Autoinforme. Jóvenes ≤11." data-en="Short Mood and Feelings Questionnaire — standard CoCM depression screening and monitoring. Child self-report. Youth ≤11.">Short Mood and Feelings Questionnaire — cribado y monitoreo de depresión en el flujo CoCM estándar. Autoinforme. Jóvenes ≤11.</div>
         </a>
 
-        <!-- MFQ-C — optional detailed use -->
-        <a href="mfq.html" class="tool-card ready">
-          <div class="tool-card-header">
-            <div class="tool-card-icon">😔</div>
-          </div>
-          <div class="tool-card-name">MFQ-C <span style="font-weight:400; font-size:var(--text-sm);" data-es="Niño/a — Corta" data-en="Child — Short">Niño/a — Corta</span></div>
-          <div class="tool-card-desc">
-            <span class="es">Estado de Ánimo y Sentimientos — versión corta autoinforme. <strong><u>No</u> forma parte del flujo estándar CoCM; disponible para información más detallada si se desea.</strong></span>
-            <span class="en">Mood &amp; Feelings Questionnaire — child short version. <strong><u>Not</u> part of the standard CoCM workflow; available for more detailed information if desired.</strong></span>
-          </div>
         </a>
 
         <!-- MFQ-P — optional detailed use -->
