@@ -1614,6 +1614,7 @@ function onAnswerSelected(qNum, idx) {
       var n = parseInt(s.id.replace('qsec', ''));
       return !_answeredQNums.has(n);
     });
+    if (nextUnanswered && nextUnanswered.getBoundingClientRect().top < _tbH()) return;
     if (nextUnanswered) _scrollToTop(nextUnanswered);
   }, 80);
 }

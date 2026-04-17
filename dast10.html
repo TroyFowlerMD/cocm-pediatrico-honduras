@@ -1437,17 +1437,20 @@ function renderQuestions() {
           <div class="question-text-es">${q.es}</div>
           <div class="question-text-en">${q.en}</div>
           <div class="radio-group">
-            ${[1, 0].map(v => `
+            ${[{lbl:'yes'}, {lbl:'no'}].map(btn => {
+              const isSi = btn.lbl === 'yes';
+              const val  = q.rev ? (isSi ? 0 : 1) : (isSi ? 1 : 0);
+              return `
               <div class="radio-option">
-                <input type="radio" name="q${q.n}" id="q${q.n}_${v}" value="${v}"
+                <input type="radio" name="q${q.n}" id="q${q.n}_${btn.lbl}" value="${val}"
                   onchange="onAnswerSelected(${q.n}, ${idx})">
-                <label for="q${q.n}_${v}">
-                  <span class="radio-score">${v === 1 ? (q.rev ? 'No' : 'Sí') : (q.rev ? 'Sí' : 'No')}</span>
-                  <span class="radio-label-es">${v === 1 ? (q.rev ? 'No' : 'Sí') : (q.rev ? 'Sí' : 'No')}</span>
-                  <span class="radio-label-en">${v === 1 ? (q.rev ? 'No' : 'Yes') : (q.rev ? 'Yes' : 'No')}</span>
+                <label for="q${q.n}_${btn.lbl}">
+                  <span class="radio-score">${isSi ? 'Sí' : 'No'}</span>
+                  <span class="radio-label-es">${isSi ? 'Sí' : 'No'}</span>
+                  <span class="radio-label-en">${isSi ? 'Yes' : 'No'}</span>
                 </label>
-              </div>
-            `).join('')}
+              </div>`;
+            }).join('')}
           </div>
           ${revNote}
         </div>
