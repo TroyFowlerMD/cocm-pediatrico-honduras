@@ -945,7 +945,7 @@ a, button, [role='button'], input, select {
 }
 .legend-item { display: flex; align-items: center; gap: var(--space-2); }
 .legend-dot {
-  width: 10px; height: 10px; border-radius: var(--radius-full);
+  width: 28px; height: 28px; border-radius: var(--radius-full); flex-shrink:0;
 }
 .legend-dot.I { background: var(--color-primary); }
 .legend-dot.A { background: #daa520; }
@@ -1360,15 +1360,14 @@ a, button, [role='button'], input, select {
     </div>
 
     <span data-es="Inatención (IN) — ítems 1–9 | Corte clínico: ≥13/27" data-en="Inattention (IN) — items 1–9 | Clinical cutoff: ≥13/27">Inatención (IN) — ítems 1–9 | Corte clínico: ≥13/27</span></div>
-        <div class="legend-item"><div class="legend-dot" style="background:#92400e"></div><span data-es="Hiperactividad/Impulsividad (HI) — ítems 10–18 | Corte clínico: ≥13/27" data-en="Hyperactivity/Impulsivity (HI) — items 10–18 | Clinical cutoff: ≥13/27">Hiperactividad/Impulsividad (HI) — ítems 10–18 | Corte clínico: ≥13/27</span></div>
-        <div class="legend-item"><div class="legend-dot" style="background:#991b1b"></div><span data-es="Oposición/Desafío (ODD) — ítems 19–26 | Corte clínico: ≥8/24" data-en="ODD — items 19–26 | Clinical cutoff: ≥8/24">Oposición/Desafío (ODD) — ítems 19–26 | Corte clínico: ≥8/24</span></div>
       </div>
 
     <form id="toolform" novalidate>
       <div id="questions-container"></div>
 
       <div class="subscale-legend">
-        <div class="legend-item"><div class="legend-dot" style="background:#0369a1"></div>
+        <div class="legend-item"><div class="legend-dot" style="background:#0369a1"></div><span data-es="Inatención (IN) — ítems 1–9 | Corte clínico: ≥13/27" data-en="Inattention (IN) — items 1–9 | Clinical cutoff: ≥13/27">Inatención (IN) — ítems 1–9 | Corte clínico: ≥13/27</span></div>
+      </div>
       <div class="score-panel" id="scorePanel">
         <div class="score-panel-title" data-es="Resultados" data-en="Results">Resultados</div>
         <div style="display:flex; align-items:flex-end; gap:var(--space-6); flex-wrap:wrap; margin-bottom:var(--space-4);">
@@ -1545,27 +1544,7 @@ function onAnswerSelected(qNum, idx) {
     if (nextUnanswered) _scrollToTop(nextUnanswered);
   }, 80);
 }
-function onAnswerSelected(qNum, idx) {
-  _answeredQNums.add(qNum);
-  updateScore();
-  generateNote();
-  // Find first unanswered question
-  var nextQ = null;
-  for (var i = 0; i < QUESTIONS.length; i++) {
-    if (!_answeredQNums.has(QUESTIONS[i].n)) {
-      nextQ = document.getElementById('qsec' + QUESTIONS[i].n);
-      break;
-    }
-  }
-  setTimeout(function() {
-    if (nextQ) {
-      _scrollToTop(nextQ);
-    } else {
-      var panel = document.getElementById('scorePanel');
-      if (panel) _scrollToTop(panel);
-    }
-  }, 80);
-}
+
 
 function getScores() {
   let total=0, answered=0, IN=0, HI=0, ODD=0;

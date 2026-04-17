@@ -1485,27 +1485,7 @@ function onAnswerSelected(qNum, idx) {
     if (nextUnanswered) _scrollToTop(nextUnanswered);
   }, 80);
 }
-function onAnswerSelected(qNum, idx) {
-  _answeredQNums.add(qNum);
-  updateScore();
-  generateNote();
-  // Find first unanswered question
-  var nextQ = null;
-  for (var i = 0; i < QUESTIONS.length; i++) {
-    if (!_answeredQNums.has(QUESTIONS[i].n)) {
-      nextQ = document.getElementById('qsec' + QUESTIONS[i].n);
-      break;
-    }
-  }
-  setTimeout(function() {
-    if (nextQ) {
-      _scrollToTop(nextQ);
-    } else {
-      var panel = document.getElementById('scorePanel');
-      if (panel) _scrollToTop(panel);
-    }
-  }, 80);
-}
+
 
 function getScores() {
   let total=0, IN=0, OV=0, answered=0;
@@ -1583,9 +1563,9 @@ Rango de edad: 6–13 años | Período: última semana
 Ítems completados: ${answered}/12
 
 Puntuaciones:
-  • Inatención (IN, ítems 1,2,5,7,9,10,12): ${IN}/14${flagIN}
-  • Sobreactividad (OV, ítems 3,4,6,8,11):   ${OV}/10${flagOV}
-  • Total:                                    ${total}/24${flagTOT}
+  • Inatención (IN): ${IN}/14${flagIN}
+  • Sobreactividad (OV): ${OV}/10${flagOV}
+  • Total:            ${total}/24${flagTOT}
 
 Valores de referencia ${pctNote}`;
 
@@ -1598,9 +1578,9 @@ Age range: 6–13 years | Period: past week
 Items completed: ${answered}/12
 
 Scores:
-  • Inattention (IN, items 1,2,5,7,9,10,12): ${IN}/14${flagIN}
-  • Overactivity (OV, items 3,4,6,8,11):      ${OV}/10${flagOV}
-  • Total:                                     ${total}/24${flagTOT}
+  • Inattention (IN): ${IN}/14${flagIN}
+  • Overactivity (OV): ${OV}/10${flagOV}
+  • Total:            ${total}/24${flagTOT}
 
 Reference values ${pctNote}`;
 

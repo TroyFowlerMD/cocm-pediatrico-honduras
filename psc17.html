@@ -1528,27 +1528,7 @@ function onAnswerSelected(qNum, idx) {
     if (nextUnanswered) _scrollToTop(nextUnanswered);
   }, 80);
 }
-function onAnswerSelected(qNum, idx) {
-  _answeredQNums.add(qNum);
-  updateScore();
-  generateNote();
-  // Find first unanswered question
-  var nextQ = null;
-  for (var i = 0; i < QUESTIONS.length; i++) {
-    if (!_answeredQNums.has(QUESTIONS[i].n)) {
-      nextQ = document.getElementById('qsec' + QUESTIONS[i].n);
-      break;
-    }
-  }
-  setTimeout(function() {
-    if (nextQ) {
-      _scrollToTop(nextQ);
-    } else {
-      var panel = document.getElementById('scorePanel');
-      if (panel) _scrollToTop(panel);
-    }
-  }, 80);
-}
+
 
 // ===== SCORING =====
 function getScores() {

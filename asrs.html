@@ -1338,7 +1338,7 @@ function renderQuestions() {
     const opts = [0,1,2,3,4].map(v => `
       <div class="radio-option">
         <input type="radio" name="q${q.n}" id="q${q.n}_${v}" value="${v}"
-          onchange="onAnswer(${q.n}, ${idx})">
+          onchange="onAnswerSelected(${q.n}, ${idx})">
         <label for="q${q.n}_${v}">
           <span class="radio-score">${v}</span>
           <span class="radio-label-es">${FREQ.es[v]}</span>
@@ -1402,7 +1402,7 @@ function onAnswerSelected(qNum, idx) {
     if (nextUnanswered) _scrollToTop(nextUnanswered);
   }, 80);
 }
-function onAnswer(qNum, idx) {
+function onAnswerSelected(qNum, idx) {
   _answeredQNums.add(qNum);
   updateScore();
   generateNote();

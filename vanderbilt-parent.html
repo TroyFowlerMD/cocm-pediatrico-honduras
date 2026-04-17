@@ -318,7 +318,7 @@ a, button, [role='button'], input, select {
 }
 
 /* Main content */
-.main-content {
+.main-content { text-align:left; 
   margin-left: var(--sidebar-width);
   flex: 1;
   min-width: 0;
@@ -1106,7 +1106,7 @@ a, button, [role='button'], input, select {
   .sidebar-overlay.open {
     display: block;
   }
-  .main-content {
+  .main-content { text-align:left; 
     margin-left: 0;
   }
   .topbar {
@@ -1178,7 +1178,7 @@ a, button, [role='button'], input, select {
 
 
 /* No sidebar — main fills full width */
-.no-sidebar .main-content {
+.no-sidebar .main-content { text-align:left; 
   margin-left: 0;
   width: 100%;
 }
@@ -1455,10 +1455,10 @@ a, button, [role='button'], input, select {
     <div class="lang-toggle" role="group" aria-label="Idioma">
       <button id="btn-es"   class="lang-btn active" aria-pressed="true">Español</button>
       <button id="btn-en"   class="lang-btn" aria-pressed="false">English</button>
+      <button id="theme-btn" class="icon-btn" aria-label="Cambiar tema" title="Cambiar tema" style="margin-left:4px;">
+        <span id="theme-label">☀️</span>
+      </button>
     </div>
-    <button id="theme-btn" class="icon-btn" aria-label="Cambiar tema" title="Cambiar tema">
-      <span id="theme-label">☀️</span>
-    </button>
   </div>
 </header>
 
@@ -3134,7 +3134,7 @@ function renderScore() {
   const r = computeResults();
   const lang = document.documentElement.getAttribute('data-lang') || 'es';
   const es = lang === 'es';
-  const both = lang === 'en';
+  const both = false; // EN mode shows EN labels only
 
   function tx(esText, enText) {
     if (es)   return esText;
