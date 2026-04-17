@@ -1984,7 +1984,7 @@ a, button, [role='button'], input, select {
           <div class="tool-card-header">
             <div class="tool-card-icon">😔</div>
           </div>
-          <div class="tool-card-name">SMFQ <span style="font-weight:400; font-size:var(--text-sm);" data-es="Niño/a" data-en="Child">Niño/a</span></div>
+          <div class="tool-card-name">SMFQ <span style="font-weight:400; font-size:var(--text-sm);" data-es="— Niño/a" data-en="— Child">— Niño/a</span></div>
           <div class="tool-card-desc" data-es="Short Mood and Feelings Questionnaire — cribado y monitoreo de depresión en el flujo CoCM estándar. Autoinforme. Jóvenes ≤11." data-en="Short Mood and Feelings Questionnaire — standard CoCM depression screening and monitoring. Child self-report. Youth ≤11.">Short Mood and Feelings Questionnaire — cribado y monitoreo de depresión en el flujo CoCM estándar. Autoinforme. Jóvenes ≤11.</div>
         </a>
 
@@ -1995,7 +1995,7 @@ a, button, [role='button'], input, select {
           <div class="tool-card-header">
             <div class="tool-card-icon">👨‍👩‍👦</div>
           </div>
-          <div class="tool-card-name">MFQ-PC <span style="font-weight:400; font-size:var(--text-sm);" data-es="Padres — Corta" data-en="Parent — Short">Padres — Corta</span></div>
+          <div class="tool-card-name">MFQ-PC <span style="font-weight:400; font-size:var(--text-sm);" data-es="— Padres, Corta" data-en="— Parent, Short">— Padres, Corta</span></div>
           <div class="tool-card-desc">
             <span class="es">Estado de Ánimo y Sentimientos — versión corta para padres. <strong><u>No</u> forma parte del flujo estándar CoCM; disponible para información más detallada si se desea.</strong></span>
             <span class="en">Mood &amp; Feelings Questionnaire — parent short version. <strong><u>Not</u> part of the standard CoCM workflow; available for more detailed information if desired.</strong></span>
@@ -2272,11 +2272,28 @@ function setLang(lang) {
         <span data-es="Cuestionario" data-en="Questionnaire">Cuestionario</span>
       </label>
       <select class="send-select" id="sendQSelect">
-        <option value="psc17-ext.html" data-es="PSC-17 (Tamizaje Universal)" data-en="PSC-17 (Universal Screening)">PSC-17 (Tamizaje Universal)</option>
-        <option value="scared-parent-ext.html" data-es="SCARED-P (Ansiedad — Padres)" data-en="SCARED-P (Anxiety — Parent)">SCARED-P (Ansiedad — Padres)</option>
-        <option value="snapiv-ext.html" data-es="SNAP-IV (TDAH/TND)" data-en="SNAP-IV (ADHD/ODD)">SNAP-IV (TDAH/TND)</option>
-        <option value="vanderbilt-parent-ext.html" data-es="Vanderbilt — Padres" data-en="Vanderbilt — Parent">Vanderbilt — Padres</option>
-        <option value="vanderbilt-teacher-ext.html" data-es="Vanderbilt — Maestros" data-en="Vanderbilt — Teacher">Vanderbilt — Maestros</option>
+        <optgroup label="Depresión / Depression">
+          <option value="smfq.html" data-es="SMFQ — Niño/a (Depresión ≤11)" data-en="SMFQ — Child (Depression ≤11)">SMFQ — Niño/a (Depresión ≤11)</option>
+          <option value="mfq-parent.html" data-es="MFQ-PC — Padres, Corta (Depresión 6–17)" data-en="MFQ-PC — Parent, Short (Depression 6–17)">MFQ-PC — Padres, Corta (Depresión 6–17)</option>
+          <option value="phqa.html" data-es="PHQ-A (Depresión ≥12)" data-en="PHQ-A (Depression ≥12)">PHQ-A (Depresión ≥12)</option>
+        </optgroup>
+        <optgroup label="Ansiedad / Anxiety">
+          <option value="scared.html" data-es="SCARED-N — Niño/a (Ansiedad)" data-en="SCARED-N — Child (Anxiety)">SCARED-N — Niño/a (Ansiedad)</option>
+          <option value="scared-parent-ext.html" data-es="SCARED-P — Padres (Ansiedad)" data-en="SCARED-P — Parent (Anxiety)">SCARED-P — Padres (Ansiedad)</option>
+          <option value="gad7.html" data-es="GAD-7 (Ansiedad ≥12)" data-en="GAD-7 (Anxiety ≥12)">GAD-7 (Ansiedad ≥12)</option>
+        </optgroup>
+        <optgroup label="TDAH / ADHD">
+          <option value="cap.html" data-es="CAP Scale (TDAH ≤11, maestro/a)" data-en="CAP Scale (ADHD ≤11, teacher)">CAP Scale (TDAH ≤11, maestro/a)</option>
+          <option value="snapiv-ext.html" data-es="SNAP-IV (TDAH/TND)" data-en="SNAP-IV (ADHD/ODD)">SNAP-IV (TDAH/TND)</option>
+          <option value="asrs.html" data-es="ASRS-5 (TDAH ≥18)" data-en="ASRS-5 (ADHD ≥18)">ASRS-5 (TDAH ≥18)</option>
+          <option value="vanderbilt-parent-ext.html" data-es="Vanderbilt — Padres (TDAH)" data-en="Vanderbilt — Parent (ADHD)">Vanderbilt — Padres (TDAH)</option>
+          <option value="vanderbilt-teacher-ext.html" data-es="Vanderbilt — Maestros (TDAH)" data-en="Vanderbilt — Teacher (ADHD)">Vanderbilt — Maestros (TDAH)</option>
+        </optgroup>
+        <optgroup label="Universal / Sustancias">
+          <option value="psc17-ext.html" data-es="PSC-17 (Tamizaje Universal)" data-en="PSC-17 (Universal Screening)">PSC-17 (Tamizaje Universal)</option>
+          <option value="crafft.html" data-es="CRAFFT 2.1 (Sustancias ≥12)" data-en="CRAFFT 2.1 (Substances ≥12)">CRAFFT 2.1 (Sustancias ≥12)</option>
+          <option value="dast10.html" data-es="DAST-10 (Drogas ≥15)" data-en="DAST-10 (Drugs ≥15)">DAST-10 (Drogas ≥15)</option>
+        </optgroup>
       </select>
     </div>
 

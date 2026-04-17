@@ -1507,7 +1507,8 @@ function _scrollToTop(el) {
 function _isFullyVisible(el) {
   var r = el.getBoundingClientRect();
   var tbH = _tbH();
-  return r.top >= tbH && r.bottom <= window.innerHeight;
+  // Suppress scroll if the question is at least partially on-screen above the fold
+  return r.top >= tbH && r.top < window.innerHeight;
 }
 function onAnswerSelected(qNum, idx) {
   _answeredQNums.add(qNum);
