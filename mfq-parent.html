@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>MFQ-PC — CoCM Pediátrico</title>
+  <title>SMFQ-P — CoCM Pediátrico</title>
   <style>
 /* ============================================================
    CoCM Pediátrico — Shared Stylesheet
@@ -1320,7 +1320,7 @@ a, button, [role='button'], input, select {
     <div class="topbar">
       <div style="display:flex; align-items:center; gap:var(--space-3);">
         <div>
-          <div class="topbar-title">MFQ-P</div>
+          <div class="topbar-title">SMFQ-P</div>
           <div class="topbar-subtitle" data-es="Estado de Ánimo — Versión Padres (Larga)" data-en="Mood & Feelings — Parent Long Version">Estado de Ánimo — Versión Padres (Larga)</div>
         </div>
       </div>
@@ -1343,13 +1343,13 @@ a, button, [role='button'], input, select {
       <div class="breadcrumb">
         <a href="index.html" data-es="Panel Principal" data-en="Dashboard">Panel Principal</a>
         <span class="breadcrumb-sep">›</span>
-        <span>MFQ-PC</span>
+        <span>SMFQ-P</span>
       </div>
 
       <!-- Header card -->
       <div class="tool-header-card">
-        <h1>MFQ-PC</h1>
-        <p data-es="Cuestionario de Estado de Ánimo y Sentimientos — Versión Corta para Padres/Madres (MFQ-PC). Cribado de depresión infantil desde la perspectiva del cuidador." data-en="Mood and Feelings Questionnaire — Parent Short Version (MFQ-PC). Depression screening in children from the parent/caregiver perspective.">Cuestionario de Estado de Ánimo y Sentimientos — Versión Corta para Padres/Madres (MFQ-PC). Cribado de depresión infantil desde la perspectiva del cuidador.</p>
+        <h1>SMFQ-P</h1>
+        <p data-es="Short Mood and Feelings Questionnaire — Padres (SMFQ-P). Cribado de depresión infantil desde la perspectiva del cuidador." data-en="Short Mood and Feelings Questionnaire — Parent (SMFQ-P). Depression screening in children from the parent/caregiver perspective.">Short Mood and Feelings Questionnaire — Padres (SMFQ-P). Cribado de depresión infantil desde la perspectiva del cuidador.</p>
         <div class="tool-header-meta">
           <span data-es="13 ítems" data-en="13 items">13 ítems</span>
           <span data-es="Corte: ≥12" data-en="Cutoff: ≥12">Corte: ≥12</span>
@@ -1410,7 +1410,7 @@ a, button, [role='button'], input, select {
   
   <div class="copyright-footer">
     <strong data-es="Derechos de autor:" data-en="Copyright:">Derechos de autor:</strong>
-    <span data-es=" MFQ-P (Mood and Feelings Questionnaire — Parent version). © Angold & Costello, 1987. Desarrollado en la Universidad de Duke. Reproducido con fines clínicos no comerciales. No para distribución masiva ni uso con fines de lucro." data-en=" MFQ-P (Mood and Feelings Questionnaire — Parent version). © Angold & Costello, 1987. Developed at Duke University. Reproduced for non-commercial clinical use. Not for mass distribution or use for profit."> MFQ-P (Mood and Feelings Questionnaire — Parent version). © Angold & Costello, 1987. Desarrollado en la Universidad de Duke. Reproducido con fines clínicos no comerciales. No para distribución masiva ni uso con fines de lucro.</span>
+    <span data-es=" SMFQ-P (Short Mood and Feelings Questionnaire — Parent). © Angold & Costello, 1987. Desarrollado en la Universidad de Duke. Reproducido con fines clínicos no comerciales. No para distribución masiva ni uso con fines de lucro." data-en=" SMFQ-P (Short Mood and Feelings Questionnaire — Parent). © Angold & Costello, 1987. Developed at Duke University. Reproduced for non-commercial clinical use. Not for mass distribution or use for profit."> SMFQ-P (Short Mood and Feelings Questionnaire — Parent). © Angold & Costello, 1987. Desarrollado en la Universidad de Duke. Reproducido con fines clínicos no comerciales. No para distribución masiva ni uso con fines de lucro.</span>
   </div>
 
 </main>
@@ -1616,7 +1616,7 @@ function generateNote() {
   const rEN = !complete ? 'INCOMPLETE' : total >= 12 ? 'POSITIVE (≥12)' : 'NEGATIVE (<12)';
 
   const noteES =
-`MFQ-PC (Versión Corta) — Resumen de Resultados — ${todayES}
+`SMFQ-P — Resumen de Resultados — ${todayES}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Respondido por: padre/madre/tutor
 Puntuación total: ${total} / 26
@@ -1624,7 +1624,7 @@ Resultado: ${rES}
 Corte: ≥12 sugiere presencia de síntomas depresivos`;
 
   const noteEN =
-`MFQ-PC (Short Version) — Results Summary — ${todayEN}
+`SMFQ-P — Results Summary — ${todayEN}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Completed by: parent/guardian
 Total score: ${total} / 26
