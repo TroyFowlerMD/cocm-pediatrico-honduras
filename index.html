@@ -1203,6 +1203,208 @@ a, button, [role='button'], input, select {
 }
 .dashboard-disclaimer strong { color: var(--color-text); }
 
+/* ── SEND CARD ── */
+.send-card {
+  background: var(--surface-2, #1e1d1b);
+  border: 1.5px solid var(--gold-border, rgba(200,155,60,0.5));
+  border-radius: 14px;
+  padding: 18px 22px 20px;
+  margin: 0 0 28px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.send-card-icon {
+  width: 42px;
+  height: 42px;
+  background: rgba(200,155,60,0.14);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1.3rem;
+}
+.send-card-body { flex: 1; min-width: 200px; }
+.send-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--gold, #c89b3c);
+  margin-bottom: 4px;
+}
+.send-card-desc {
+  font-size: 0.82rem;
+  color: var(--muted, #78766e);
+  margin-bottom: 12px;
+  line-height: 1.45;
+}
+.send-card-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--gold, #c89b3c);
+  color: #171614;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 9px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.send-card-btn:hover { opacity: .85; }
+
+/* ── SEND MODAL ── */
+.send-modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 9000;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.send-modal-backdrop.open { display: flex; }
+.send-modal {
+  background: var(--surface-2, #1e1d1b);
+  border: 1px solid var(--gold-border, rgba(200,155,60,0.5));
+  border-radius: 16px;
+  padding: 28px 28px 24px;
+  width: 100%;
+  max-width: 480px;
+  position: relative;
+}
+.send-modal-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gold, #c89b3c);
+  margin-bottom: 4px;
+}
+.send-modal-subtitle {
+  font-size: 0.8rem;
+  color: var(--muted, #78766e);
+  margin-bottom: 20px;
+  line-height: 1.4;
+}
+.send-modal-close {
+  position: absolute;
+  top: 16px; right: 18px;
+  background: none; border: none;
+  color: var(--muted, #78766e);
+  font-size: 1.3rem;
+  cursor: pointer;
+  line-height: 1;
+}
+.send-modal-close:hover { color: var(--color-text, #d0cfc9); }
+.send-field { margin-bottom: 14px; }
+.send-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted, #78766e);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin-bottom: 5px;
+}
+.send-input, .send-select {
+  width: 100%;
+  background: var(--surface, #171614);
+  border: 1px solid var(--border, #2a2927);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--color-text, #d0cfc9);
+  font-size: 0.88rem;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color .15s;
+}
+.send-input:focus, .send-select:focus {
+  outline: none;
+  border-color: var(--gold, #c89b3c);
+}
+.send-select option { background: #1e1d1b; }
+.send-modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.send-generate-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--gold, #c89b3c);
+  color: #171614;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 11px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.send-generate-btn:hover { opacity: .85; }
+.send-lang-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.send-lang-chip {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border, #2a2927);
+  background: var(--surface, #171614);
+  color: var(--muted, #78766e);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all .15s;
+}
+.send-lang-chip.active {
+  border-color: var(--gold, #c89b3c);
+  background: rgba(200,155,60,0.12);
+  color: var(--gold, #c89b3c);
+}
+
+/* ── TOOL CARD WRAPPER (for sendable cards) ── */
+.tool-card-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.tool-card-wrap .tool-card {
+  flex: 1;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom: none;
+}
+.tool-card-send-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(200,155,60,0.12);
+  border: 1px solid var(--gold-border, rgba(200,155,60,0.4));
+  border-top: none;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  padding: 7px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--gold, #c89b3c);
+  cursor: pointer;
+  width: 100%;
+  transition: background .15s;
+  box-sizing: border-box;
+}
+.tool-card-send-btn:hover { background: rgba(200,155,60,0.22); }
+
 </style>
 </head>
 <body>
@@ -1247,6 +1449,23 @@ a, button, [role='button'], input, select {
         <span data-es="Todas las herramientas en este sitio son solo para fines de detección clínica. No reemplazan el juicio clínico ni constituyen un diagnóstico. Los resultados deben ser interpretados por un profesional de salud calificado." data-en="All tools on this site are for clinical screening purposes only. They do not replace clinical judgment and do not constitute a diagnosis. Results must be interpreted by a qualified health professional.">Todas las herramientas en este sitio son solo para fines de detección clínica. No reemplazan el juicio clínico ni constituyen un diagnóstico. Los resultados deben ser interpretados por un profesional de salud calificado.</span>
       </div>
 
+
+      <!-- SEND QUESTIONNAIRE CARD -->
+      <div class="send-card" id="sendCard">
+        <div class="send-card-icon">✉️</div>
+        <div class="send-card-body">
+          <div class="send-card-title">
+            <span data-es="Enviar cuestionario a padre, madre o maestro" data-en="Send questionnaire to parent or teacher">Enviar cuestionario a padre, madre o maestro</span>
+          </div>
+          <div class="send-card-desc">
+            <span data-es="Genere un enlace personalizado y ábralo en su app de correo — listo para enviar. El padre, madre o maestro completa el cuestionario y le regresa los resultados." data-en="Generate a personalized link that opens in your email app — ready to send. The parent or teacher completes the questionnaire and returns the results to you.">Genere un enlace personalizado y ábralo en su app de correo — listo para enviar. El padre, madre o maestro completa el cuestionario y le regresa los resultados.</span>
+          </div>
+          <button class="send-card-btn" onclick="openSendModal()">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
+            <span data-es="Enviar cuestionario" data-en="Send questionnaire">Enviar cuestionario</span>
+          </button>
+        </div>
+      </div>
 
       <!-- Workflow flowchart (embedded) -->
       <div class="section-heading" data-es="Flujo de Trabajo CoCM" data-en="CoCM Workflow">Flujo de Trabajo CoCM</div>
@@ -1511,13 +1730,19 @@ a, button, [role='button'], input, select {
       <div class="tool-grid">
 
         <!-- PSC-17 — READY -->
-        <a href="psc17.html" class="tool-card ready">
-          <div class="tool-card-header">
-            <div class="tool-card-icon">📋</div>
-          </div>
-          <div class="tool-card-name">PSC-17</div>
-          <div class="tool-card-desc" data-es="Lista de Síntomas Pediátricos — tamizaje universal de salud mental conductual. Edades 4–17." data-en="Pediatric Symptom Checklist — universal behavioral health screening. Ages 4–17.">Lista de Síntomas Pediátricos — tamizaje universal de salud mental conductual.</div>
-        </a>
+        <div class="tool-card-wrap">
+          <a href="psc17.html" class="tool-card ready">
+            <div class="tool-card-header">
+              <div class="tool-card-icon">📋</div>
+            </div>
+            <div class="tool-card-name">PSC-17</div>
+            <div class="tool-card-desc" data-es="Lista de Síntomas Pediátricos — tamizaje universal de salud mental conductual. Edades 4–17." data-en="Pediatric Symptom Checklist — universal behavioral health screening. Ages 4–17.">Lista de Síntomas Pediátricos — tamizaje universal de salud mental conductual.</div>
+          </a>
+          <button class="tool-card-send-btn" onclick="openSendModal('psc17-ext.html')">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
+            <span data-es="Enviar a padre/madre" data-en="Send to parent">Enviar a padre/madre</span>
+          </button>
+        </div>
 
         <!-- SMFQ — READY (standard CoCM workflow) -->
         <a href="smfq.html" class="tool-card ready">
@@ -1561,13 +1786,19 @@ a, button, [role='button'], input, select {
         </a>
 
         <!-- SCARED-P — READY -->
-        <a href="scared-parent.html" class="tool-card ready">
-          <div class="tool-card-header">
-            <div class="tool-card-icon">👨‍👩‍👦</div>
-          </div>
-          <div class="tool-card-name">SCARED-P <span style="font-weight:400; font-size:var(--text-sm);" data-es="Padres" data-en="Parent">Padres</span></div>
-          <div class="tool-card-desc" data-es="Escala de Ansiedad Infantil — versión para padres/madres. 5 subescalas. Edades 8–17." data-en="Screen for Child Anxiety — parent report version. 5 subscales. Ages 8–17.">Escala de Ansiedad Infantil — versión para padres/madres. 5 subescalas.</div>
-        </a>
+        <div class="tool-card-wrap">
+          <a href="scared-parent.html" class="tool-card ready">
+            <div class="tool-card-header">
+              <div class="tool-card-icon">👨‍👩‍👦</div>
+            </div>
+            <div class="tool-card-name">SCARED-P <span style="font-weight:400; font-size:var(--text-sm);" data-es="Padres" data-en="Parent">Padres</span></div>
+            <div class="tool-card-desc" data-es="Escala de Ansiedad Infantil — versión para padres/madres. 5 subescalas. Edades 8–17." data-en="Screen for Child Anxiety — parent report version. 5 subscales. Ages 8–17.">Escala de Ansiedad Infantil — versión para padres/madres. 5 subescalas.</div>
+          </a>
+          <button class="tool-card-send-btn" onclick="openSendModal('scared-parent-ext.html')">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
+            <span data-es="Enviar a padre/madre" data-en="Send to parent">Enviar a padre/madre</span>
+          </button>
+        </div>
 
         <!-- GAD-7 — READY -->
         <a href="gad7.html" class="tool-card ready">
@@ -1587,13 +1818,19 @@ a, button, [role='button'], input, select {
           <div class="tool-card-desc" data-es="Child Attention Profile — inatención y sobreactividad. 12 ítems, maestro/a. Edades 6–13." data-en="Child Attention Profile — inattention and overactivity. 12 items, teacher-rated. Ages 6–13.">Child Attention Profile — evaluación de inatención y sobreactividad. 12 ítems, calificado por maestro/a.</div>
         </a>
 
-        <a href="snapiv.html" class="tool-card ready">
-          <div class="tool-card-header">
-            <div class="tool-card-icon">⚡</div>
-          </div>
-          <div class="tool-card-name">SNAP-IV 26</div>
-          <div class="tool-card-desc" data-es="Swanson, Nolan and Pelham — TDAH, inatención, hiperactividad y TND. 26 ítems. Edades 6–18." data-en="Swanson, Nolan and Pelham — ADHD, inattention, hyperactivity, and ODD. 26 items. Ages 6–18.">Swanson, Nolan and Pelham — evaluación de TDAH, inatención, hiperactividad y TND. 26 ítems.</div>
-        </a>
+        <div class="tool-card-wrap">
+          <a href="snapiv.html" class="tool-card ready">
+            <div class="tool-card-header">
+              <div class="tool-card-icon">⚡</div>
+            </div>
+            <div class="tool-card-name">SNAP-IV 26</div>
+            <div class="tool-card-desc" data-es="Swanson, Nolan and Pelham — TDAH, inatención, hiperactividad y TND. 26 ítems. Edades 6–18." data-en="Swanson, Nolan and Pelham — ADHD, inattention, hyperactivity, and ODD. 26 items. Ages 6–18.">Swanson, Nolan and Pelham — evaluación de TDAH, inatención, hiperactividad y TND. 26 ítems.</div>
+          </a>
+          <button class="tool-card-send-btn" onclick="openSendModal('snapiv-ext.html')">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
+            <span data-es="Enviar a padre/maestro" data-en="Send to parent/teacher">Enviar a padre/maestro</span>
+          </button>
+        </div>
 
         <a href="crafft.html" class="tool-card ready">
           <div class="tool-card-header">
@@ -1612,22 +1849,34 @@ a, button, [role='button'], input, select {
         </a>
 
         <!-- Vanderbilt — Parent -->
-        <a href="vanderbilt-parent.html" class="tool-card ready">
-          <div class="tool-card-header">
-            <div class="tool-card-icon">🧠</div>
-          </div>
-          <div class="tool-card-name">Vanderbilt — <span style="font-weight:400;font-size:var(--text-sm);" data-es="Padres" data-en="Parent">Padres</span></div>
-          <div class="tool-card-desc" data-es="Escala de evaluación de Vanderbilt para padres — TDAH, TND, conducta, ansiedad/depresión. 55 ítems. Edades 6–12." data-en="Vanderbilt Assessment Scale — Parent. ADHD, ODD, conduct, anxiety/depression. 55 items. Ages 6–12.">Escala de evaluación de Vanderbilt para padres — TDAH, TND, conducta, ansiedad/depresión. 55 ítems.</div>
-        </a>
+        <div class="tool-card-wrap">
+          <a href="vanderbilt-parent.html" class="tool-card ready">
+            <div class="tool-card-header">
+              <div class="tool-card-icon">🧠</div>
+            </div>
+            <div class="tool-card-name">Vanderbilt — <span style="font-weight:400;font-size:var(--text-sm);" data-es="Padres" data-en="Parent">Padres</span></div>
+            <div class="tool-card-desc" data-es="Escala de evaluación de Vanderbilt para padres — TDAH, TND, conducta, ansiedad/depresión. 55 ítems. Edades 6–12." data-en="Vanderbilt Assessment Scale — Parent. ADHD, ODD, conduct, anxiety/depression. 55 items. Ages 6–12.">Escala de evaluación de Vanderbilt para padres — TDAH, TND, conducta, ansiedad/depresión. 55 ítems.</div>
+          </a>
+          <button class="tool-card-send-btn" onclick="openSendModal('vanderbilt-parent-ext.html')">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
+            <span data-es="Enviar a padre/madre" data-en="Send to parent">Enviar a padre/madre</span>
+          </button>
+        </div>
 
         <!-- Vanderbilt — Teacher -->
-        <a href="vanderbilt-teacher.html" class="tool-card ready">
-          <div class="tool-card-header">
-            <div class="tool-card-icon">🏫</div>
-          </div>
-          <div class="tool-card-name">Vanderbilt — <span style="font-weight:400;font-size:var(--text-sm);" data-es="Maestros" data-en="Teacher">Maestros</span></div>
-          <div class="tool-card-desc" data-es="Escala de evaluación de Vanderbilt para maestros — TDAH, conducta, desempeño académico. 43 ítems. Edades 6–12." data-en="Vanderbilt Assessment Scale — Teacher. ADHD, conduct, academic performance. 43 items. Ages 6–12.">Escala de evaluación de Vanderbilt para maestros — TDAH, conducta, desempeño académico. 43 ítems.</div>
-        </a>
+        <div class="tool-card-wrap">
+          <a href="vanderbilt-teacher.html" class="tool-card ready">
+            <div class="tool-card-header">
+              <div class="tool-card-icon">🏫</div>
+            </div>
+            <div class="tool-card-name">Vanderbilt — <span style="font-weight:400;font-size:var(--text-sm);" data-es="Maestros" data-en="Teacher">Maestros</span></div>
+            <div class="tool-card-desc" data-es="Escala de evaluación de Vanderbilt para maestros — TDAH, conducta, desempeño académico. 43 ítems. Edades 6–12." data-en="Vanderbilt Assessment Scale — Teacher. ADHD, conduct, academic performance. 43 items. Ages 6–12.">Escala de evaluación de Vanderbilt para maestros — TDAH, conducta, desempeño académico. 43 ítems.</div>
+          </a>
+          <button class="tool-card-send-btn" onclick="openSendModal('vanderbilt-teacher-ext.html')">
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
+            <span data-es="Enviar a maestro/a" data-en="Send to teacher">Enviar a maestro/a</span>
+          </button>
+        </div>
 
 
         <!-- ASRS — Ready -->
@@ -1703,5 +1952,150 @@ function setLang(lang) {
 // ---- Sidebar (mobile) ----
 
 </script>
+
+<!-- ══ SEND MODAL ══ -->
+<div class="send-modal-backdrop" id="sendModalBackdrop" onclick="closeSendModalOutside(event)">
+  <div class="send-modal" role="dialog" aria-modal="true" aria-labelledby="sendModalTitle">
+    <button class="send-modal-close" onclick="closeSendModal()" aria-label="Cerrar">&times;</button>
+
+    <div class="send-modal-title" id="sendModalTitle">
+      <span data-es="Enviar cuestionario" data-en="Send questionnaire">Enviar cuestionario</span>
+    </div>
+    <div class="send-modal-subtitle">
+      <span data-es="Complete los campos y haga clic en &ldquo;Generar correo&rdquo;. Su app de correo se abrirá lista para enviar." data-en="Fill in the fields and click &ldquo;Generate email&rdquo;. Your email app will open ready to send.">Complete los campos y haga clic en &ldquo;Generar correo&rdquo;. Su app de correo se abrirá lista para enviar.</span>
+    </div>
+
+    <!-- Questionnaire select -->
+    <div class="send-field">
+      <label class="send-label" for="sendQSelect">
+        <span data-es="Cuestionario" data-en="Questionnaire">Cuestionario</span>
+      </label>
+      <select class="send-select" id="sendQSelect">
+        <option value="psc17-ext.html" data-es="PSC-17 (Tamizaje Universal)" data-en="PSC-17 (Universal Screening)">PSC-17 (Tamizaje Universal)</option>
+        <option value="scared-parent-ext.html" data-es="SCARED-P (Ansiedad — Padres)" data-en="SCARED-P (Anxiety — Parent)">SCARED-P (Ansiedad — Padres)</option>
+        <option value="snapiv-ext.html" data-es="SNAP-IV (TDAH/TND)" data-en="SNAP-IV (ADHD/ODD)">SNAP-IV (TDAH/TND)</option>
+        <option value="vanderbilt-parent-ext.html" data-es="Vanderbilt — Padres" data-en="Vanderbilt — Parent">Vanderbilt — Padres</option>
+        <option value="vanderbilt-teacher-ext.html" data-es="Vanderbilt — Maestros" data-en="Vanderbilt — Teacher">Vanderbilt — Maestros</option>
+      </select>
+    </div>
+
+    <!-- Child name -->
+    <div class="send-field">
+      <label class="send-label" for="sendChildName">
+        <span data-es="Nombre del niño/a" data-en="Child's name">Nombre del niño/a</span>
+      </label>
+      <input class="send-input" id="sendChildName" type="text" placeholder="Ej: María López" autocomplete="off">
+    </div>
+
+    <!-- Therapist email -->
+    <div class="send-field">
+      <label class="send-label" for="sendTherapistEmail">
+        <span data-es="Su correo electrónico (terapeuta)" data-en="Your email address (therapist)">Su correo electrónico (terapeuta)</span>
+      </label>
+      <input class="send-input" id="sendTherapistEmail" type="email" placeholder="terapeuta@ejemplo.com" autocomplete="email">
+    </div>
+
+    <!-- Language chips -->
+    <div class="send-field">
+      <label class="send-label">
+        <span data-es="Idioma del cuestionario" data-en="Questionnaire language">Idioma del cuestionario</span>
+      </label>
+      <div class="send-lang-row">
+        <button class="send-lang-chip active" id="sendLangES" onclick="setSendLang('es')">Español</button>
+        <button class="send-lang-chip" id="sendLangEN" onclick="setSendLang('en')">English</button>
+      </div>
+    </div>
+
+    <div class="send-modal-actions">
+      <button class="send-generate-btn" onclick="generateSendEmail()">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
+        <span data-es="Generar correo" data-en="Generate email">Generar correo</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ══ SEND MODAL LOGIC ══
+var _sendLang = 'es';
+var _sendPreselect = null;
+
+function openSendModal(preselect) {
+  if (preselect) {
+    var sel = document.getElementById('sendQSelect');
+    for (var i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value === preselect) { sel.selectedIndex = i; break; }
+    }
+  }
+  // Default lang to dashboard lang
+  var dashLang = document.documentElement.getAttribute('data-lang') || 'es';
+  setSendLang(dashLang);
+  document.getElementById('sendModalBackdrop').classList.add('open');
+  setTimeout(function(){ document.getElementById('sendChildName').focus(); }, 80);
+}
+
+function closeSendModal() {
+  document.getElementById('sendModalBackdrop').classList.remove('open');
+}
+
+function closeSendModalOutside(e) {
+  if (e.target === document.getElementById('sendModalBackdrop')) closeSendModal();
+}
+
+function setSendLang(lang) {
+  _sendLang = lang;
+  document.getElementById('sendLangES').classList.toggle('active', lang === 'es');
+  document.getElementById('sendLangEN').classList.toggle('active', lang === 'en');
+}
+
+function generateSendEmail() {
+  var q    = document.getElementById('sendQSelect').value;
+  var child = document.getElementById('sendChildName').value.trim();
+  var email = document.getElementById('sendTherapistEmail').value.trim();
+
+  // Build URL
+  var base = window.location.href.replace(/[^\/]*$/, '');
+  var url  = base + q + '?lang=' + _sendLang;
+  if (child)  url += '&child='     + encodeURIComponent(child);
+  if (email)  url += '&therapist=' + encodeURIComponent(email);
+
+  // Build email text
+  var qLabel = document.getElementById('sendQSelect').selectedOptions[0];
+  var qName  = _sendLang === 'en'
+    ? (qLabel.getAttribute('data-en') || qLabel.text)
+    : (qLabel.getAttribute('data-es') || qLabel.text);
+
+  var subjES = 'Cuestionario para completar' + (child ? ' — ' + child : '');
+  var subjEN = 'Questionnaire to complete'   + (child ? ' — ' + child : '');
+  var subj   = _sendLang === 'en' ? subjEN : subjES;
+
+  var bodyES =
+    'Estimado/a,\n\n' +
+    'Le solicito que complete el siguiente cuestionario para ' + (child || 'su hijo/a') + '.\n\n' +
+    'Cuestionario: ' + qName + '\n' +
+    'Enlace: ' + url + '\n\n' +
+    'Una vez completado, por favor copie los resultados y envíelos de vuelta a este correo.' +
+    (email ? '\nMi correo: ' + email : '') + '\n\nGracias.';
+
+  var bodyEN =
+    'Dear parent/teacher,\n\n' +
+    'Please complete the following questionnaire for ' + (child || 'your child') + '.\n\n' +
+    'Questionnaire: ' + qName + '\n' +
+    'Link: ' + url + '\n\n' +
+    'Once completed, please copy the results and send them back to this email.' +
+    (email ? '\nMy email: ' + email : '') + '\n\nThank you.';
+
+  var body   = _sendLang === 'en' ? bodyEN : bodyES;
+  var mailto = 'mailto:?subject=' + encodeURIComponent(subj) + '&body=' + encodeURIComponent(body);
+  window.open(mailto, '_self');
+  closeSendModal();
+}
+
+// Escape key closes modal
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeSendModal();
+});
+</script>
+
 </body>
 </html>
