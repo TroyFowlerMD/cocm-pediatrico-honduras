@@ -258,13 +258,31 @@ async function submitSuggestion() {
 
   const url = cfgGet(REG_LS.APPS_SCRIPT_URL);
   if (url && file) {
-    // Send through Apps Script with attachment
+    // Send through Apps Script with attachment (schema matches Code.gs submitSuggestion)
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type':'text/plain;charset=utf-8' },
-      body: JSON.stringify({ op:'suggestion', row, attachmentData, attachmentName }),
+      body: JSON.stringify({
+        op: 'suggest',
+        submitter,
+        category,
+        priority,
+        description: desc,
+        attachment: attachmentData ? { name: attachmentName, mimeType: file.type || 'application/octet-stream', dataB64: attachmentData } : null,
+      }),
     });
-    await res.json();
+    const json = await res.json();
+    if (json && json.id) row.Suggestion_ID = json.id;
+    if (json && json.url) row.Attachment_URL = json.url;
+  } else if (url) {
+    // No attachment — still route through Apps Script so email fires
+    const res = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type':'text/plain;charset=utf-8' },
+      body: JSON.stringify({ op:'suggest', submitter, category, priority, description: desc }),
+    });
+    const json = await res.json();
+    if (json && json.id) row.Suggestion_ID = json.id;
   } else {
     await writeRow('Sugerencias', row);
   }

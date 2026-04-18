@@ -18,6 +18,12 @@ const REG_LS = {
   CACHE:           'coCMCamasca.cache',
 };
 
+// Default Apps Script relay URL. Users can override via the Config modal,
+// but the default points at Troy's deployed relay so the dashboard is
+// live-by-default when loaded. When ownership transfers, update this
+// constant + redeploy the page.
+const REG_DEFAULT_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxjjT0zEXEccqbL0wqpmGMsrOfTVMBNINF8ki9U_XzIdRx_VTp-XmQGEDeSpI_uKf4J/exec';
+
 // ── Spreadsheet layout (must match the deployed Sheet) ─────────
 const REG_GIDS = {
   Pacientes:    1939309800,
@@ -75,7 +81,15 @@ const TIER_EN = {
 // ════════════════════════════════════════════════════════════════
 // CONFIG PERSISTENCE
 // ════════════════════════════════════════════════════════════════
-function cfgGet(key) { return localStorage.getItem(key) || ''; }
+function cfgGet(key) {
+  const stored = localStorage.getItem(key);
+  if (stored) return stored;
+  // Fall back to bundled default for the Apps Script URL only
+  if (key === REG_LS.APPS_SCRIPT_URL && REG_DEFAULT_APPS_SCRIPT_URL) {
+    return REG_DEFAULT_APPS_SCRIPT_URL;
+  }
+  return '';
+}
 function cfgSet(key, val) { if (val) localStorage.setItem(key, val); else localStorage.removeItem(key); }
 
 function getDataMode() {
