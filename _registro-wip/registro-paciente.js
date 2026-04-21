@@ -186,10 +186,10 @@ function render() {
         <span><strong>${t('th_status')}:</strong> ${translateStatus(p.Status)||'—'}</span>
       </div>
       <div style="margin-top: var(--space-3);">
-        <strong style="font-size:var(--text-xs);color:var(--color-text-muted);text-transform:uppercase;">${t('label_conditions')}:</strong>
+        <strong class="cond-label" style="font-size:var(--text-xs);color:var(--color-text-muted);text-transform:uppercase;">${t('label_conditions')}:</strong>
         ${condChips || '—'}
       </div>
-      ${p.Notes ? `<div style="margin-top: var(--space-3); font-size: var(--text-sm); color: var(--color-text-muted);"><strong>${t('label_notes')}:</strong> ${renderMarkdownInline(p.Notes)}</div>` : ''}
+      ${p.Notes ? `<div class="pat-notes-line" style="margin-top: var(--space-3); color: var(--color-text-muted);"><strong>${t('label_notes')}:</strong> ${renderMarkdownInline(p.Notes)}</div>` : ''}
       ${safetyActive ? `
         <div class="pat-safety-banner">
           <span>⚠ <strong>${t('safety_active')}</strong></span>
