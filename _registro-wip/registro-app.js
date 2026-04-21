@@ -500,6 +500,7 @@ async function reloadData() { await loadAndRender(); }
 
 function populateUserDropdown() {
   const sel = document.getElementById('userSelect');
+  if (!sel) { location.reload(); return; }
   sel.innerHTML = '<option value="">—</option>' +
     STATE.team.map(tm => `<option value="${tm.name}">${tm.name}</option>`).join('');
   const saved = localStorage.getItem(REG_LS.USER);
@@ -511,12 +512,14 @@ function populateUserDropdown() {
 
 function populateTherapistFilter() {
   const sel = document.getElementById('filterTherapist');
+  if (!sel) return;
   sel.innerHTML = `<option value="">${t('filter_all_therapists')}</option>` +
     STATE.team.filter(tm => tm.role==='therapist').map(tm => `<option value="${tm.name}">${tm.name}</option>`).join('');
 }
 
 function populateConditionFilter() {
   const sel = document.getElementById('filterCondition');
+  if (!sel) return;
   const lang = getLang();
   sel.innerHTML = `<option value="">${t('filter_all_conditions')}</option>` +
     Object.entries(STATE.conditions).map(([k,v]) => `<option value="${k}">${lang==='en'?v.en:v.es}</option>`).join('');
