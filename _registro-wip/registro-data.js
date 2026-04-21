@@ -430,12 +430,16 @@ async function fetchTab(tabName) {
 }
 
 async function fetchAll() {
-  // Serialize reads so Apps Script redirect chain doesn't clobber itself under parallel load
-  const pacientes = await fetchTab('Pacientes');
-  const visitas   = await fetchTab('Visitas');
-  const meds      = await fetchTab('Medicamentos');
-  const config    = await fetchTab('Config');
-  return { pacientes, visitas, meds, config };
+  // v1.1: parallelize reads now that fetchTab has timeouts + retries.
+  // Falls back per-tab on individual failure so one bad tab doesn't nuke the page.
+  const [pacientes, visitas, meds, config, authorizedUsers] = await Promise.all([
+    fetchTab('Pacientes').catch(e => { console.warn('[fetchAll] Pacientes failed', e); return []; }),
+    fetchTab('Visitas').catch(e => { console.warn('[fetchAll] Visitas failed', e); return []; }),
+    fetchTab('Medicamentos').catch(e => { console.warn('[fetchAll] Medicamentos failed', e); return []; }),
+    fetchTab('Config').catch(e => { console.warn('[fetchAll] Config failed', e); return []; }),
+    fetchTab('AuthorizedUsers').catch(e => { console.warn('[fetchAll] AuthorizedUsers failed', e); return []; }),
+  ]);
+  return { pacientes, visitas, meds, config, authorizedUsers };
 }
 
 // ════════════════════════════════════════════════════════════════
