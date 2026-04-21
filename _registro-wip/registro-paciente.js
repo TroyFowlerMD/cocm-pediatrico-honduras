@@ -1641,7 +1641,12 @@ function openScoreModal() {
     </div>
     <div style="margin-top:var(--space-3);">
       <label class="np-label">${t('label_note')} <span style="font-size:var(--text-xs);color:var(--color-text-muted);font-weight:400;text-transform:none;">(${t('label_optional')})</span></label>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px;">
+        <button type="button" class="chip-fill" onclick="sNoteFill('${en?'Teacher form returned':'Formulario de maestro devuelto'}')">${en?'Teacher form returned':'Formulario de maestro devuelto'}</button>
+        <button type="button" class="chip-fill" onclick="sNoteFill('${en?'Parent/caregiver rating':'Puntaje de padre/cuidador'}')">${en?'Parent/caregiver rating':'Puntaje de padre/cuidador'}</button>
+      </div>
       <textarea id="sNote" rows="2" placeholder="${en?'e.g. teacher form returned via WhatsApp':'p. ej. formulario de maestro devuelto por WhatsApp'}" style="${inputSt}"></textarea>
+      <div style="font-size:10.5px;color:var(--color-text-muted);margin-top:4px;font-style:italic;">${en?'Tip: wrap text in **bold** or *italic* for emphasis.':'Consejo: usa **negrita** o *cursiva* para resaltar.'}</div>
     </div>
   `;
   host.style.display = 'flex';
@@ -1993,6 +1998,14 @@ function voNoteFill(phrase) {
   ta.value = phrase;
   ta.focus();
 }
+function sNoteFill(text) {
+  const ta = document.getElementById('sNote');
+  if (!ta) return;
+  const cur = (ta.value || '').trim();
+  ta.value = cur ? (cur + (cur.endsWith('.') ? ' ' : '. ') + text) : text;
+  ta.focus();
+}
+if (typeof window !== 'undefined') window.sNoteFill = sNoteFill;
 if (typeof window !== 'undefined') {
   window.openVisitOnlyModal = openVisitOnlyModal;
   window.closeVisitOnlyModal = closeVisitOnlyModal;
