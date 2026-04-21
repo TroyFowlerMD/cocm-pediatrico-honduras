@@ -152,7 +152,7 @@ function render() {
         <strong style="font-size:var(--text-xs);color:var(--color-text-muted);text-transform:uppercase;">${t('label_conditions')}:</strong>
         ${condChips || '—'}
       </div>
-      ${p.Notes ? `<div style="margin-top: var(--space-3); font-size: var(--text-sm); color: var(--color-text-muted);"><strong>${t('label_notes')}:</strong> ${escapeHtml(p.Notes)}</div>` : ''}
+      ${p.Notes ? `<div style="margin-top: var(--space-3); font-size: var(--text-sm); color: var(--color-text-muted);"><strong>${t('label_notes')}:</strong> ${renderMarkdownInline(p.Notes)}</div>` : ''}
       ${safetyActive ? `
         <div class="pat-safety-banner">
           <span>⚠ <strong>${t('safety_active')}</strong></span>
@@ -161,7 +161,7 @@ function render() {
       ` : ''}
       ${isTruthyFlag(p.Brigade_Flag) ? `
         <div class="pat-brigade-banner">
-          <span>🚩 <strong>${t('brigade_banner_title')}</strong>${p.Brigade_Reason ? ` — ${escapeHtml(p.Brigade_Reason)}` : ''}</span>
+          <span>🚩 <strong>${t('brigade_banner_title')}</strong>${p.Brigade_Reason ? ` — ${renderMarkdownInline(p.Brigade_Reason)}` : ''}</span>
         </div>
       ` : ''}
       <div class="quick-actions">
@@ -741,7 +741,7 @@ function renderMeds(lang) {
   if (!PSTATE.meds.length) return `<p style="color:var(--color-text-muted);">${t('no_meds')}</p>`;
   return PSTATE.meds.map(m => {
     const freqPart = m.Frequency ? ` <span style="color:var(--color-text-muted);font-weight:400;">· ${escapeHtml(m.Frequency)}</span>` : '';
-    const notesLine = m.Notes ? `<div style="grid-column:1 / -1;color:var(--color-text-muted);font-size:var(--text-xs);font-style:italic;margin-top:2px;">${escapeHtml(m.Notes)}</div>` : '';
+    const notesLine = m.Notes ? `<div style="grid-column:1 / -1;color:var(--color-text-muted);font-size:var(--text-xs);font-style:italic;margin-top:2px;">${renderMarkdownInline(m.Notes)}</div>` : '';
     return `
     <div class="med-row">
       <div class="mdate">${m.Date}</div>
@@ -1427,12 +1427,12 @@ function openEditPatientModal() {
         <input type="checkbox" id="epBrigadeFlag" ${isTruthyFlag(p.Brigade_Flag)?'checked':''} style="width:18px;height:18px;cursor:pointer;"/>
         <span>🚩 ${en?'Flag for next brigade':'Marcar para próxima brigada'}</span>
       </label>
-      <input type="text" id="epBrigadeReason" placeholder="${en?'Reason / details (optional)':'Razón / detalles (opcional)'}" value="${escapeHtml(p.Brigade_Reason||'')}" style="${inputStyle}margin-top:6px;"/>
+      <input type="text" id="epBrigadeReason" placeholder="${en?'Reason / details — supports **bold** / *italic*':'Razón / detalles — admite **negrita** / *cursiva*'}" value="${escapeHtml(p.Brigade_Reason||'')}" style="${inputStyle}margin-top:6px;"/>
       <div style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:4px;">${en?'Flags this patient to be seen by the next brigade. Appears on the registry Brigade filter chip.':'Marca a este paciente para ser visto en la próxima brigada. Aparece en el filtro de Brigada del registro.'}</div>
     </div>
     <div style="margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--color-border);">
       <label class="np-label">${en?'Notes':'Notas'}</label>
-      <textarea id="epNotes" rows="2" style="${inputStyle}">${escapeHtml(p.Notes||'')}</textarea>
+      <textarea id="epNotes" rows="2" placeholder="${en?'Notes (supports **bold** / *italic*)':'Notas (admite **negrita** / *cursiva*)'}" style="${inputStyle}">${escapeHtml(p.Notes||'')}</textarea>
     </div>
   `;
   document.getElementById('editPatientModal').style.display = 'flex';
@@ -2150,3 +2150,45 @@ if (typeof window !== 'undefined') {
   window.closeEditVisitModal = closeEditVisitModal;
   window.submitEditVisit = submitEditVisit;
 }
+
+
+// ── v2.5.2b: global keyboard shortcuts for modals ──
+// Esc: close any open modal. Cmd/Ctrl+Enter: save visit-form modals.
+(function registerModalKeys() {
+  if (typeof document === 'undefined') return;
+  document.addEventListener('keydown', (e) => {
+    // Esc — close topmost visible modal
+    if (e.key === 'Escape') {
+      const openModals = ['visitModal','scoreModal','visitOnlyModal','editVisitModal','editPatientModal','todoModal']
+        .map(id => document.getElementById(id))
+        .filter(m => m && m.style.display !== 'none' && getComputedStyle(m).display !== 'none');
+      if (openModals.length) {
+        // Close the last-opened (DOM order last)
+        const target = openModals[openModals.length - 1];
+        const closeBtn = target.querySelector('.modal-close') || target.querySelector('button.ghost');
+        if (closeBtn) closeBtn.click();
+        e.preventDefault();
+      }
+      return;
+    }
+    // Cmd/Ctrl + Enter — submit visit-form modals
+    if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+      const formMap = [
+        { modal: 'visitModal',     btnId: 'visitSaveBtn',     fn: 'submitVisit'     },
+        { modal: 'scoreModal',     btnId: 'scoreSaveBtn',     fn: 'submitScore'     },
+        { modal: 'visitOnlyModal', btnId: 'visitOnlySaveBtn', fn: 'submitVisitOnly' },
+      ];
+      for (const { modal, btnId, fn } of formMap) {
+        const m = document.getElementById(modal);
+        if (m && m.style.display !== 'none') {
+          const btn = document.getElementById(btnId);
+          if (btn && !btn.disabled && typeof window[fn] === 'function') {
+            window[fn]();
+            e.preventDefault();
+            return;
+          }
+        }
+      }
+    }
+  });
+})();
