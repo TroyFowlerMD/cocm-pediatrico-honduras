@@ -53,6 +53,31 @@
     .sug-cat-pill { font-size: var(--text-xs); font-weight: 700; padding: 2px 8px; border-radius: var(--radius-full); background: var(--color-primary-bg); color: var(--color-primary); }
     .sug-status-open { color: var(--color-warning); font-weight: 600; }
     .sug-status-done { color: var(--color-success); font-weight: 600; }
+
+    /* How-to card (shared) */
+    .howto-card {
+      background: var(--color-primary-bg);
+      border: 1px solid oklch(from var(--color-primary) l c h / 0.3);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-4);
+      overflow: hidden;
+    }
+    .howto-card summary {
+      cursor: pointer; padding: var(--space-3) var(--space-4);
+      font-weight: 600; font-size: var(--text-sm); color: var(--color-primary);
+      display: flex; align-items: center; gap: var(--space-2);
+      list-style: none; user-select: none;
+    }
+    .howto-card summary::-webkit-details-marker { display: none; }
+    .howto-card .howto-chevron { margin-left: auto; transition: transform 0.15s; font-size: 0.9em; }
+    .howto-card[open] .howto-chevron { transform: rotate(180deg); }
+    .howto-card .howto-body {
+      padding: 0 var(--space-4) var(--space-4) var(--space-4);
+      color: var(--color-text); font-size: var(--text-sm); line-height: 1.55;
+    }
+    .howto-card .howto-body ul { margin: 0; padding-left: var(--space-5); }
+    .howto-card .howto-body li { margin-bottom: var(--space-2); }
+    .howto-card .howto-body strong { color: var(--color-primary); }
   </style>
 </head>
 <body>
@@ -83,12 +108,22 @@
     <div class="page-content">
       <div class="sug-wrap">
 
+        <!-- How-to card (collapsible) -->
+        <details class="howto-card">
+          <summary>
+            <span class="howto-icon">ℹ️</span>
+            <span data-es="¿Cómo uso esta página?" data-en="How do I use this page?">¿Cómo uso esta página?</span>
+            <span class="howto-chevron">▾</span>
+          </summary>
+          <div class="howto-body" id="howtoBody"></div>
+        </details>
+
         <div class="sug-card">
           <h2 data-es="Nueva sugerencia" data-en="New suggestion">Nueva sugerencia</h2>
 
           <div class="sug-field">
-            <label data-es="Quién envía" data-en="Submitter">Quién envía</label>
-            <select id="sSubmitter"><option value="">—</option></select>
+            <label for="sSubmitter" data-es="Su nombre" data-en="Your name">Su nombre</label>
+            <input type="text" id="sSubmitter" placeholder="Dr. Jane Doe" data-es-placeholder="Escriba su nombre" data-en-placeholder="Type your name" />
           </div>
 
           <div class="sug-field">
@@ -106,10 +141,8 @@
           <div class="sug-field">
             <label data-es="Prioridad" data-en="Priority">Prioridad</label>
             <div class="sug-radio-group" id="sPriority">
-              <label><input type="radio" name="spri" value="urgent"/><span data-es="Urgente" data-en="Urgent">Urgente</span></label>
-              <label><input type="radio" name="spri" value="high"/><span data-es="Alta" data-en="High">Alta</span></label>
               <label><input type="radio" name="spri" value="normal" checked/><span data-es="Normal" data-en="Normal">Normal</span></label>
-              <label><input type="radio" name="spri" value="low"/><span data-es="Baja" data-en="Low">Baja</span></label>
+              <label><input type="radio" name="spri" value="high"/><span data-es="Alta" data-en="High">Alta</span></label>
             </div>
           </div>
 
@@ -144,6 +177,10 @@
 
 <div class="toast" id="toast"></div>
 
+<!-- Toast host -->
+<div id="regToastHost" style="position:fixed;bottom:20px;right:20px;display:flex;flex-direction:column;gap:8px;z-index:500;pointer-events:none;"></div>
+
+<script src="registro-i18n.js"></script>
 <script src="registro-data.js"></script>
 <script>
 // ── Language toggle ───────────────────────────────────────────
@@ -163,6 +200,8 @@ function setLang(lang) {
   const btnES = document.getElementById('btnES'), btnEN = document.getElementById('btnEN');
   if (btnES) btnES.classList.toggle('active', !isEN);
   if (btnEN) btnEN.classList.toggle('active', isEN);
+  const hb = document.getElementById('howtoBody');
+  if (hb && typeof t === 'function') hb.innerHTML = t('howto_suggestions_body');
 }
 
 // ── Theme ───────────────────────────────────────────────────────
@@ -186,11 +225,12 @@ async function load() {
     fetchTab('Config'),
     fetchTab('Sugerencias').catch(()=>[])
   ]);
-  SUG_STATE.team = config.filter(r => r.Category==='team' && r.Active==='TRUE').map(r => r.Key);
+  SUG_STATE.team = config.filter(r => r.Category==='team' && isActiveRow(r)).map(r => r.Key);
   SUG_STATE.suggestions = suggestions;
-  const sel = document.getElementById('sSubmitter');
-  const savedUser = localStorage.getItem(REG_LS.USER);
-  sel.innerHTML = '<option value="">—</option>' + SUG_STATE.team.map(n => `<option value="${n}" ${n===savedUser?'selected':''}>${n}</option>`).join('');
+  // Pre-fill submitter freetext if we remembered a user from the registry page
+  const sInput = document.getElementById('sSubmitter');
+  const savedUser = localStorage.getItem(REG_LS.USER) || localStorage.getItem('coCMCamasca.sug.submitter');
+  if (sInput && savedUser && !sInput.value) sInput.value = savedUser;
   renderSugList();
 }
 
@@ -222,14 +262,15 @@ function clearForm() {
 }
 
 async function submitSuggestion() {
-  const submitter = document.getElementById('sSubmitter').value;
+  const submitter = document.getElementById('sSubmitter').value.trim();
+  if (submitter) localStorage.setItem('coCMCamasca.sug.submitter', submitter);
   const category  = document.querySelector('input[name=scat]:checked')?.value;
   const priority  = document.querySelector('input[name=spri]:checked')?.value || 'normal';
   const desc      = document.getElementById('sDesc').value.trim();
   const file      = document.getElementById('sFile').files[0];
   const lang      = document.documentElement.getAttribute('data-lang') || 'es';
 
-  if (!submitter) return alert(lang==='en'?'Please select who you are.':'Seleccione quién envía.');
+  if (!submitter) return alert(lang==='en'?'Please enter your name.':'Escriba su nombre.');
   if (!category)  return alert(lang==='en'?'Please pick a category.':'Seleccione una categoría.');
   if (!desc)      return alert(lang==='en'?'Please enter a description.':'Ingrese una descripción.');
 

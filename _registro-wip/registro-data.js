@@ -16,13 +16,77 @@ const REG_LS = {
   USER:            'coCMCamasca.user',
   PENDING_WRITES:  'coCMCamasca.pendingWrites',
   CACHE:           'coCMCamasca.cache',
+  FEATURES:        'coCMCamasca.features',
 };
+
+// ════════════════════════════════════════════════════════════════
+// FEATURE FLAGS — per-device "what to show" toggles
+// ════════════════════════════════════════════════════════════════
+// Therapists can simplify the UI by disabling columns they aren't ready
+// to track yet. Disabling a feature only hides UI — it does NOT strip the
+// underlying field from the sheet or prevent other users from using it.
+// Defaults follow AIMS core recommendations; advanced / derived flags default off.
+// Per user decision (April 2026): all display prefs default ON except
+// simplified_mode and show_enrollment_date.
+const REG_FEATURE_DEFAULTS = {
+  simplified_mode:        false,  // master toggle: show only core columns
+  show_psych_consult:     true,   // AIMS-essential
+  show_bhcm_contact:      true,   // AIMS-essential (separate from scored visit)
+  show_review_flag:       true,   // manual flag-for-review
+  show_enrollment_date:   false,  // off by default — shown in detail page
+  show_baseline_on_main:  true,   // AIMS-recommended
+  show_trend_sparkline:   true,
+  show_delta_column:      true,
+  show_conditions_column: true,
+  show_due_for_review:    true,   // auto-derived from psych consult date
+};
+
+// Columns hidden in simplified mode (keeps: therapist, patient, score, last visit, flags)
+const REG_SIMPLIFIED_HIDDEN = new Set([
+  'show_delta_column',
+  'show_trend_sparkline',
+  'show_conditions_column',
+  'show_enrollment_date',
+  'show_baseline_on_main',
+]);
+
+function featGet(key) {
+  try {
+    const stored = JSON.parse(localStorage.getItem(REG_LS.FEATURES) || '{}');
+    const val = (key in stored) ? stored[key] : REG_FEATURE_DEFAULTS[key];
+    const simple = (key in stored) ? stored.simplified_mode : REG_FEATURE_DEFAULTS.simplified_mode;
+    // Simplified mode forces some flags off regardless of individual toggle
+    if (simple && REG_SIMPLIFIED_HIDDEN.has(key)) return false;
+    return val !== undefined ? val : (REG_FEATURE_DEFAULTS[key] || false);
+  } catch (e) {
+    return REG_FEATURE_DEFAULTS[key] || false;
+  }
+}
+function featSet(key, val) {
+  try {
+    const stored = JSON.parse(localStorage.getItem(REG_LS.FEATURES) || '{}');
+    stored[key] = val;
+    localStorage.setItem(REG_LS.FEATURES, JSON.stringify(stored));
+  } catch (e) { /* ignore */ }
+}
+function featAll() {
+  const out = {};
+  Object.keys(REG_FEATURE_DEFAULTS).forEach(k => out[k] = featGet(k));
+  return out;
+}
 
 // Default Apps Script relay URL. Users can override via the Config modal,
 // but the default points at Troy's deployed relay so the dashboard is
 // live-by-default when loaded. When ownership transfers, update this
 // constant + redeploy the page.
-const REG_DEFAULT_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxjjT0zEXEccqbL0wqpmGMsrOfTVMBNINF8ki9U_XzIdRx_VTp-XmQGEDeSpI_uKf4J/exec';
+//
+// ⚠️ SECURITY (v2 — April 2026):
+// The relay now gates every request on Google Sign-In. Deployment must be:
+//   Execute as: User accessing the web app
+//   Who has access: Anyone with Google account
+// Only emails listed in the AuthorizedUsers tab (with active=TRUE) can read/write.
+// Rotate this URL whenever you redeploy a new version of the relay.
+const REG_DEFAULT_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxETBuDCCMByaPxUoajI5BpUDhzrkMM0oBPqcGSbQEkK-R-XrXcBEMHbW9URIMlXzEo/exec';
 
 // ── Spreadsheet layout (must match the deployed Sheet) ─────────
 const REG_GIDS = {
@@ -34,31 +98,82 @@ const REG_GIDS = {
   Sugerencias:  315401556,
 };
 const REG_HEADERS = {
-  Pacientes: ["Patient_ID","Patient_Name","Initials","DOB","Age","Sex","Therapist","Conditions","Tools","Enrollment_Date","Status","Priority","Safety_Flag","Safety_Flag_Ack_By","Safety_Flag_Ack_At","Notes","Created_By","Created_At","Updated_By","Updated_At","Schema_Version"],
-  Visitas:   ["Visit_ID","Patient_ID","Visit_Date","Therapist","Tool","Score","Baseline_Score","Subscale_Scores","SI_Positive","Not_Improving_Flag","Visit_Note","Created_By","Created_At","Updated_By","Updated_At","Schema_Version"],
+  // Pacientes: schema v2 adds AIMS-aligned tracking fields.
+  //   Last_Psych_Consult_Date  — ISO date; most recent psychiatric consultant review
+  //   Last_BHCM_Contact_Date   — ISO date; most recent meaningful therapist contact
+  //                              (may or may not have a scored measure)
+  //   Last_BHCM_Contact_Note   — short text describing type/outcome of contact
+  //   Review_Flag              — "TRUE"/"" — manually flagged for next case review
+  //   Baseline_Tool            — primary measurement tool name at enrollment (optional)
+  //   Baseline_Score           — baseline score for Baseline_Tool (optional)
+  //   Baseline_Date            — date baseline was collected (optional)
+  // All new fields are OPTIONAL. Missing values render as "—" and never
+  // break layout or derived flags.
+  Pacientes: ["Patient_ID","Patient_Name","Initials","DOB","Age","Sex","Therapist","Conditions","Primary_Condition","Primary_Condition_Verified","Tools","Enrollment_Date","Status","Priority","Safety_Flag","Safety_Flag_Ack_By","Safety_Flag_Ack_At","Notes","Last_Psych_Consult_Date","Last_BHCM_Contact_Date","Last_BHCM_Contact_Note","Review_Flag","Baseline_Tool","Baseline_Score","Baseline_Date","Brigade_Flag","Brigade_Reason","Todo_Items","Created_By","Created_At","Updated_By","Updated_At","Schema_Version"],
+  Visitas:   ["Visit_ID","Patient_ID","Visit_Date","Therapist","Tool","Score","Baseline_Score","Subscale_Scores","SI_Positive","Not_Improving_Flag","Visit_Note","Entry_Type","Created_By","Created_At","Updated_By","Updated_At","Schema_Version"],
   Medicamentos: ["Med_ID","Patient_ID","Date","Medication","Dose","Frequency","Action","Prescriber","Reason","Notes","Created_By","Created_At","Schema_Version"],
   Config:    ["Category","Key","Value","Display_ES","Display_EN","Active","Notes"],
   Auditoria: ["Audit_ID","Timestamp","User","Action","Tab","Row_ID","Field","Old_Value","New_Value"],
   Sugerencias: ["Suggestion_ID","Timestamp","Submitter","Category","Priority","Description","Attachment_URL","Status","Resolution_Notes","Resolved_By","Resolved_At"],
 };
 
+
+// ════════════════════════════════════════════════════════════════
+// DATASET ROUTING (production vs test)
+// ════════════════════════════════════════════════════════════════
+// window.REG_DATASET is set by the app layer to 'real' (default) or 'test'.
+// When 'test', reads/writes target the _Test suffixed worksheets.
+// Supports Pacientes, Visitas, Medicamentos only — Config/Auditoria/Sugerencias
+// are always shared across datasets.
+const REG_DATASET_TABS = new Set(['Pacientes','Visitas','Medicamentos']);
+
+function resolveTab(tabName) {
+  const ds = (typeof window !== 'undefined' && window.REG_DATASET) || 'real';
+  if (ds === 'test' && REG_DATASET_TABS.has(tabName)) {
+    return tabName + '_Test';
+  }
+  return tabName;
+}
+
+// Test dataset GIDs (populated when Pacientes_Test / Visitas_Test / Medicamentos_Test
+// worksheets are created in the Sheet). Leave 0 until known; CSV mode can't read
+// until GIDs are filled in, but Apps Script mode uses tab name so it works immediately.
+const REG_GIDS_TEST = {
+  Pacientes_Test:   1906948828,
+  Visitas_Test:     948080109,
+  Medicamentos_Test: 927908472,
+};
+
 // ── Tool → portal URL map ───────────────────────────────────────
-// Matches repo filenames. SMFQ-C = child short, SMFQ-P = parent short.
+// Links to live CoCM Pediátrico hub — each tool opens in a new tab.
+const COCM_TOOLS_BASE = "https://troyfowlermd.github.io/cocm-pediatrico-honduras/";
 const TOOL_URL_MAP = {
-  "PHQ-A":             "phqa.html",
-  "GAD-7":             "gad7.html",
-  "SCARED-N":          "scared.html",
-  "SCARED-Parent":     "scared-parent.html",
-  "SMFQ-C":            "smfq.html",
-  "SMFQ-P":            "mfq-parent.html",
-  "SNAP-IV":           "snapiv.html",
-  "Vanderbilt-Parent": "vanderbilt-parent.html",
-  "Vanderbilt-Teacher":"vanderbilt-teacher.html",
-  "PSC-17":            "psc17.html",
-  "CAP":               "cap.html",
-  "CRAFFT":            "crafft.html",
-  "DAST-10":           "dast10.html",
-  "ASRS":              "asrs.html",
+  "PHQ-A":             COCM_TOOLS_BASE + "phqa.html",
+  "GAD-7":             COCM_TOOLS_BASE + "gad7.html",
+  "SCARED-N":          COCM_TOOLS_BASE + "scared.html",
+  "SCARED-Parent":     COCM_TOOLS_BASE + "scared-parent.html",
+  "SMFQ-C":            COCM_TOOLS_BASE + "smfq.html",
+  "SMFQ-P":            COCM_TOOLS_BASE + "mfq-parent.html",
+  "SNAP-IV":           COCM_TOOLS_BASE + "snapiv.html",
+  "Vanderbilt-Parent": COCM_TOOLS_BASE + "vanderbilt-parent.html",
+  "Vanderbilt-Teacher":COCM_TOOLS_BASE + "vanderbilt-teacher.html",
+  "PSC-17":            COCM_TOOLS_BASE + "psc17.html",
+  "CAP":               COCM_TOOLS_BASE + "cap.html",
+  "CRAFFT":            COCM_TOOLS_BASE + "crafft.html",
+  "DAST-10":           COCM_TOOLS_BASE + "dast10.html",
+  "ASRS":              COCM_TOOLS_BASE + "asrs.html",
+};
+
+// Outside-party (ext) versions — stripped of navigation, safe to share with
+// parents/teachers via WhatsApp or email. Only tools with a known -ext file.
+const TOOL_EXT_URL_MAP = {
+  "SCARED-Parent":     COCM_TOOLS_BASE + "scared-parent-ext.html",
+  "SMFQ-P":            COCM_TOOLS_BASE + "smfq-p-ext.html",
+  "SNAP-IV":           COCM_TOOLS_BASE + "snapiv-ext.html",
+  "Vanderbilt-Parent": COCM_TOOLS_BASE + "vanderbilt-parent-ext.html",
+  "Vanderbilt-Teacher":COCM_TOOLS_BASE + "vanderbilt-teacher-ext.html",
+  "PSC-17":            COCM_TOOLS_BASE + "psc17-ext.html",
+  "CAP":               COCM_TOOLS_BASE + "cap-ext.html",
 };
 
 // ── Severity tier ordering ─────────────────────────────────────
@@ -77,6 +192,92 @@ const TIER_EN = {
   "Remisión":  "Remission",
   "Sin datos": "No data",
 };
+
+// ── Primary condition groups (registry sort) ───────────────────
+// Display order: Depression → Anxiety → PTSD → Mixed/Other → ADHD.
+// ADHD last by explicit user preference ("see fires first").
+const PRIMARY_GROUPS = ['depression','anxiety','ptsd','mixed_other','adhd'];
+const PRIMARY_GROUP_LABELS = {
+  depression:  { es: 'Depresión',          en: 'Depression' },
+  anxiety:     { es: 'Ansiedad',           en: 'Anxiety' },
+  ptsd:        { es: 'Trauma / PTSD',      en: 'Trauma / PTSD' },
+  mixed_other: { es: 'Mixto / otros',      en: 'Mixed / other' },
+  adhd:        { es: 'TDAH',               en: 'ADHD' },
+};
+// Map normalized condition key → primary group.
+const CONDITION_TO_GROUP = {
+  depression:      'depression',
+  mdd_gad:         'depression', // comorbid — picks depression first
+  anxiety:         'anxiety',
+  social_anxiety:  'anxiety',
+  adhd:            'adhd',
+  trauma:          'ptsd',
+  ptsd:            'ptsd',
+  adjustment:      'mixed_other',
+  sud_risk:        'mixed_other',
+  learning:        'mixed_other',
+  language:        'mixed_other',
+  behavior:        'mixed_other',
+  attachment:      'mixed_other',
+  emperor:         'mixed_other',
+  trichotillomania:'mixed_other',
+  other:           'mixed_other',
+};
+// Map tool key → primary group (used as fallback when Conditions is blank).
+const TOOL_TO_GROUP = {
+  'PHQ-A':              'depression',
+  'SMFQ-C':             'depression',
+  'SMFQ-P':             'depression',
+  'GAD-7':              'anxiety',
+  'SCARED-N':           'anxiety',
+  'SCARED-Parent':      'anxiety',
+  'SNAP-IV':            'adhd',
+  'Vanderbilt-Parent':  'adhd',
+  'Vanderbilt-Teacher': 'adhd',
+  'CAP':                'adhd',
+  'ASRS':               'adhd',
+  'PSC-17':             'mixed_other',
+  'DAST-10':            'mixed_other',
+  'CRAFFT':             'mixed_other',
+};
+
+// Normalize a free-text condition into one of the canonical keys above.
+// Handles Spanish/English variants with accent stripping.
+function normalizeConditionKey(raw) {
+  if (!raw) return '';
+  let s = String(raw).trim().toLowerCase();
+  // Strip diacritics
+  s = s.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+  // Remove punctuation, collapse whitespace/underscores
+  s = s.replace(/[^a-z0-9 _-]/g, ' ').replace(/[\s_-]+/g, '_').replace(/^_|_$/g,'');
+  // Direct canonical match
+  if (CONDITION_TO_GROUP[s]) return s;
+  // Aliases → canonical keys
+  const aliases = {
+    depresion: 'depression', depression: 'depression', mdd: 'depression', dep: 'depression',
+    ansiedad: 'anxiety', anxiety: 'anxiety', gad: 'anxiety',
+    ansiedad_social: 'social_anxiety', social: 'social_anxiety', social_anxiety: 'social_anxiety',
+    tdah: 'adhd', adhd: 'adhd', deficit_de_atencion: 'adhd',
+    trauma: 'trauma', ptsd: 'ptsd', tept: 'ptsd',
+    ajuste: 'adjustment', adjustment: 'adjustment',
+    sud: 'sud_risk', sud_risk: 'sud_risk', riesgo_sud: 'sud_risk', riesgo_de_consumo: 'sud_risk',
+    aprendizaje: 'learning', learning: 'learning',
+    lenguaje: 'language', language: 'language',
+    comportamiento: 'behavior', behavior: 'behavior', conducta: 'behavior',
+    apego: 'attachment', attachment: 'attachment',
+    emperador: 'emperor', emperor: 'emperor',
+    tricotilomania: 'trichotillomania', trichotillomania: 'trichotillomania',
+    otro: 'other', other: 'other',
+    mdd_gad: 'mdd_gad',
+  };
+  if (aliases[s]) return aliases[s];
+  return s; // unknown — caller falls back to mixed_other
+}
+
+function conditionKeyToGroup(key) {
+  if (!key) return 'mixed_other';
+  return CONDITION_TO_GROUP[key] || 'mixed_other';
+}
 
 // ════════════════════════════════════════════════════════════════
 // CONFIG PERSISTENCE
@@ -132,21 +333,44 @@ function parseCSV(text) {
 // ════════════════════════════════════════════════════════════════
 async function fetchTab(tabName) {
   const mode = getDataMode();
-  if (mode === 'demo') return DEMO_DATA[tabName] || [];
+  const resolved = resolveTab(tabName);
+  // Demo/offline mode: honor dataset toggle by picking from DEMO_TEST_DATA when
+  // resolved name ends in _Test, otherwise use DEMO_DATA. Config/etc always use DEMO_DATA.
+  if (mode === 'demo') {
+    if (resolved.endsWith('_Test')) {
+      const baseKey = resolved.replace('_Test','');
+      return (DEMO_TEST_DATA[baseKey] || [])
+        .concat(DEMO_DATA[baseKey] ? [] : []); // test-only when toggled
+    }
+    return DEMO_DATA[tabName] || [];
+  }
   if (mode === 'csv') {
     const base = cfgGet(REG_LS.CSV_BASE_URL);
-    const gid  = REG_GIDS[tabName];
-    const url  = base.includes('gid=') ? base : `${base}&gid=${gid}`;
-    const res  = await fetch(url);
-    if (!res.ok) throw new Error(`CSV fetch failed for ${tabName}: ${res.status}`);
+    // Try test GID first for _Test tabs; fall back to production-name GID map for normal tabs.
+    const gid = REG_GIDS_TEST[resolved] || REG_GIDS[resolved] || REG_GIDS[tabName];
+    const url = base.includes('gid=') ? base : `${base}&gid=${gid}`;
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`CSV fetch failed for ${resolved}: ${res.status}`);
     return parseCSV(await res.text());
   }
   if (mode === 'appsscript') {
     const url = cfgGet(REG_LS.APPS_SCRIPT_URL);
-    const res = await fetch(`${url}?op=read&tab=${encodeURIComponent(tabName)}`);
-    if (!res.ok) throw new Error(`Apps Script fetch failed for ${tabName}: ${res.status}`);
+    const res = await fetch(`${url}?op=read&tab=${encodeURIComponent(resolved)}`, { credentials: 'include' });
+    if (!res.ok) throw new Error(`Apps Script fetch failed for ${resolved}: ${res.status}`);
+    // Detect Google Sign-In redirect (HTML response instead of JSON)
+    const ct = res.headers.get('content-type') || '';
+    if (!ct.includes('application/json')) {
+      const err = new Error('AUTH_REDIRECT');
+      err.code = 'AUTH_REDIRECT';
+      err.signInUrl = url;
+      throw err;
+    }
     const json = await res.json();
-    if (!json.ok) throw new Error(json.error || 'Apps Script error');
+    if (!json.ok) {
+      const err = new Error(json.error || 'Apps Script error');
+      if (/UNAUTHORIZED/i.test(json.error || '')) err.code = 'UNAUTHORIZED';
+      throw err;
+    }
     return json.rows || [];
   }
 }
@@ -165,46 +389,101 @@ async function fetchAll() {
 // WRITE LAYER (Apps Script only; queues locally otherwise)
 // ════════════════════════════════════════════════════════════════
 async function writeRow(tab, row) {
+  const resolved = resolveTab(tab);
   const url = cfgGet(REG_LS.APPS_SCRIPT_URL);
   if (!url) {
     // Queue locally
     const q = JSON.parse(localStorage.getItem(REG_LS.PENDING_WRITES) || '[]');
-    q.push({ ts: new Date().toISOString(), op: 'append', tab, row });
+    q.push({ ts: new Date().toISOString(), op: 'append', tab: resolved, row });
     localStorage.setItem(REG_LS.PENDING_WRITES, JSON.stringify(q));
     return { ok: false, queued: true };
   }
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify({ op: 'append', tab, row }),
+    credentials: 'include',
+    body: JSON.stringify({ op: 'append', tab: resolved, row }),
   });
   const json = await res.json();
   return json;
 }
 
 async function updateRow(tab, rowId, updates) {
+  const resolved = resolveTab(tab);
   const url = cfgGet(REG_LS.APPS_SCRIPT_URL);
   if (!url) {
     const q = JSON.parse(localStorage.getItem(REG_LS.PENDING_WRITES) || '[]');
-    q.push({ ts: new Date().toISOString(), op: 'update', tab, rowId, updates });
+    q.push({ ts: new Date().toISOString(), op: 'update', tab: resolved, rowId, updates });
     localStorage.setItem(REG_LS.PENDING_WRITES, JSON.stringify(q));
     return { ok: false, queued: true };
   }
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify({ op: 'update', tab, rowId, updates }),
+    credentials: 'include',
+    body: JSON.stringify({ op: 'update', tab: resolved, rowId, updates }),
   });
   return await res.json();
 }
 
 // ════════════════════════════════════════════════════════════════
+// AUTH PING — verifies signed-in Google account is in AuthorizedUsers
+// ════════════════════════════════════════════════════════════════
+// Returns one of:
+//   { status: 'ok',           user: { email, name, role } }
+//   { status: 'unauthorized', email }
+//   { status: 'signin_required', signInUrl }
+//   { status: 'no_relay' }                  // relay URL not configured
+//   { status: 'error', message }
+async function pingAuth() {
+  const url = cfgGet(REG_LS.APPS_SCRIPT_URL);
+  if (!url || url === 'PASTE_NEW_EXEC_URL_HERE') return { status: 'no_relay' };
+  try {
+    const res = await fetch(`${url}?op=ping`, { credentials: 'include' });
+    const ct = res.headers.get('content-type') || '';
+    if (!ct.includes('application/json')) {
+      return { status: 'signin_required', signInUrl: url };
+    }
+    const json = await res.json();
+    if (!json.ok) return { status: 'error', message: json.error || 'ping failed' };
+    if (json.authorized) return { status: 'ok', user: json.user };
+    return { status: 'unauthorized', email: (json.user && json.user.email) || '' };
+  } catch (err) {
+    return { status: 'error', message: String(err && err.message || err) };
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
 // HELPERS — tool cutoffs, tier calculation
 // ════════════════════════════════════════════════════════════════
+// Accept various truthy encodings for the Active column ("TRUE", "true", "1", true, etc.).
+// Google Sheets via Apps Script often returns lowercase 'true'/'false' strings.
+function isActiveRow(r) {
+  const v = r && r.Active;
+  if (v === true) return true;
+  if (typeof v === 'string') {
+    const s = v.trim().toLowerCase();
+    return s === 'true' || s === 'yes' || s === '1' || s === 'y';
+  }
+  if (typeof v === 'number') return v === 1;
+  return false;
+}
+
+// Accept "TRUE", "true", "1", true, 1, "yes" — Apps Script returns lowercase.
+function isTruthyFlag(v) {
+  if (v === true) return true;
+  if (typeof v === 'string') {
+    const s = v.trim().toLowerCase();
+    return s === 'true' || s === 'yes' || s === '1' || s === 'y';
+  }
+  if (typeof v === 'number') return v === 1;
+  return false;
+}
+
 function parseToolCutoffs(configRows) {
   const tools = {};
   for (const r of configRows) {
-    if (r.Category !== 'tool' || r.Active !== 'TRUE') continue;
+    if (r.Category !== 'tool' || !isActiveRow(r)) continue;
     try {
       const cut = JSON.parse(r.Value);
       tools[r.Key] = { ...cut, displayES: r.Display_ES, displayEN: r.Display_EN };
@@ -271,6 +550,60 @@ function computePatientTiers(pacientes, visitas, tools) {
       }
     }
     const lastVisitDate = visits[0]?.Visit_Date || p.Enrollment_Date || '';
+
+    // ── Primary condition resolution ────────────────────────────
+    // 1. If Primary_Condition explicitly set, use it.
+    // 2. Else, first key from Conditions field (auto-infer, needs verify).
+    // 3. Else, fall back to first monitored tool.
+    // 4. Else, 'mixed_other' with needs-verify flag.
+    let primaryCondition = '';
+    let primaryGroup = 'mixed_other';
+    let needsVerify = false;
+    const storedPrimary = normalizeConditionKey(p.Primary_Condition);
+    const verifiedFlag = isTruthyFlag(p.Primary_Condition_Verified);
+    if (storedPrimary) {
+      primaryCondition = storedPrimary;
+      primaryGroup = conditionKeyToGroup(storedPrimary);
+      needsVerify = !verifiedFlag; // explicit but not yet verified
+    } else {
+      // Auto-infer from first Conditions entry
+      const condsRaw = String(p.Conditions || '').split(',').map(s => s.trim()).filter(Boolean);
+      if (condsRaw.length) {
+        const firstKey = normalizeConditionKey(condsRaw[0]);
+        if (firstKey) {
+          primaryCondition = firstKey;
+          primaryGroup = conditionKeyToGroup(firstKey);
+          needsVerify = true;
+        }
+      }
+      // Fallback: first tool
+      if (!primaryCondition) {
+        const toolsRaw = String(p.Tools || '').split(',').map(s => s.trim()).filter(Boolean);
+        if (toolsRaw.length && TOOL_TO_GROUP[toolsRaw[0]]) {
+          primaryGroup = TOOL_TO_GROUP[toolsRaw[0]];
+          needsVerify = true;
+        } else {
+          needsVerify = true;
+        }
+      }
+    }
+
+    // Find latest score for the tool most relevant to primary group.
+    // Strategy: among latestByTool, pick the most-recent visit whose tool
+    // maps to primaryGroup; if none, any latest visit.
+    let primaryScore = null, primaryScoreTool = null, primaryScoreDate = null;
+    const candidates = Object.entries(latestByTool)
+      .filter(([tool]) => TOOL_TO_GROUP[tool] === primaryGroup);
+    const pickFrom = candidates.length ? candidates : Object.entries(latestByTool);
+    pickFrom.sort((a,b) => String(b[1].Visit_Date).localeCompare(String(a[1].Visit_Date)));
+    if (pickFrom.length) {
+      const [tool, v] = pickFrom[0];
+      primaryScoreTool = tool;
+      primaryScoreDate = v.Visit_Date;
+      const numScore = Number(v.Score);
+      primaryScore = isNaN(numScore) ? null : numScore;
+    }
+
     return {
       ...p,
       _visits: visits,
@@ -281,7 +614,13 @@ function computePatientTiers(pacientes, visitas, tools) {
       _toolScores: toolScores,
       _lastVisitDate: lastVisitDate,
       _daysSinceLastVisit: lastVisitDate ? daysBetween(lastVisitDate, todayISO()) : 9999,
-      _safetyActive: p.Safety_Flag === 'TRUE' && !p.Safety_Flag_Ack_At,
+      _safetyActive: isTruthyFlag(p.Safety_Flag) && !p.Safety_Flag_Ack_At,
+      _primaryCondition: primaryCondition,
+      _primaryGroup: primaryGroup,
+      _primaryNeedsVerify: needsVerify,
+      _primaryScore: primaryScore,
+      _primaryScoreTool: primaryScoreTool,
+      _primaryScoreDate: primaryScoreDate,
     };
   });
 }
@@ -333,3 +672,10 @@ const DEMO_DATA = {
     {Category:"tool",Key:"Vanderbilt-Parent",Value:JSON.stringify({remission:0,mild:999,moderate:999,severe:999}),Display_ES:"Vanderbilt-P",Display_EN:"Vanderbilt-P",Active:"TRUE",Notes:""},
   ],
 };
+
+// ════════════════════════════════════════════════════════════════
+// DEMO TEST DATA  (used when dataset toggle set to 'test' and no sheet configured)
+// 20 synthetic patients, 5 per condition (depression, anxiety, adhd, mdd_gad),
+// 3-6 visits each, realistic trajectories, 3 safety-flagged, ≥3 not-improving.
+// ════════════════════════════════════════════════════════════════
+const DEMO_TEST_DATA = {"Pacientes":[{"Patient_ID":"CCM-0100","Patient_Name":"Camila Gómez Rivera","Initials":"CGR","DOB":"2016-10-09","Age":"9","Sex":"F","Therapist":"Eylin Ramos","Conditions":"depression","Tools":"SMFQ-C,PHQ-A","Enrollment_Date":"2025-08-08","Status":"Activo","Priority":"","Safety_Flag":"TRUE","Safety_Flag_Ack_By":"","Safety_Flag_Ack_At":"","Notes":"Test data — synthetic — ideación pasiva monitoreo","Created_By":"test-seed","Created_At":"2025-08-08","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Patient_ID":"CCM-0101","Patient_Name":"Camila Cruz Cartagena","Initials":"CCC","DOB":"2010-11-20","Age":"15","Sex":"F","Therapist":"Eylin Ramos","Conditions":"depression","Tools":"SMFQ-C,PHQ-A","Enrollment_Date":"2025-11-05","Status":"Activo","Priority":"","Safety_Flag":"FALSE","Safety_Flag_Ack_By":"","Safety_Flag_Ack_At":"","Notes":"Test data — synthetic","Created_By":"test-seed","Created_At":"2025-11-05","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Patient_ID":"CCM-0102","Patient_Name":"Bryan Martínez Maldonado","Initials":"BMM","DOB":"2014-11-09","Age":"12","Sex":"M","Therapist":"Karelia Marquez","Conditions":"depression","Tools":"SMFQ-C,PHQ-A","Enrollment_Date":"2026-01-02","Status":"Activo","Priority":"","Safety_Flag":"FALSE","Safety_Flag_Ack_By":"","Safety_Flag_Ack_At":"","Notes":"Test data — synthetic","Created_By":"test-seed","Created_At":"2026-01-02","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Patient_ID":"CCM-0103","Patient_Name":"Valentina Sánchez Maradiaga","Initials":"VSM","DOB":"2014-06-07","Age":"11","Sex":"F","Therapist":"Karelia Marquez","Conditions":"depression","Tools":"SMFQ-C,PHQ-A","Enrollment_Date":"2025-11-08","Status":"Activo","Priority":"","Safety_Flag":"FALSE","Safety_Flag_Ack_By":"","Safety_Flag_Ack_At":"","Notes":"Test data — synthetic","Created_By":"test-seed","Created_At":"2025-11-08","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Patient_ID":"CCM-0104","Patient_Name":"Diego Gómez Bonilla","Initials":"DGB","DOB":"2010-07-20","Age":"15","Sex":"M","Therapist":"Karelia Marquez","Conditions":"depression","Tools":"SMFQ-C,PHQ-A","Enrollment_Date":"2025-12-05","Status":"Activo","Priority":"","Safety_Flag":"FALSE","Safety_Flag_Ack_By":"","Safety_Flag_Ack_At":"","Notes":"Test data — synthetic","Created_By":"test-seed","Created_At":"2025-12-05","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Patient_ID":"CCM-0105","Patient_Name":"Carlos Reyes Rivera","Initials":"CRR","DOB":"2009-03-12","Age":"17","Sex":"M","Therapist":"Eylin Ramos","Conditions":"anxiety","Tools":"GAD-7,SCARED-N","Enrollment_Date":"2026-03-28","Status":"Activo","Priority":"","Safety_Flag":"FALSE","Safety_Flag_Ack_By":"","Safety_Flag_Ack_At":"","Notes":"Test data — synthetic","Created_By":"test-seed","Created_At":"2026-03-28","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Patient_ID":"CCM-0106","Patient_Name":"Alejandra Rodríguez Fuentes","Initials":"ARF","DOB":"2008-03-05","Age":"17","Sex":"F","Therapist":"Eylin Ramos","Conditions":"anxiety","Tools":"GAD-7,SCARED-N","Enrollment_Date":"2025-10-01","Status":"Activo","Priority":"","Safety_Flag":"FALSE","Safety_Flag_Ack_By":"","Safety_Flag_Ack_At":"","Notes":"Test data — synthetic","Created_By":"test-seed","Created_At":"2025-10-01","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Patient_ID":"CCM-0107","Patient_Name":"Yeison Flores Maradiaga","Initials":"YFM","DOB":"2008-10-18","Age":"17","Sex":"M","Therapist":"Eylin Ramos","Conditions":"anxiety","Tools":"GAD-7,SCARED-N","Enrollment_Date":"2025-11-17","Status":"Activo","Priority":"","Safety_Flag":"FALSE","Safety_Flag_Ack_By":"","Safety_Flag_Ack_At":"","Notes":"Test data — synthetic","Created_By":"test-seed","Created_At":"2025-11-17","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Patient_ID":"CCM-0108","Patient_Name":"Ana Mejía Bonilla","Initials":"AMB","DOB":"2014-04-04","Age":"12","Sex":"F","Therapist":"Eylin Ramos","Conditions":"anxiety","Tools":"GAD-7,SCARED-N","Enrollment_Date":"2026-01-23","Status":"Activo","Priority":"","Safety_Flag":"FALSE","Safety_Flag_Ack_By":"","Safety_Flag_Ack_At":"","Notes":"Test data — synthetic","Created_By":"test-seed","Created_At":"2026-01-23","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Patient_ID":"CCM-0109","Patient_Name":"Daniela Aguilar Rivera","Initials":"DAR","DOB":"2010-08-08","Age":"15","Sex":"F","Therapist":"Eylin Ramos","Conditions":"anxiety","Tools":"GAD-7,SCARED-N","Enrollment_Date":"2025-09-14","Status":"Activo","Priority":"","Safety_Flag":"FALSE","Safety_Flag_Ack_By":"","Safety_Flag_Ack_At":"","Notes":"Test data — synthetic","Created_By":"test-seed","Created_At":"2025-09-14","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Patient_ID":"CCM-0110","Patient_Name":"Ana Ramírez Paz","Initials":"ARP","DOB":"2009-01-13","Age":"16","Sex":"F","Therapist":"Eylin Ramos","Conditions":"adhd","Tools":"Vanderbilt-Parent,Vanderbilt-Teacher","Enrollment_Date":"2025-09-02","Status":"Activo","Priority":"","Safety_Flag":"TRUE","Safety_Flag_Ack_By":"","Safety_Flag_Ack_At":"","Notes":"Test data — synthetic — ideación pasiva monitoreo","Created_By":"test-seed","Created_At":"2025-09-02","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Patient_ID":"CCM-0111","Patient_Name":"Wilmer Ramírez Ortega","Initials":"WRO","DOB":"2013-03-03","Age":"13","Sex":"M","Therapist":"Karelia Marquez","Conditions":"adhd","Tools":"Vanderbilt-Parent,Vanderbilt-Teacher","Enrollment_Date":"2026-03-24","Status":"Activo","Priority":"","Safety_Flag":"FALSE","Safety_Flag_Ack_By":"","Safety_Flag_Ack_At":"","Notes":"Test data — synthetic","Created_By":"test-seed","Created_At":"2026-03-24","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Patient_ID":"CCM-0112","Patient_Name":"Camila Flores Vásquez","Initials":"CFV","DOB":"2013-11-21","Age":"12","Sex":"F","Therapist":"Eylin Ramos","Conditions":"adhd","Tools":"Vanderbilt-Parent,Vanderbilt-Teacher","Enrollment_Date":"2025-06-19","Status":"Activo","Priority":"","Safety_Flag":"FALSE","Safety_Flag_Ack_By":"","Safety_Flag_Ack_At":"","Notes":"Test data — synthetic","Created_By":"test-seed","Created_At":"2025-06-19","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Patient_ID":"CCM-0113","Patient_Name":"Ángel Flores Vásquez","Initials":"ÁFV","DOB":"2009-12-10","Age":"16","Sex":"M","Therapist":"Eylin Ramos","Conditions":"adhd","Tools":"Vanderbilt-Parent,Vanderbilt-Teacher","Enrollment_Date":"2025-09-01","Status":"Activo","Priority":"","Safety_Flag":"FALSE","Safety_Flag_Ack_By":"","Safety_Flag_Ack_At":"","Notes":"Test data — synthetic","Created_By":"test-seed","Created_At":"2025-09-01","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Patient_ID":"CCM-0114","Patient_Name":"Heidy Gómez Pineda","Initials":"HGP","DOB":"2009-11-14","Age":"17","Sex":"F","Therapist":"Eylin Ramos","Conditions":"adhd","Tools":"Vanderbilt-Parent,Vanderbilt-Teacher","Enrollment_Date":"2026-03-04","Status":"Activo","Priority":"","Safety_Flag":"FALSE","Safety_Flag_Ack_By":"","Safety_Flag_Ack_At":"","Notes":"Test data — synthetic","Created_By":"test-seed","Created_At":"2026-03-04","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Patient_ID":"CCM-0115","Patient_Name":"Luis Reyes Pineda","Initials":"LRP","DOB":"2016-06-07","Age":"9","Sex":"M","Therapist":"Eylin Ramos","Conditions":"mdd_gad","Tools":"PHQ-A,GAD-7","Enrollment_Date":"2025-08-25","Status":"Activo","Priority":"","Safety_Flag":"TRUE","Safety_Flag_Ack_By":"","Safety_Flag_Ack_At":"","Notes":"Test data — synthetic — ideación pasiva monitoreo","Created_By":"test-seed","Created_At":"2025-08-25","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Patient_ID":"CCM-0116","Patient_Name":"Elvin Gómez Velásquez","Initials":"EGV","DOB":"2008-01-28","Age":"17","Sex":"M","Therapist":"Eylin Ramos","Conditions":"mdd_gad","Tools":"PHQ-A,GAD-7","Enrollment_Date":"2025-12-20","Status":"Activo","Priority":"","Safety_Flag":"FALSE","Safety_Flag_Ack_By":"","Safety_Flag_Ack_At":"","Notes":"Test data — synthetic","Created_By":"test-seed","Created_At":"2025-12-20","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Patient_ID":"CCM-0117","Patient_Name":"Diego Aguilar Maldonado","Initials":"DAM","DOB":"2014-10-09","Age":"12","Sex":"M","Therapist":"Eylin Ramos","Conditions":"mdd_gad","Tools":"PHQ-A,GAD-7","Enrollment_Date":"2026-02-12","Status":"Activo","Priority":"","Safety_Flag":"FALSE","Safety_Flag_Ack_By":"","Safety_Flag_Ack_At":"","Notes":"Test data — synthetic","Created_By":"test-seed","Created_At":"2026-02-12","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Patient_ID":"CCM-0118","Patient_Name":"Keyla Cruz Cartagena","Initials":"KCC","DOB":"2015-06-20","Age":"10","Sex":"F","Therapist":"Karelia Marquez","Conditions":"mdd_gad","Tools":"PHQ-A,GAD-7","Enrollment_Date":"2025-09-12","Status":"Activo","Priority":"","Safety_Flag":"FALSE","Safety_Flag_Ack_By":"","Safety_Flag_Ack_At":"","Notes":"Test data — synthetic","Created_By":"test-seed","Created_At":"2025-09-12","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Patient_ID":"CCM-0119","Patient_Name":"Diego Reyes Maradiaga","Initials":"DRM","DOB":"2015-10-21","Age":"10","Sex":"M","Therapist":"Karelia Marquez","Conditions":"mdd_gad","Tools":"PHQ-A,GAD-7","Enrollment_Date":"2025-11-17","Status":"Activo","Priority":"","Safety_Flag":"FALSE","Safety_Flag_Ack_By":"","Safety_Flag_Ack_At":"","Notes":"Test data — synthetic","Created_By":"test-seed","Created_At":"2025-11-17","Updated_By":"","Updated_At":"","Schema_Version":"1.0"}],"Visitas":[{"Visit_ID":"VT-1001","Patient_ID":"CCM-0100","Visit_Date":"2025-08-08","Therapist":"Eylin Ramos","Tool":"SMFQ-C","Score":"14","Baseline_Score":"14","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2025-08-08","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1002","Patient_ID":"CCM-0100","Visit_Date":"2025-09-30","Therapist":"Eylin Ramos","Tool":"SMFQ-C","Score":"13","Baseline_Score":"14","Subscale_Scores":"","SI_Positive":"TRUE","Not_Improving_Flag":"FALSE","Visit_Note":"Test — SI+","Created_By":"test-seed","Created_At":"2025-09-30","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1003","Patient_ID":"CCM-0100","Visit_Date":"2025-11-17","Therapist":"Eylin Ramos","Tool":"SMFQ-C","Score":"14","Baseline_Score":"14","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"TRUE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2025-11-17","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1004","Patient_ID":"CCM-0101","Visit_Date":"2025-11-05","Therapist":"Eylin Ramos","Tool":"SMFQ-C","Score":"18","Baseline_Score":"18","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2025-11-05","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1005","Patient_ID":"CCM-0101","Visit_Date":"2025-12-22","Therapist":"Eylin Ramos","Tool":"SMFQ-C","Score":"15","Baseline_Score":"18","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2025-12-22","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1006","Patient_ID":"CCM-0101","Visit_Date":"2026-01-29","Therapist":"Eylin Ramos","Tool":"SMFQ-C","Score":"14","Baseline_Score":"18","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-01-29","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1007","Patient_ID":"CCM-0102","Visit_Date":"2026-01-02","Therapist":"Karelia Marquez","Tool":"SMFQ-C","Score":"14","Baseline_Score":"14","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-01-02","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1008","Patient_ID":"CCM-0102","Visit_Date":"2026-03-05","Therapist":"Karelia Marquez","Tool":"SMFQ-C","Score":"14","Baseline_Score":"14","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-03-05","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1009","Patient_ID":"CCM-0102","Visit_Date":"2026-04-16","Therapist":"Karelia Marquez","Tool":"SMFQ-C","Score":"13","Baseline_Score":"14","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"TRUE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-04-16","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1010","Patient_ID":"CCM-0103","Visit_Date":"2025-11-08","Therapist":"Karelia Marquez","Tool":"SMFQ-C","Score":"14","Baseline_Score":"14","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2025-11-08","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1011","Patient_ID":"CCM-0103","Visit_Date":"2026-01-03","Therapist":"Karelia Marquez","Tool":"SMFQ-C","Score":"13","Baseline_Score":"14","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-01-03","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1012","Patient_ID":"CCM-0103","Visit_Date":"2026-02-17","Therapist":"Karelia Marquez","Tool":"SMFQ-C","Score":"15","Baseline_Score":"14","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-02-17","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1013","Patient_ID":"CCM-0103","Visit_Date":"2026-04-19","Therapist":"Karelia Marquez","Tool":"SMFQ-C","Score":"15","Baseline_Score":"14","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"TRUE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-04-19","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1014","Patient_ID":"CCM-0104","Visit_Date":"2025-12-05","Therapist":"Karelia Marquez","Tool":"SMFQ-C","Score":"16","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2025-12-05","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1015","Patient_ID":"CCM-0104","Visit_Date":"2026-02-06","Therapist":"Karelia Marquez","Tool":"SMFQ-C","Score":"12","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-02-06","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1016","Patient_ID":"CCM-0104","Visit_Date":"2026-03-31","Therapist":"Karelia Marquez","Tool":"SMFQ-C","Score":"10","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-03-31","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1017","Patient_ID":"CCM-0104","Visit_Date":"2026-05-17","Therapist":"Karelia Marquez","Tool":"SMFQ-C","Score":"4","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-05-17","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1018","Patient_ID":"CCM-0104","Visit_Date":"2026-07-02","Therapist":"Karelia Marquez","Tool":"SMFQ-C","Score":"8","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-07-02","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1019","Patient_ID":"CCM-0104","Visit_Date":"2026-08-13","Therapist":"Karelia Marquez","Tool":"SMFQ-C","Score":"1","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-08-13","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1020","Patient_ID":"CCM-0105","Visit_Date":"2026-03-28","Therapist":"Eylin Ramos","Tool":"GAD-7","Score":"16","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-03-28","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1021","Patient_ID":"CCM-0105","Visit_Date":"2026-05-26","Therapist":"Eylin Ramos","Tool":"GAD-7","Score":"13","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-05-26","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1022","Patient_ID":"CCM-0105","Visit_Date":"2026-07-20","Therapist":"Eylin Ramos","Tool":"GAD-7","Score":"10","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-07-20","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1023","Patient_ID":"CCM-0105","Visit_Date":"2026-09-03","Therapist":"Eylin Ramos","Tool":"GAD-7","Score":"7","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-09-03","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1024","Patient_ID":"CCM-0105","Visit_Date":"2026-10-11","Therapist":"Eylin Ramos","Tool":"GAD-7","Score":"12","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-10-11","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1025","Patient_ID":"CCM-0106","Visit_Date":"2025-10-01","Therapist":"Eylin Ramos","Tool":"GAD-7","Score":"14","Baseline_Score":"14","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2025-10-01","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1026","Patient_ID":"CCM-0106","Visit_Date":"2025-12-04","Therapist":"Eylin Ramos","Tool":"GAD-7","Score":"13","Baseline_Score":"14","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2025-12-04","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1027","Patient_ID":"CCM-0106","Visit_Date":"2026-01-19","Therapist":"Eylin Ramos","Tool":"GAD-7","Score":"15","Baseline_Score":"14","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"TRUE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-01-19","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1028","Patient_ID":"CCM-0107","Visit_Date":"2025-11-17","Therapist":"Eylin Ramos","Tool":"GAD-7","Score":"18","Baseline_Score":"18","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2025-11-17","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1029","Patient_ID":"CCM-0107","Visit_Date":"2026-01-13","Therapist":"Eylin Ramos","Tool":"GAD-7","Score":"17","Baseline_Score":"18","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-01-13","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1030","Patient_ID":"CCM-0107","Visit_Date":"2026-02-26","Therapist":"Eylin Ramos","Tool":"GAD-7","Score":"18","Baseline_Score":"18","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-02-26","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1031","Patient_ID":"CCM-0107","Visit_Date":"2026-04-14","Therapist":"Eylin Ramos","Tool":"GAD-7","Score":"17","Baseline_Score":"18","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"TRUE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-04-14","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1032","Patient_ID":"CCM-0108","Visit_Date":"2026-01-23","Therapist":"Eylin Ramos","Tool":"GAD-7","Score":"14","Baseline_Score":"14","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-01-23","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1033","Patient_ID":"CCM-0108","Visit_Date":"2026-03-26","Therapist":"Eylin Ramos","Tool":"GAD-7","Score":"12","Baseline_Score":"14","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-03-26","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1034","Patient_ID":"CCM-0108","Visit_Date":"2026-05-10","Therapist":"Eylin Ramos","Tool":"GAD-7","Score":"10","Baseline_Score":"14","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-05-10","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1035","Patient_ID":"CCM-0109","Visit_Date":"2025-09-14","Therapist":"Eylin Ramos","Tool":"GAD-7","Score":"14","Baseline_Score":"14","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2025-09-14","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1036","Patient_ID":"CCM-0109","Visit_Date":"2025-10-20","Therapist":"Eylin Ramos","Tool":"GAD-7","Score":"13","Baseline_Score":"14","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2025-10-20","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1037","Patient_ID":"CCM-0109","Visit_Date":"2025-12-06","Therapist":"Eylin Ramos","Tool":"GAD-7","Score":"14","Baseline_Score":"14","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"TRUE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2025-12-06","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1038","Patient_ID":"CCM-0110","Visit_Date":"2025-09-02","Therapist":"Eylin Ramos","Tool":"Vanderbilt-Parent","Score":"16","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"TRUE","Not_Improving_Flag":"FALSE","Visit_Note":"Test — SI+","Created_By":"test-seed","Created_At":"2025-09-02","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1039","Patient_ID":"CCM-0110","Visit_Date":"2025-11-05","Therapist":"Eylin Ramos","Tool":"Vanderbilt-Parent","Score":"15","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2025-11-05","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1040","Patient_ID":"CCM-0110","Visit_Date":"2026-01-03","Therapist":"Eylin Ramos","Tool":"Vanderbilt-Parent","Score":"16","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"TRUE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-01-03","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1041","Patient_ID":"CCM-0111","Visit_Date":"2026-03-24","Therapist":"Karelia Marquez","Tool":"Vanderbilt-Parent","Score":"16","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-03-24","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1042","Patient_ID":"CCM-0111","Visit_Date":"2026-05-04","Therapist":"Karelia Marquez","Tool":"Vanderbilt-Parent","Score":"14","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-05-04","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1043","Patient_ID":"CCM-0111","Visit_Date":"2026-06-17","Therapist":"Karelia Marquez","Tool":"Vanderbilt-Parent","Score":"8","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-06-17","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1044","Patient_ID":"CCM-0111","Visit_Date":"2026-07-28","Therapist":"Karelia Marquez","Tool":"Vanderbilt-Parent","Score":"10","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-07-28","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1045","Patient_ID":"CCM-0112","Visit_Date":"2025-06-19","Therapist":"Eylin Ramos","Tool":"Vanderbilt-Parent","Score":"12","Baseline_Score":"12","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2025-06-19","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1046","Patient_ID":"CCM-0112","Visit_Date":"2025-08-06","Therapist":"Eylin Ramos","Tool":"Vanderbilt-Parent","Score":"12","Baseline_Score":"12","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2025-08-06","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1047","Patient_ID":"CCM-0112","Visit_Date":"2025-10-01","Therapist":"Eylin Ramos","Tool":"Vanderbilt-Parent","Score":"11","Baseline_Score":"12","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"TRUE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2025-10-01","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1048","Patient_ID":"CCM-0113","Visit_Date":"2025-09-01","Therapist":"Eylin Ramos","Tool":"Vanderbilt-Parent","Score":"14","Baseline_Score":"14","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2025-09-01","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1049","Patient_ID":"CCM-0113","Visit_Date":"2025-10-23","Therapist":"Eylin Ramos","Tool":"Vanderbilt-Parent","Score":"12","Baseline_Score":"14","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2025-10-23","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1050","Patient_ID":"CCM-0113","Visit_Date":"2025-12-03","Therapist":"Eylin Ramos","Tool":"Vanderbilt-Parent","Score":"8","Baseline_Score":"14","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2025-12-03","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1051","Patient_ID":"CCM-0114","Visit_Date":"2026-03-04","Therapist":"Eylin Ramos","Tool":"Vanderbilt-Parent","Score":"16","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-03-04","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1052","Patient_ID":"CCM-0114","Visit_Date":"2026-05-01","Therapist":"Eylin Ramos","Tool":"Vanderbilt-Parent","Score":"15","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-05-01","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1053","Patient_ID":"CCM-0114","Visit_Date":"2026-06-22","Therapist":"Eylin Ramos","Tool":"Vanderbilt-Parent","Score":"14","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-06-22","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1054","Patient_ID":"CCM-0115","Visit_Date":"2025-08-25","Therapist":"Eylin Ramos","Tool":"PHQ-A","Score":"20","Baseline_Score":"20","Subscale_Scores":"","SI_Positive":"TRUE","Not_Improving_Flag":"FALSE","Visit_Note":"Test — SI+","Created_By":"test-seed","Created_At":"2025-08-25","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1055","Patient_ID":"CCM-0115","Visit_Date":"2025-10-16","Therapist":"Eylin Ramos","Tool":"PHQ-A","Score":"19","Baseline_Score":"20","Subscale_Scores":"","SI_Positive":"TRUE","Not_Improving_Flag":"FALSE","Visit_Note":"Test — SI+","Created_By":"test-seed","Created_At":"2025-10-16","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1056","Patient_ID":"CCM-0115","Visit_Date":"2025-12-12","Therapist":"Eylin Ramos","Tool":"PHQ-A","Score":"19","Baseline_Score":"20","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2025-12-12","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1057","Patient_ID":"CCM-0115","Visit_Date":"2026-01-29","Therapist":"Eylin Ramos","Tool":"PHQ-A","Score":"20","Baseline_Score":"20","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-01-29","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1058","Patient_ID":"CCM-0115","Visit_Date":"2026-03-22","Therapist":"Eylin Ramos","Tool":"PHQ-A","Score":"20","Baseline_Score":"20","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-03-22","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1059","Patient_ID":"CCM-0115","Visit_Date":"2026-04-26","Therapist":"Eylin Ramos","Tool":"PHQ-A","Score":"19","Baseline_Score":"20","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"TRUE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-04-26","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1077","Patient_ID":"CCM-0115","Visit_Date":"2025-08-25","Therapist":"Eylin Ramos","Tool":"GAD-7","Score":"15","Baseline_Score":"15","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2025-08-25","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1078","Patient_ID":"CCM-0115","Visit_Date":"2025-10-16","Therapist":"Eylin Ramos","Tool":"GAD-7","Score":"14","Baseline_Score":"15","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2025-10-16","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1079","Patient_ID":"CCM-0115","Visit_Date":"2025-12-12","Therapist":"Eylin Ramos","Tool":"GAD-7","Score":"13","Baseline_Score":"15","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2025-12-12","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1080","Patient_ID":"CCM-0115","Visit_Date":"2026-01-29","Therapist":"Eylin Ramos","Tool":"GAD-7","Score":"15","Baseline_Score":"15","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-01-29","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1081","Patient_ID":"CCM-0115","Visit_Date":"2026-03-22","Therapist":"Eylin Ramos","Tool":"GAD-7","Score":"14","Baseline_Score":"15","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-03-22","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1082","Patient_ID":"CCM-0115","Visit_Date":"2026-04-26","Therapist":"Eylin Ramos","Tool":"GAD-7","Score":"13","Baseline_Score":"15","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-04-26","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1060","Patient_ID":"CCM-0116","Visit_Date":"2025-12-20","Therapist":"Eylin Ramos","Tool":"PHQ-A","Score":"16","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2025-12-20","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1061","Patient_ID":"CCM-0116","Visit_Date":"2026-02-18","Therapist":"Eylin Ramos","Tool":"PHQ-A","Score":"17","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-02-18","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1062","Patient_ID":"CCM-0116","Visit_Date":"2026-04-19","Therapist":"Eylin Ramos","Tool":"PHQ-A","Score":"15","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-04-19","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1063","Patient_ID":"CCM-0116","Visit_Date":"2026-05-29","Therapist":"Eylin Ramos","Tool":"PHQ-A","Score":"16","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"TRUE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-05-29","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1064","Patient_ID":"CCM-0117","Visit_Date":"2026-02-12","Therapist":"Eylin Ramos","Tool":"PHQ-A","Score":"16","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-02-12","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1065","Patient_ID":"CCM-0117","Visit_Date":"2026-03-19","Therapist":"Eylin Ramos","Tool":"PHQ-A","Score":"15","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-03-19","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1066","Patient_ID":"CCM-0117","Visit_Date":"2026-05-14","Therapist":"Eylin Ramos","Tool":"PHQ-A","Score":"12","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-05-14","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1067","Patient_ID":"CCM-0117","Visit_Date":"2026-06-24","Therapist":"Eylin Ramos","Tool":"PHQ-A","Score":"13","Baseline_Score":"16","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-06-24","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1068","Patient_ID":"CCM-0118","Visit_Date":"2025-09-12","Therapist":"Karelia Marquez","Tool":"PHQ-A","Score":"18","Baseline_Score":"18","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2025-09-12","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1069","Patient_ID":"CCM-0118","Visit_Date":"2025-10-29","Therapist":"Karelia Marquez","Tool":"PHQ-A","Score":"17","Baseline_Score":"18","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2025-10-29","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1070","Patient_ID":"CCM-0118","Visit_Date":"2025-12-31","Therapist":"Karelia Marquez","Tool":"PHQ-A","Score":"12","Baseline_Score":"18","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2025-12-31","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1071","Patient_ID":"CCM-0119","Visit_Date":"2025-11-17","Therapist":"Karelia Marquez","Tool":"PHQ-A","Score":"14","Baseline_Score":"14","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2025-11-17","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1072","Patient_ID":"CCM-0119","Visit_Date":"2026-01-13","Therapist":"Karelia Marquez","Tool":"PHQ-A","Score":"11","Baseline_Score":"14","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-01-13","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1073","Patient_ID":"CCM-0119","Visit_Date":"2026-02-26","Therapist":"Karelia Marquez","Tool":"PHQ-A","Score":"8","Baseline_Score":"14","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-02-26","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1074","Patient_ID":"CCM-0119","Visit_Date":"2026-04-19","Therapist":"Karelia Marquez","Tool":"PHQ-A","Score":"8","Baseline_Score":"14","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-04-19","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1075","Patient_ID":"CCM-0119","Visit_Date":"2026-05-28","Therapist":"Karelia Marquez","Tool":"PHQ-A","Score":"2","Baseline_Score":"14","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-05-28","Updated_By":"","Updated_At":"","Schema_Version":"1.0"},{"Visit_ID":"VT-1076","Patient_ID":"CCM-0119","Visit_Date":"2026-07-08","Therapist":"Karelia Marquez","Tool":"PHQ-A","Score":"1","Baseline_Score":"14","Subscale_Scores":"","SI_Positive":"FALSE","Not_Improving_Flag":"FALSE","Visit_Note":"Test","Created_By":"test-seed","Created_At":"2026-07-08","Updated_By":"","Updated_At":"","Schema_Version":"1.0"}],"Medicamentos":[{"Med_ID":"MT-0501","Patient_ID":"CCM-0100","Date":"2025-09-30","Medication":"Fluoxetina","Dose":"10 mg","Frequency":"1 vez al día","Action":"Inicio","Prescriber":"Troy Fowler, MD","Reason":"Depresión moderada-severa","Notes":"Test data","Created_By":"test-seed","Created_At":"2025-09-30","Schema_Version":"1.0"},{"Med_ID":"MT-0502","Patient_ID":"CCM-0110","Date":"2025-11-05","Medication":"Metilfenidato","Dose":"10 mg","Frequency":"2 veces al día","Action":"Inicio","Prescriber":"Troy Fowler, MD","Reason":"TDAH","Notes":"Test data","Created_By":"test-seed","Created_At":"2025-11-05","Schema_Version":"1.0"},{"Med_ID":"MT-0503","Patient_ID":"CCM-0111","Date":"2026-05-04","Medication":"Metilfenidato","Dose":"10 mg","Frequency":"2 veces al día","Action":"Inicio","Prescriber":"Troy Fowler, MD","Reason":"TDAH","Notes":"Test data","Created_By":"test-seed","Created_At":"2026-05-04","Schema_Version":"1.0"},{"Med_ID":"MT-0504","Patient_ID":"CCM-0115","Date":"2025-10-16","Medication":"Fluoxetina","Dose":"10 mg","Frequency":"1 vez al día","Action":"Inicio","Prescriber":"Troy Fowler, MD","Reason":"Depresión moderada-severa","Notes":"Test data","Created_By":"test-seed","Created_At":"2025-10-16","Schema_Version":"1.0"}]};

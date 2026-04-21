@@ -6,6 +6,64 @@
   <title>CoCM Camasca — Paciente</title>
   <link rel="stylesheet" href="style.css" />
   <style>
+    /* ── User-adjustable zoom (A− / A+) ── */
+    .app-layout.no-sidebar { zoom: var(--reg-scale, 1); }
+
+    /* ── Topbar compaction (match registry page) ── */
+    .topbar-title { font-size: 16px !important; }
+    .topbar-subtitle { font-size: 12px !important; }
+    .lang-btn { font-size: 11px !important; padding: 3px 10px !important; }
+    .howto-card summary { font-size: 12.5px !important; }
+
+    /* ── Global compact typography (match registry page) ── */
+    .app-layout.no-sidebar .page-content { font-size: 12.5px; }
+    .app-layout.no-sidebar .page-content button,
+    .app-layout.no-sidebar .page-content input,
+    .app-layout.no-sidebar .page-content select,
+    .app-layout.no-sidebar .page-content textarea,
+    .app-layout.no-sidebar .page-content label,
+    .app-layout.no-sidebar .page-content p,
+    .app-layout.no-sidebar .page-content li,
+    .app-layout.no-sidebar .page-content a { font-size: 12.5px; }
+    .app-layout.no-sidebar .page-content h1 { font-size: 20px; line-height: 1.2; margin: 4px 0; }
+    .app-layout.no-sidebar .page-content h2 { font-size: 15px; line-height: 1.25; margin: 6px 0; }
+    .app-layout.no-sidebar .page-content h3 { font-size: 13px; line-height: 1.3; margin: 4px 0; }
+    .app-layout.no-sidebar .page-content .howto-body,
+    .app-layout.no-sidebar .page-content .howto-body li,
+    .app-layout.no-sidebar .page-content .howto-body strong { font-size: 11.5px; line-height: 1.4; }
+
+    /* ── Patient-page specific overrides: force all cards to match compact sizing ── */
+    .pat-header-card { padding: 12px 14px; margin-bottom: 12px; }
+    .pat-header-name { font-size: 18px !important; }
+    .pat-header-id { font-size: 12px !important; }
+    .pat-header-meta { font-size: 12px !important; gap: 12px !important; margin-top: 6px !important; }
+    .pat-safety-banner { font-size: 12.5px; padding: 8px 12px; }
+    .pat-safety-banner button { font-size: 12px !important; padding: 4px 10px !important; }
+    .sec-card { padding: 12px 14px; margin-bottom: 10px; }
+    .sec-card h2 { font-size: 14px !important; margin-bottom: 8px !important; padding-bottom: 6px !important; }
+    .cocm-label { font-size: 10.5px !important; }
+    .cocm-value { font-size: 12.5px !important; }
+    .cocm-actions .ghost.sm { font-size: 11px !important; padding: 3px 8px !important; }
+    .flag-review { font-size: 10.5px !important; padding: 1px 6px !important; }
+    .trend-card { padding: 8px 10px; }
+    .trend-card h3 { font-size: 12.5px !important; }
+    .trend-card h3 .tool-badge { font-size: 10.5px !important; padding: 1px 6px !important; }
+    .trend-card .trend-score { font-size: 18px !important; margin-top: 4px !important; }
+    .trend-card .trend-sub { font-size: 10.5px !important; }
+    .visit-row { font-size: 12px !important; padding: 4px 0 !important; }
+    .visit-row .vdate, .visit-row .vtool, .visit-row .vtier { font-size: 10.5px !important; }
+    .med-row { font-size: 12px !important; padding: 4px 0 !important; }
+    .med-row .mdate, .med-row .maction { font-size: 10.5px !important; }
+    .prompt-card { font-size: 12px !important; padding: 8px 12px !important; margin-bottom: 6px !important; }
+    .prompt-card button { font-size: 11px !important; padding: 3px 8px !important; }
+    .tool-launch-btn { font-size: 11px !important; padding: 4px 8px !important; }
+    .quick-actions button { font-size: 12px !important; padding: 6px 12px !important; }
+    .np-label { font-size: 10.5px !important; }
+    .safety-first-box { padding: 8px 10px; margin-bottom: 8px; }
+    .safety-first-box label { font-size: 12.5px !important; }
+    .safety-first-box .safety-note { font-size: 10.5px !important; }
+    .last-visit-nudge { font-size: 11px !important; padding: 4px 8px !important; margin-bottom: 8px !important; }
+
     .pat-header-card {
       background: var(--color-surface);
       border: 1px solid var(--color-border);
@@ -46,6 +104,37 @@
       display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: var(--space-3);
     }
+
+    /* ── CoCM tracking card rows ── */
+    .cocm-grid { display: flex; flex-direction: column; gap: var(--space-3); }
+    .cocm-row {
+      display: grid; grid-template-columns: minmax(180px, 1fr) 2fr auto;
+      gap: var(--space-3); align-items: center;
+      padding: var(--space-2) 0;
+      border-bottom: 1px solid var(--color-divider);
+    }
+    .cocm-row:last-child { border-bottom: none; }
+    .cocm-label {
+      font-size: var(--text-xs); font-weight: 600;
+      color: var(--color-text-muted); text-transform: uppercase; letter-spacing: 0.04em;
+    }
+    .cocm-value { font-size: var(--text-sm); }
+    .cocm-actions { display: flex; gap: 4px; }
+    .cocm-actions .ghost.sm {
+      padding: 4px 10px; font-size: var(--text-xs); font-weight: 600;
+    }
+    .cell-empty { color: var(--color-text-faint, var(--color-text-muted)); }
+    .flag-review {
+      font-size: var(--text-xs); font-weight: 700;
+      padding: 2px 8px;
+      background: #e6f0fa; color: #1a5a9e;
+      border-radius: var(--radius-full);
+      white-space: nowrap; display: inline-block;
+    }
+    @media (max-width: 600px) {
+      .cocm-row { grid-template-columns: 1fr; gap: 2px; }
+      .cocm-label { margin-top: var(--space-2); }
+    }
     .trend-card {
       background: var(--color-surface-2); border: 1px solid var(--color-border);
       border-radius: var(--radius-md); padding: var(--space-3);
@@ -57,12 +146,12 @@
     }
     .trend-card .trend-score { font-size: var(--text-xl); font-weight: 700; font-family: var(--font-display); margin-top: var(--space-2); }
     .trend-card .trend-sub { font-size: var(--text-xs); color: var(--color-text-muted); }
-    .trend-card .big-spark { width: 100%; height: 48px; margin-top: var(--space-2); }
+    .trend-card .big-spark { width: 100%; height: auto; margin-top: var(--space-2); }
 
     .visit-timeline { margin-top: var(--space-2); }
     .visit-row {
       display: grid;
-      grid-template-columns: 100px 90px 1fr 60px 100px;
+      grid-template-columns: 94px 62px 90px 1fr 60px 100px;
       gap: var(--space-3);
       padding: var(--space-2) 0;
       border-bottom: 1px solid var(--color-divider);
@@ -70,19 +159,27 @@
       align-items: center;
     }
     @media (max-width: 700px) {
-      .visit-row { grid-template-columns: 1fr auto; grid-template-areas: 'date score' 'tool tier' 'note note'; }
+      .visit-row { grid-template-columns: 1fr auto; grid-template-areas: 'date score' 'type tier' 'tool tier' 'note note'; }
       .visit-row .vdate { grid-area: date; }
+      .visit-row .vtype { grid-area: type; }
       .visit-row .vtool { grid-area: tool; }
       .visit-row .vscore { grid-area: score; text-align: right; }
       .visit-row .vtier { grid-area: tier; justify-self: end; }
       .visit-row .vnote { grid-area: note; font-size: var(--text-xs); color: var(--color-text-muted); }
     }
     .visit-row:last-child { border: none; }
+    .visit-row.visit-row-score { opacity: 0.85; }
     .visit-row .vdate { color: var(--color-text-muted); font-family: ui-monospace, monospace; font-size: var(--text-xs); }
     .visit-row .vtool { font-family: ui-monospace, monospace; font-size: var(--text-xs); font-weight: 700; color: var(--color-primary); }
     .visit-row .vnote { color: var(--color-text); }
     .visit-row .vscore { font-family: ui-monospace, monospace; font-weight: 700; }
     .visit-row .vtier { font-size: var(--text-xs); font-weight: 700; padding: 2px 8px; border-radius: var(--radius-full); text-align: center; white-space: nowrap; }
+    .entry-type-chip { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: var(--radius-full); text-transform: uppercase; letter-spacing: 0.02em; display: inline-block; }
+    .entry-type-chip.type-visit { background: var(--color-primary-bg); color: var(--color-primary); }
+    .entry-type-chip.type-score { background: var(--color-surface-offset); color: var(--color-text-muted); border: 1px dashed var(--color-border); }
+    .brigade-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: var(--radius-full); font-size: var(--text-xs); font-weight: 700; background: oklch(from var(--color-warning) l c h / 0.12); color: var(--color-warning); border: 1px solid oklch(from var(--color-warning) l c h / 0.35); }
+    .todo-row { display: flex; align-items: center; gap: 10px; padding: 6px 8px; background: var(--color-surface-2); border-radius: var(--radius-sm); }
+    .todo-row .todo-text { font-size: var(--text-sm); color: var(--color-text); }
     .tier-severe   { background: var(--color-error);  color: white; }
     .tier-moderate { background: var(--color-warning); color: white; }
     .tier-mild     { background: var(--color-primary); color: white; }
@@ -137,6 +234,86 @@
     .quick-actions .primary { background: var(--color-primary); color: white; border: none; }
     .quick-actions .ghost { background: transparent; border: 1px solid var(--color-border); color: var(--color-text); }
     .quick-actions .danger { background: var(--color-error); color: white; border: none; }
+
+    /* ── New-visit form helpers (match registro.html) ─────────── */
+    .np-label { display:block; font-size:var(--text-xs); color:var(--color-text-muted); font-weight:600; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px; }
+    .np-row-2 { display:grid; grid-template-columns:1fr 1fr; gap:var(--space-3); margin-top:var(--space-3); }
+    @media (max-width: 700px) { .np-row-2 { grid-template-columns: 1fr; } }
+
+    /* Safety-first checkbox highlight for depression/anxiety visits */
+    .safety-first-box {
+      background: oklch(from var(--color-error) l c h / 0.08);
+      border: 1px solid oklch(from var(--color-error) l c h / 0.4);
+      border-radius: var(--radius-md);
+      padding: var(--space-3);
+      margin-bottom: var(--space-3);
+    }
+    .safety-first-box label {
+      display: flex; align-items: center; gap: var(--space-2);
+      font-weight: 700; color: var(--color-error); cursor: pointer;
+    }
+    .safety-first-box .safety-note {
+      font-size: var(--text-xs); color: var(--color-text-muted); margin-top: 6px;
+    }
+
+    /* Last-visit nudge banner on patient page */
+    .last-visit-nudge {
+      background: var(--color-primary-bg); color: var(--color-primary);
+      border-radius: var(--radius-md); padding: var(--space-2) var(--space-3);
+      font-size: var(--text-xs); font-weight: 600;
+      margin-bottom: var(--space-3); display: inline-block;
+    }
+
+    /* How-to card (shared) */
+    .howto-card {
+      background: var(--color-primary-bg);
+      border: 1px solid oklch(from var(--color-primary) l c h / 0.3);
+      border-radius: var(--radius-lg);
+      margin-bottom: 8px;
+      overflow: hidden;
+    }
+    .howto-card summary {
+      cursor: pointer; padding: 6px 12px;
+      font-weight: 600; font-size: 12.5px; color: var(--color-primary);
+      display: flex; align-items: center; gap: var(--space-2);
+      list-style: none; user-select: none;
+    }
+    .howto-card summary::-webkit-details-marker { display: none; }
+    .howto-card .howto-chevron { margin-left: auto; transition: transform 0.15s; font-size: 0.9em; }
+    .howto-card[open] .howto-chevron { transform: rotate(180deg); }
+    .howto-card .howto-body {
+      padding: 0 var(--space-4) var(--space-4) var(--space-4);
+      color: var(--color-text); font-size: var(--text-sm); line-height: 1.55;
+    }
+    .howto-card .howto-body ul { margin: 0; padding-left: var(--space-5); }
+    .howto-card .howto-body li { margin-bottom: var(--space-2); }
+    .howto-card .howto-body strong { color: var(--color-primary); }
+
+    /* Toast host (shared) */
+    #regToastHost {
+      position: fixed; bottom: var(--space-5); right: var(--space-5);
+      display: flex; flex-direction: column; gap: var(--space-2);
+      z-index: 500; pointer-events: none;
+    }
+    #regToastHost .reg-toast {
+      pointer-events: auto;
+      background: var(--color-surface); color: var(--color-text);
+      border: 1px solid var(--color-border);
+      border-left: 4px solid var(--color-primary);
+      border-radius: var(--radius-md);
+      padding: var(--space-3) var(--space-4);
+      box-shadow: var(--shadow-lg);
+      font-size: var(--text-sm); max-width: 380px;
+      display: flex; align-items: center; gap: var(--space-3);
+    }
+    #regToastHost .reg-toast.toast-success { border-left-color: var(--color-success); }
+    #regToastHost .reg-toast.toast-warn    { border-left-color: var(--color-warning); }
+    #regToastHost .reg-toast.toast-error   { border-left-color: var(--color-error); }
+    #regToastHost .reg-toast button {
+      background: transparent; border: 1px solid var(--color-border);
+      padding: 4px 10px; font-size: var(--text-xs); font-weight: 600;
+      border-radius: var(--radius-sm); cursor: pointer; color: var(--color-text);
+    }
   </style>
 </head>
 <body>
@@ -153,6 +330,11 @@
         </div>
       </div>
       <div class="topbar-actions">
+        <a href="https://troyfowlermd.github.io/cocm-pediatrico-honduras/" target="_blank" rel="noopener" class="cocm-portal-link" title="Open CoCM Pediátrico portal (workflow + tools)" data-es="🔗 Portal CoCM" data-en="🔗 CoCM Portal" style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border:1px solid var(--color-primary);background:color-mix(in srgb, var(--color-primary) 10%, transparent);color:var(--color-primary);border-radius:var(--radius-full);font-size:11px;font-weight:600;text-decoration:none;white-space:nowrap;">🔗 Portal CoCM</a>
+        <div class="text-size-toggle" style="display:inline-flex;align-items:center;gap:2px;border:1px solid var(--color-border);border-radius:var(--radius-full);padding:2px;">
+          <button type="button" onclick="adjustTextSize(-1)" aria-label="Decrease text size" title="Decrease text size (A−)" style="background:transparent;border:none;padding:3px 8px;font-size:11px;font-weight:600;color:var(--color-text-muted);cursor:pointer;border-radius:var(--radius-full);">A−</button>
+          <button type="button" onclick="adjustTextSize(1)" aria-label="Increase text size" title="Increase text size (A+)" style="background:transparent;border:none;padding:3px 8px;font-size:13px;font-weight:700;color:var(--color-text-muted);cursor:pointer;border-radius:var(--radius-full);">A+</button>
+        </div>
         <div class="lang-toggle">
           <button class="lang-btn active" id="btnES" onclick="setLang('es')">Español</button>
           <button class="lang-btn" id="btnEN" onclick="setLang('en')">English</button>
@@ -166,8 +348,18 @@
     </div>
 
     <div class="page-content">
+      <!-- How-to card (collapsible) -->
+      <details class="howto-card">
+        <summary>
+          <span class="howto-icon">ℹ️</span>
+          <span data-es="¿Cómo uso esta página?" data-en="How do I use this page?">¿Cómo uso esta página?</span>
+          <span class="howto-chevron">▾</span>
+        </summary>
+        <div class="howto-body" id="howtoBody"></div>
+      </details>
+
       <div id="patBody">
-        <div class="empty-state"><p>Cargando…</p></div>
+        <div class="empty-state"><p data-es="Cargando…" data-en="Loading…">Cargando…</p></div>
       </div>
     </div>
   </main>
@@ -183,7 +375,37 @@
     <div class="modal-body" id="visitForm"></div>
     <div class="modal-footer">
       <button class="ghost" onclick="closeVisitModal()" data-es="Cancelar" data-en="Cancel">Cancelar</button>
-      <button class="primary" onclick="submitVisit()" data-es="Guardar" data-en="Save">Guardar</button>
+      <button class="primary" id="visitSaveBtn" onclick="submitVisit()" data-es="Guardar" data-en="Save">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Change Status Modal -->
+<div class="modal-backdrop" id="statusModal" style="display:none;">
+  <div class="modal" style="max-width:520px;">
+    <div class="modal-header">
+      <h3 data-es="Cambiar estado" data-en="Change status">Cambiar estado</h3>
+      <button class="modal-close" onclick="closeStatusModal()">×</button>
+    </div>
+    <div class="modal-body" id="statusForm"></div>
+    <div class="modal-footer">
+      <button class="ghost" onclick="closeStatusModal()" data-es="Cancelar" data-en="Cancel">Cancelar</button>
+      <button class="primary" id="statusSaveBtn" onclick="submitStatus()" data-es="Guardar" data-en="Save">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Patient Modal (demographics + conditions + monitored tools) -->
+<div class="modal-backdrop" id="editPatientModal" style="display:none;">
+  <div class="modal" style="max-width:640px;">
+    <div class="modal-header">
+      <h3 data-es="Editar paciente" data-en="Edit patient">Editar paciente</h3>
+      <button class="modal-close" onclick="closeEditPatientModal()">×</button>
+    </div>
+    <div class="modal-body" id="editPatientForm"></div>
+    <div class="modal-footer">
+      <button class="ghost" onclick="closeEditPatientModal()" data-es="Cancelar" data-en="Cancel">Cancelar</button>
+      <button class="primary" id="editPatientSaveBtn" onclick="submitEditPatient()" data-es="Guardar" data-en="Save">Guardar</button>
     </div>
   </div>
 </div>
@@ -198,7 +420,7 @@
     <div class="modal-body" id="medForm"></div>
     <div class="modal-footer">
       <button class="ghost" onclick="closeMedModal()" data-es="Cancelar" data-en="Cancel">Cancelar</button>
-      <button class="primary" onclick="submitMed()" data-es="Guardar" data-en="Save">Guardar</button>
+      <button class="primary" id="medSaveBtn" onclick="submitMed()" data-es="Guardar" data-en="Save">Guardar</button>
     </div>
   </div>
 </div>
@@ -216,6 +438,10 @@
   .modal-footer button.ghost { background: transparent; border: 1px solid var(--color-border); color: var(--color-text); }
 </style>
 
+<!-- Toast host -->
+<div id="regToastHost"></div>
+
+<script src="registro-i18n.js"></script>
 <script src="registro-data.js"></script>
 <script src="registro-paciente.js"></script>
 </body>
