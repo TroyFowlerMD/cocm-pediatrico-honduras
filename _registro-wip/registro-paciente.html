@@ -131,6 +131,13 @@
       border-radius: var(--radius-full);
       white-space: nowrap; display: inline-block;
     }
+    /* ── v2.5.5 additional trims ── */
+    /* Date + ago (e.g. "[2026-04-21] · today") inside cocm rows */
+    .cocm-row .cocm-value strong { font-size: 11px !important; font-weight: 600 !important; }
+    .cocm-row .cocm-value span { font-size: 10px !important; }
+    /* Prompt card body text ("Opens the tool on the CoCM portal…") */
+    .prompt-card { font-size: 11.5px !important; line-height: 1.4 !important; padding: 8px 12px !important; }
+    .prompt-card button { font-size: 11px !important; padding: 3px 10px !important; }
     /* ── v2.5.4 text-size trims (user-selected) ── */
     /* #4: "Conditions:" label only — chips stay at current size */
     .pat-header-card .cond-label {
@@ -164,11 +171,13 @@
     .pat-header-top > span:last-child {
       font-size: 10.5px !important;
     }
-    /* Registry back button, top-left */
-    .app-layout.no-sidebar .page-content a[href="registro.html"] {
-      font-size: 11.5px !important;
-      padding: 4px 8px !important;
+    /* Registry back button, top-left (in .topbar, not .page-content) */
+    .topbar a[href="registro.html"] {
+      font-size: 11px !important;
+      padding: 3px 8px !important;
+      line-height: 1.2 !important;
     }
+    .topbar a[href="registro.html"] span { font-size: 11px !important; }
     /* To-do card — all text shrinks EXCEPT the h2 title */
     #todoCard p,
     #todoCard .todo-text,
@@ -387,7 +396,7 @@
         </div>
       </div>
       <div class="topbar-actions">
-        <a href="https://cocm-camasca.github.io/cocm-pediatrico-honduras/" target="_blank" rel="noopener" class="cocm-portal-link" title="Open CoCM Pediátrico portal (workflow + tools)" data-es="🔗 Portal CoCM" data-en="🔗 CoCM Portal" style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border:1px solid var(--color-primary);background:color-mix(in srgb, var(--color-primary) 10%, transparent);color:var(--color-primary);border-radius:var(--radius-full);font-size:11px;font-weight:600;text-decoration:none;white-space:nowrap;">🔗 Portal CoCM</a>
+        <a href="https://cocm-camasca.github.io/cocm-pediatrico-honduras/" target="_blank" rel="noopener" class="cocm-portal-link" title="Open CoCM Pediátrico portal (workflow + tools)" data-es="🔗 Portal de Herramientas CoCM" data-en="🔗 CoCM Tools Portal" style="display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border:1px solid var(--color-primary);background:color-mix(in srgb, var(--color-primary) 10%, transparent);color:var(--color-primary);border-radius:var(--radius-full);font-size:11px;font-weight:600;text-decoration:none;white-space:nowrap;">🔗 Portal de Herramientas CoCM</a>
         <div class="text-size-toggle" style="display:inline-flex;align-items:center;gap:2px;border:1px solid var(--color-border);border-radius:var(--radius-full);padding:2px;">
           <button type="button" onclick="adjustTextSize(-1)" aria-label="Decrease text size" title="Decrease text size (A−)" style="background:transparent;border:none;padding:3px 8px;font-size:11px;font-weight:600;color:var(--color-text-muted);cursor:pointer;border-radius:var(--radius-full);">A−</button>
           <button type="button" onclick="adjustTextSize(1)" aria-label="Increase text size" title="Increase text size (A+)" style="background:transparent;border:none;padding:3px 8px;font-size:13px;font-weight:700;color:var(--color-text-muted);cursor:pointer;border-radius:var(--radius-full);">A+</button>
