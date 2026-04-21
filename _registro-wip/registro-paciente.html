@@ -166,6 +166,12 @@
       .visit-row .vscore { grid-area: score; text-align: right; }
       .visit-row .vtier { grid-area: tier; justify-self: end; }
       .visit-row .vnote { grid-area: note; font-size: var(--text-xs); color: var(--color-text-muted); }
+      /* v2.5.2 mobile fix: 2-col grid has no slot for the header-row's 7 cells
+         — hide the header row on mobile. The data rows are self-labeling via
+         chip + tier color, so we don't lose signal. */
+      .visit-row.visit-row-header { display: none !important; }
+      /* Edit button has no grid area on mobile — tuck it inline at end of note row */
+      .visit-row .vedit-btn { grid-area: note; justify-self: end; margin-top: -22px; opacity: 0.6; }
     }
     .visit-row:last-child { border: none; }
     .visit-row.visit-row-score { opacity: 0.85; }
@@ -514,7 +520,8 @@
       font-size: var(--text-sm);
     }
     @media (max-width: 700px) {
-      .pat-brigade-banner { font-size: 12.5px; padding: 8px 12px; }
+      .pat-brigade-banner { font-size: 12.5px; padding: 8px 12px; flex-wrap: wrap; }
+      .pat-brigade-banner > span { flex: 1 1 100%; }
     }
     /* Auto-fill chips in log-visit-no-score modal */
     .chip-fill {
