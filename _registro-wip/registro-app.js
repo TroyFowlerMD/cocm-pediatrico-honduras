@@ -1255,3 +1255,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   loadAndRender();
 });
+
+
+// ── v2.5.2b: Esc closes registry modals ──
+(function registerRegistryModalKeys() {
+  if (typeof document === 'undefined') return;
+  document.addEventListener('keydown', (e) => {
+    if (e.key !== 'Escape') return;
+    const ids = ['newPatientModal','importModal','exportModal','featuresModal','settingsModal','authModal'];
+    const open = ids.map(id => document.getElementById(id))
+                    .filter(m => m && m.style.display !== 'none' && getComputedStyle(m).display !== 'none');
+    if (!open.length) return;
+    const target = open[open.length - 1];
+    const closeBtn = target.querySelector('.modal-close') || target.querySelector('button.ghost');
+    if (closeBtn) { closeBtn.click(); e.preventDefault(); }
+  });
+})();
