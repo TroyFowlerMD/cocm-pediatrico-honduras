@@ -564,6 +564,8 @@
         <div class="filter-group">
           <label for="filterStatus" data-es="Estado" data-en="Status">Estado</label>
           <select id="filterStatus" onchange="renderAll()">
+            <!-- Hidden options used by status-chip clicks (safety, brigade) — kept out of dropdown UI via CSS -->
+            <option value="brigade" class="_chip-only-option" hidden>brigade</option>
             <option value="active" data-es="Activos" data-en="Active" title="En tratamiento activo" data-tip-es="Pacientes en tratamiento activo." data-tip-en="Patients in active treatment.">Activos</option>
             <option value="all" data-es="Todos" data-en="All" title="Todos los pacientes, independientemente del estado" data-tip-es="Todos los pacientes, independientemente del estado." data-tip-en="All patients regardless of status.">Todos</option>
             <option value="safety" data-es="⚠ Con bandera de seguridad" data-en="⚠ Safety flag" title="Pacientes con bandera de seguridad activa" data-tip-es="Pacientes con bandera de seguridad activa (SI, autolesión, etc.)." data-tip-en="Patients with active safety flag (SI, self-harm, etc.).">⚠ Con bandera de seguridad</option>
@@ -772,6 +774,17 @@
   .modal-footer button { padding: var(--space-2) var(--space-4); border-radius: var(--radius-md); font-weight: 600; font-size: var(--text-sm); }
   .modal-footer button.primary { background: var(--color-primary); color: white; border: none; }
   .modal-footer button.ghost { background: transparent; border: 1px solid var(--color-border); color: var(--color-text); }
+
+    /* Phase 2.5.1: brigade row flag */
+    .flag-brigade {
+      display: inline-flex; align-items: center; gap: 2px;
+      padding: 2px 8px;
+      background: oklch(from var(--color-warning) l c h / 0.15);
+      color: var(--color-warning);
+      border: 1px solid oklch(from var(--color-warning) l c h / 0.4);
+      border-radius: var(--radius-full);
+      font-size: 11px; font-weight: 700;
+    }
 </style>
 
 <!-- Toast host (populated by registro-i18n.js showToast) -->
