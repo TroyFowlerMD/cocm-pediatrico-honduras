@@ -1245,8 +1245,8 @@ async function _pacAuthGate() {
     title = isEN ? 'Access denied' : 'Acceso denegado';
     const email = result.email || (isEN ? 'your account' : 'su cuenta');
     bodyHtml = isEN
-      ? `<p>The account <strong>${email}</strong> is not authorized.</p><p>Contact <a href="mailto:troyfowlermd@gmail.com">troyfowlermd@gmail.com</a> to be added.</p>`
-      : `<p>La cuenta <strong>${email}</strong> no está autorizada.</p><p>Contacte a <a href="mailto:troyfowlermd@gmail.com">troyfowlermd@gmail.com</a>.</p>`;
+      ? `<p>The account <strong>${email}</strong> is not authorized.</p><p>Contact <a href="mailto:cocm.camasca@gmail.com">cocm.camasca@gmail.com</a> to be added.</p>`
+      : `<p>La cuenta <strong>${email}</strong> no está autorizada.</p><p>Contacte a <a href="mailto:cocm.camasca@gmail.com">cocm.camasca@gmail.com</a>.</p>`;
   } else {
     title = isEN ? 'Connection error' : 'Error de conexión';
     bodyHtml = `<pre style="background:#f9fafb; padding:10px; border-radius:6px; font-size:12px;">${String(result.message || '').replace(/</g,'&lt;')}</pre>`;
