@@ -340,7 +340,7 @@ const REG_I18N = {
   psych_consult_section: { es: 'Seguimiento CoCM', en: 'CoCM tracking' },
   psych_consult_label:   { es: 'Última consulta psiq.', en: 'Last psych review' },
   bhcm_contact_label:    { es: 'Último contacto de terapeuta', en: 'Last therapist contact' },
-  last_contact_label:    { es: 'Último contacto', en: 'Last contact' },
+  last_contact_label:    { es: 'Último contacto del terapeuta', en: 'Last therapist contact' },
   last_contact_by:       { es: 'por', en: 'by' },
   bhcm_contact_note_label: { es: 'Nota de contacto', en: 'Contact note' },
   review_flag_label:     { es: 'Marcar para revisión en la próxima reunión', en: 'Flag for next case review' },
