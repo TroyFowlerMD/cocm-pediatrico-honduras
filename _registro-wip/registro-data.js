@@ -110,7 +110,7 @@ function featAll() {
 //   Who has access: Anyone with Google account
 // Only emails listed in the AuthorizedUsers tab (with active=TRUE) can read/write.
 // Rotate this URL whenever you redeploy a new version of the relay.
-const REG_DEFAULT_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxETBuDCCMByaPxUoajI5BpUDhzrkMM0oBPqcGSbQEkK-R-XrXcBEMHbW9URIMlXzEo/exec';
+const REG_DEFAULT_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxeYSvVau-oXTM0itCnKMjmGS8nk6dBbGs4fB71tHlVQEBZFtX9FVPGR5rRHjnIM_Qe/exec';
 
 // ── Spreadsheet layout (must match the deployed Sheet) ─────────
 const REG_GIDS = {
