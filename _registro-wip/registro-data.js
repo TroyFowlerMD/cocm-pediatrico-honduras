@@ -355,6 +355,19 @@ function parseCSV(text) {
 // ════════════════════════════════════════════════════════════════
 // FETCH LAYER
 // ════════════════════════════════════════════════════════════════
+// Timeout-aware fetch wrapper. Apps Script's /exec redirect chain can hang
+// indefinitely in some browser/session states; without a timeout the UI freezes.
+async function fetchWithTimeout(url, opts, timeoutMs) {
+  const ctrl = new AbortController();
+  const id = setTimeout(() => ctrl.abort(), timeoutMs || 8000);
+  try {
+    const res = await fetch(url, { ...(opts || {}), signal: ctrl.signal });
+    return res;
+  } finally {
+    clearTimeout(id);
+  }
+}
+
 async function fetchTab(tabName) {
   const mode = getDataMode();
   const resolved = resolveTab(tabName);
@@ -382,11 +395,14 @@ async function fetchTab(tabName) {
     const email = getClientEmail();
     const emailParam = email ? `&email=${encodeURIComponent(email)}` : '';
     const fullUrl = `${url}?op=read&tab=${encodeURIComponent(resolved)}${emailParam}`;
-    // Retry up to 3 times on transient "Failed to fetch" (Apps Script redirect flakiness)
+    // Retry up to 4 times on transient "Failed to fetch" OR request hang.
+    // Apps Script's /exec endpoint returns a 302 to googleusercontent.com; that
+    // redirect sometimes hangs indefinitely (especially first call after page load).
+    // fetchWithTimeout uses AbortController so hangs become retryable timeouts.
     let lastErr;
-    for (let attempt = 1; attempt <= 3; attempt++) {
+    for (let attempt = 1; attempt <= 4; attempt++) {
       try {
-        const res = await fetch(fullUrl);
+        const res = await fetchWithTimeout(fullUrl, {}, 8000);
         if (!res.ok) throw new Error(`Apps Script fetch failed for ${resolved}: ${res.status}`);
         const ct = res.headers.get('content-type') || '';
         if (!ct.includes('application/json')) {
@@ -404,9 +420,9 @@ async function fetchTab(tabName) {
         return json.rows || [];
       } catch (e) {
         lastErr = e;
-        // Don't retry on auth errors — only on network/fetch failures
+        // Don't retry on auth errors — only on network/timeout failures
         if (e.code === 'AUTH_REDIRECT' || e.code === 'UNAUTHORIZED') throw e;
-        if (attempt < 3) await new Promise(r => setTimeout(r, 400 * attempt));
+        if (attempt < 4) await new Promise(r => setTimeout(r, 500 * attempt));
       }
     }
     throw lastErr;
@@ -435,13 +451,22 @@ async function writeRow(tab, row) {
     localStorage.setItem(REG_LS.PENDING_WRITES, JSON.stringify(q));
     return { ok: false, queued: true };
   }
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify({ op: 'append', tab: resolved, row, email: getClientEmail() }),
-  });
-  const json = await res.json();
-  return json;
+  // Retry POST up to 3 times on hang/abort
+  let lastErr;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const res = await fetchWithTimeout(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ op: 'append', tab: resolved, row, email: getClientEmail() }),
+      }, 12000);
+      return await res.json();
+    } catch (e) {
+      lastErr = e;
+      if (attempt < 3) await new Promise(r => setTimeout(r, 500 * attempt));
+    }
+  }
+  throw lastErr;
 }
 
 async function updateRow(tab, rowId, updates) {
@@ -453,12 +478,21 @@ async function updateRow(tab, rowId, updates) {
     localStorage.setItem(REG_LS.PENDING_WRITES, JSON.stringify(q));
     return { ok: false, queued: true };
   }
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    body: JSON.stringify({ op: 'update', tab: resolved, rowId, updates, email: getClientEmail() }),
-  });
-  return await res.json();
+  let lastErr;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const res = await fetchWithTimeout(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ op: 'update', tab: resolved, rowId, updates, email: getClientEmail() }),
+      }, 12000);
+      return await res.json();
+    } catch (e) {
+      lastErr = e;
+      if (attempt < 3) await new Promise(r => setTimeout(r, 500 * attempt));
+    }
+  }
+  throw lastErr;
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -476,7 +510,19 @@ async function pingAuth() {
   try {
     const email = getClientEmail({ promptIfMissing: true });
     if (!email) return { status: 'unauthorized', email: '' };
-    const res = await fetch(`${url}?op=ping&email=${encodeURIComponent(email)}`);
+    // Retry ping up to 3 times with timeout
+    let res, lastPingErr;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        res = await fetchWithTimeout(`${url}?op=ping&email=${encodeURIComponent(email)}`, {}, 8000);
+        lastPingErr = null;
+        break;
+      } catch (e) {
+        lastPingErr = e;
+        if (attempt < 3) await new Promise(r => setTimeout(r, 500 * attempt));
+      }
+    }
+    if (lastPingErr) throw lastPingErr;
     const ct = res.headers.get('content-type') || '';
     if (!ct.includes('application/json')) {
       return { status: 'signin_required', signInUrl: url };
