@@ -10,6 +10,30 @@
    - Log all local writes to localStorage audit queue
    ============================================================ */
 
+// ════════════════════════════════════════════════════════════════
+// CLIENT EMAIL HELPER
+// ════════════════════════════════════════════════════════════════
+// The Apps Script deployment runs with "Execute as: Me" + "Who has access: Anyone",
+// which means Session.getActiveUser() is blank on the backend. The frontend must
+// send the user's email with every request. We read it from localStorage, or
+// prompt once on first load and persist.
+function getClientEmail(opts) {
+  const o = opts || {};
+  try {
+    const stored = (localStorage.getItem('coCMCamasca.user') || '').trim().toLowerCase();
+    if (stored && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(stored)) return stored;
+  } catch (_) {}
+  if (!o.promptIfMissing) return '';
+  var input = '';
+  try {
+    input = (window.prompt('Sign in — enter your authorized Google email (this is stored locally only):') || '').trim().toLowerCase();
+  } catch (_) { return ''; }
+  if (!input) return '';
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input)) return '';
+  try { localStorage.setItem('coCMCamasca.user', input); } catch (_) {}
+  return input;
+}
+
 const REG_LS = {
   APPS_SCRIPT_URL: 'coCMCamasca.appsScriptUrl',
   CSV_BASE_URL:    'coCMCamasca.csvBaseUrl',
@@ -355,7 +379,9 @@ async function fetchTab(tabName) {
   }
   if (mode === 'appsscript') {
     const url = cfgGet(REG_LS.APPS_SCRIPT_URL);
-    const res = await fetch(`${url}?op=read&tab=${encodeURIComponent(resolved)}`, { credentials: 'include' });
+    const email = getClientEmail();
+    const emailParam = email ? `&email=${encodeURIComponent(email)}` : '';
+    const res = await fetch(`${url}?op=read&tab=${encodeURIComponent(resolved)}${emailParam}`, { credentials: 'include' });
     if (!res.ok) throw new Error(`Apps Script fetch failed for ${resolved}: ${res.status}`);
     // Detect Google Sign-In redirect (HTML response instead of JSON)
     const ct = res.headers.get('content-type') || '';
@@ -402,7 +428,7 @@ async function writeRow(tab, row) {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     credentials: 'include',
-    body: JSON.stringify({ op: 'append', tab: resolved, row }),
+    body: JSON.stringify({ op: 'append', tab: resolved, row, email: getClientEmail() }),
   });
   const json = await res.json();
   return json;
@@ -421,7 +447,7 @@ async function updateRow(tab, rowId, updates) {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
     credentials: 'include',
-    body: JSON.stringify({ op: 'update', tab: resolved, rowId, updates }),
+    body: JSON.stringify({ op: 'update', tab: resolved, rowId, updates, email: getClientEmail() }),
   });
   return await res.json();
 }
@@ -439,7 +465,9 @@ async function pingAuth() {
   const url = cfgGet(REG_LS.APPS_SCRIPT_URL);
   if (!url || url === 'PASTE_NEW_EXEC_URL_HERE') return { status: 'no_relay' };
   try {
-    const res = await fetch(`${url}?op=ping`, { credentials: 'include' });
+    const email = getClientEmail({ promptIfMissing: true });
+    if (!email) return { status: 'unauthorized', email: '' };
+    const res = await fetch(`${url}?op=ping&email=${encodeURIComponent(email)}`, { credentials: 'include' });
     const ct = res.headers.get('content-type') || '';
     if (!ct.includes('application/json')) {
       return { status: 'signin_required', signInUrl: url };
