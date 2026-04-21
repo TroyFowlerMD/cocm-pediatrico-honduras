@@ -91,13 +91,13 @@
 
     .sec-card {
       background: var(--color-surface); border: 1px solid var(--color-border);
-      border-radius: var(--radius-lg); padding: var(--space-5);
-      margin-bottom: var(--space-4);
+      border-radius: var(--radius-lg); padding: 10px 14px;
+      margin-bottom: 8px;
     }
     .sec-card h2 {
-      font-size: var(--text-lg); font-weight: 700; margin-bottom: var(--space-3);
+      font-size: var(--text-lg); font-weight: 700; margin-bottom: 6px;
       display: flex; justify-content: space-between; align-items: baseline;
-      border-bottom: 1px solid var(--color-divider); padding-bottom: var(--space-2);
+      border-bottom: 1px solid var(--color-divider); padding-bottom: 4px;
     }
 
     .trend-grid {
@@ -106,11 +106,11 @@
     }
 
     /* ── CoCM tracking card rows ── */
-    .cocm-grid { display: flex; flex-direction: column; gap: var(--space-3); }
+    .cocm-grid { display: flex; flex-direction: column; gap: 0; }
     .cocm-row {
       display: grid; grid-template-columns: minmax(180px, 1fr) 2fr auto;
       gap: var(--space-3); align-items: center;
-      padding: var(--space-2) 0;
+      padding: 3px 0;
       border-bottom: 1px solid var(--color-divider);
     }
     .cocm-row:last-child { border-bottom: none; }
@@ -205,9 +205,9 @@
     .visit-timeline { margin-top: var(--space-2); }
     .visit-row {
       display: grid;
-      grid-template-columns: 94px 62px 90px 1fr 60px 100px;
+      grid-template-columns: 94px 62px 90px 1fr 60px 100px 28px;
       gap: var(--space-3);
-      padding: var(--space-2) 0;
+      padding: 3px 0;
       border-bottom: 1px solid var(--color-divider);
       font-size: var(--text-sm);
       align-items: center;
@@ -248,7 +248,7 @@
 
     .med-row {
       display: grid; grid-template-columns: 100px 1fr 80px 1fr 100px;
-      gap: var(--space-3); padding: var(--space-2) 0;
+      gap: var(--space-3); padding: 3px 0;
       border-bottom: 1px solid var(--color-divider);
       font-size: var(--text-sm);
     }
@@ -500,7 +500,7 @@
 /* Phase 2.5 — visit row edit button + creator attribution */
 .visit-row { position: relative; }
 .visit-row .vedit-btn:hover { color: var(--color-primary); background: var(--color-surface-3, var(--color-surface-2)); }
-.visit-row .vcreator { line-height: 1.3; }
+.visit-row .vcreator { line-height: 1.2; margin-top: 1px; }
 .log-menu-item:hover { background: var(--color-surface-3, var(--color-surface-offset, var(--color-surface-2))); }
 .log-split-btn button.primary:focus { outline: 2px solid var(--color-primary); outline-offset: 1px; }
 
