@@ -1252,15 +1252,41 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (label) label.textContent = gate.user.name || gate.user.email;
     const chip = document.getElementById('userChip');
     if (chip) chip.title = `${gate.user.email} · ${gate.user.role || ''}`;
-    // v2.5.7 — stamp into new topbar tag
-    const stag = document.getElementById('signedInEmail');
-    if (stag) stag.textContent = gate.user.email;
-    const stagWrap = document.getElementById('signedInTag');
-    if (stagWrap) stagWrap.title = `${gate.user.name || ''}${gate.user.role ? ' · ' + gate.user.role : ''}`.trim();
+    // v2.5.8 — stamp "Name (email)" into new topbar tag
+    stampSignedInTag(gate.user);
   }
   loadAndRender();
 });
 
+
+// ── v2.5.8: topbar signed-in tag helpers ──
+function stampSignedInTag(u) {
+  if (!u) return;
+  const lbl = document.getElementById('signedInLabel');
+  const wrap = document.getElementById('signedInTag');
+  if (!lbl) return;
+  const email = u.email || '';
+  const name = u.name || '';
+  lbl.textContent = name ? `${name} (${email})` : email || '—';
+  if (wrap) wrap.title = `${name}${u.role ? ' · ' + u.role : ''}`.trim();
+}
+// After loadAndRender, if name was missing from gate (older Apps Script), try to
+// enrich via AuthorizedUsers sheet which is already in STATE.
+(function enrichSignedInTag() {
+  const orig = window.loadAndRender;
+  if (typeof orig !== 'function') return;
+  window.loadAndRender = async function wrapped() {
+    const r = await orig.apply(this, arguments);
+    try {
+      const myEmail = (STATE && STATE.user) ? STATE.user.toLowerCase() : '';
+      if (!myEmail) return r;
+      const users = (STATE && STATE.authorizedUsers) || [];
+      const me = users.find(u => String(u.email || '').toLowerCase() === myEmail);
+      if (me) stampSignedInTag({ email: STATE.user, name: me.name || '', role: me.role || '' });
+    } catch (_) {}
+    return r;
+  };
+})();
 
 // ── v2.5.2b: Esc closes registry modals ──
 (function registerRegistryModalKeys() {
