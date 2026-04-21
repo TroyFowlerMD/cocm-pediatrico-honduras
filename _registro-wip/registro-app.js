@@ -560,6 +560,8 @@ function filterAndSortPatients(all) {
   const q = document.getElementById('searchBox').value.trim().toLowerCase();
   const sortBy = document.getElementById('sortBy')?.value || 'primary_group';
 
+  // Expose for debugging (F12 console: window._allPatients)
+  if (typeof window !== 'undefined') window._allPatients = all;
   let list = all.filter(p => {
     if (therapist && p.Therapist !== therapist) return false;
     if (condition && !(p.Conditions||'').split(',').map(s=>s.trim()).includes(condition)) return false;
@@ -927,6 +929,10 @@ function renderPatientRow(p, lang, opts={}) {
   const needsUpdate = hasAnyScore && statusActive && (lastScoreDays != null) && lastScoreDays > 28;
   const flags = [];
   if (p._safetyActive || opts.pinned) flags.push(`<span class="pat-row-safety">${t('flag_safety')}</span>`);
+  if (typeof isTruthyFlag === 'function' && isTruthyFlag(p.Brigade_Flag)) {
+    const brigadeTip = p.Brigade_Reason ? `${t('flag_brigade_tip')} — ${p.Brigade_Reason}` : t('flag_brigade_tip');
+    flags.push(`<span class="flag-brigade" title="${String(brigadeTip).replace(/"/g,'&quot;')}">🚩 ${t('flag_brigade_short')}</span>`);
+  }
   if (reviewFlagged && featGet('show_review_flag')) flags.push(`<span class="flag-review" title="${t('flag_review')}">${t('flag_review_short')}</span>`);
   if (psychOverdue) flags.push(`<span class="flag-psych" title="${psychTooltip}">${t('flag_due_psych_short')}</span>`);
   if (confirmStable) flags.push(`<span class="flag-confirm-stable" title="${t('flag_confirm_stable_tooltip')}">${t('flag_confirm_stable')}</span>`);
