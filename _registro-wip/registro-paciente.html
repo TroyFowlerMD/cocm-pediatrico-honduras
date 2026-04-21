@@ -443,6 +443,102 @@
 .visit-row .vcreator { line-height: 1.3; }
 .log-menu-item:hover { background: var(--color-surface-3, var(--color-surface-offset, var(--color-surface-2))); }
 .log-split-btn button.primary:focus { outline: 2px solid var(--color-primary); outline-offset: 1px; }
+
+    /* ── Phase 2.5.1: text-size fixes & new elements ─────────────── */
+    /* Shrink creator line below note text (was same/larger) */
+    .visit-row .vcreator {
+      font-size: 10.5px;
+      color: var(--color-text-muted);
+      font-style: italic;
+      line-height: 1.3;
+      margin-top: 3px;
+    }
+    .visit-row .vcreator .vupdated {
+      font-size: 10px;
+      color: var(--color-text-muted);
+      font-style: italic;
+    }
+    /* Visit history header row */
+    .visit-row.visit-row-header {
+      font-size: 11px !important;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: var(--color-text-muted);
+      font-weight: 700;
+      border-bottom: 1px solid var(--color-border);
+      padding-bottom: 6px;
+      background: transparent;
+    }
+    .visit-row.visit-row-header .vdate,
+    .visit-row.visit-row-header .vtool,
+    .visit-row.visit-row-header .vscore,
+    .visit-row.visit-row-header .vtier,
+    .visit-row.visit-row-header .vtype,
+    .visit-row.visit-row-header .vnote {
+      font-family: inherit;
+      font-weight: 700;
+      color: var(--color-text-muted);
+    }
+    /* Visit row edit button polish */
+    .visit-row .vedit-btn {
+      background: transparent;
+      border: none;
+      color: var(--color-text-muted);
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: var(--radius-sm);
+      font-size: 13px;
+    }
+    /* Last contact row: note + by-line must both be smaller than the date */
+    .cocm-row .bhcm-note {
+      font-size: 11.5px;
+      color: var(--color-text);
+      margin-top: 4px;
+      line-height: 1.35;
+    }
+    .cocm-row .bhcm-by {
+      font-size: 10.5px;
+      color: var(--color-text-muted);
+      font-style: italic;
+      margin-top: 2px;
+    }
+    /* Brigade banner — matches safety banner pattern */
+    .pat-brigade-banner {
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 12px; margin-top: var(--space-3);
+      padding: 10px 14px;
+      background: oklch(from var(--color-warning) l c h / 0.10);
+      border: 1px solid oklch(from var(--color-warning) l c h / 0.40);
+      border-radius: var(--radius-md);
+      color: var(--color-warning);
+      font-size: var(--text-sm);
+    }
+    @media (max-width: 700px) {
+      .pat-brigade-banner { font-size: 12.5px; padding: 8px 12px; }
+    }
+    /* Auto-fill chips in log-visit-no-score modal */
+    .chip-fill {
+      padding: 4px 10px;
+      font-size: 11.5px;
+      font-weight: 600;
+      background: var(--color-surface-2);
+      border: 1px solid var(--color-border);
+      color: var(--color-text-muted);
+      border-radius: var(--radius-full);
+      cursor: pointer;
+    }
+    .chip-fill:hover {
+      background: var(--color-surface-offset, var(--color-surface-2));
+      color: var(--color-primary);
+      border-color: var(--color-primary);
+    }
+    /* Hide the safety + brigade hidden <option> entries from the status select */
+    #filterStatus option[hidden] { display: none; }
+    /* Note markdown rendering */
+    .visit-row .vnote strong { font-weight: 700; color: var(--color-text); }
+    .visit-row .vnote em { font-style: italic; color: var(--color-text); }
+    .cocm-row .bhcm-note strong { font-weight: 700; color: var(--color-text); }
+    .cocm-row .bhcm-note em { font-style: italic; color: var(--color-text); }
 </style>
 
 <!-- Toast host -->
