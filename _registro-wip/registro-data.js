@@ -381,33 +381,44 @@ async function fetchTab(tabName) {
     const url = cfgGet(REG_LS.APPS_SCRIPT_URL);
     const email = getClientEmail();
     const emailParam = email ? `&email=${encodeURIComponent(email)}` : '';
-    const res = await fetch(`${url}?op=read&tab=${encodeURIComponent(resolved)}${emailParam}`);
-    if (!res.ok) throw new Error(`Apps Script fetch failed for ${resolved}: ${res.status}`);
-    // Detect Google Sign-In redirect (HTML response instead of JSON)
-    const ct = res.headers.get('content-type') || '';
-    if (!ct.includes('application/json')) {
-      const err = new Error('AUTH_REDIRECT');
-      err.code = 'AUTH_REDIRECT';
-      err.signInUrl = url;
-      throw err;
+    const fullUrl = `${url}?op=read&tab=${encodeURIComponent(resolved)}${emailParam}`;
+    // Retry up to 3 times on transient "Failed to fetch" (Apps Script redirect flakiness)
+    let lastErr;
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      try {
+        const res = await fetch(fullUrl);
+        if (!res.ok) throw new Error(`Apps Script fetch failed for ${resolved}: ${res.status}`);
+        const ct = res.headers.get('content-type') || '';
+        if (!ct.includes('application/json')) {
+          const err = new Error('AUTH_REDIRECT');
+          err.code = 'AUTH_REDIRECT';
+          err.signInUrl = url;
+          throw err;
+        }
+        const json = await res.json();
+        if (!json.ok) {
+          const err = new Error(json.error || 'Apps Script error');
+          if (/UNAUTHORIZED/i.test(json.error || '')) err.code = 'UNAUTHORIZED';
+          throw err;
+        }
+        return json.rows || [];
+      } catch (e) {
+        lastErr = e;
+        // Don't retry on auth errors — only on network/fetch failures
+        if (e.code === 'AUTH_REDIRECT' || e.code === 'UNAUTHORIZED') throw e;
+        if (attempt < 3) await new Promise(r => setTimeout(r, 400 * attempt));
+      }
     }
-    const json = await res.json();
-    if (!json.ok) {
-      const err = new Error(json.error || 'Apps Script error');
-      if (/UNAUTHORIZED/i.test(json.error || '')) err.code = 'UNAUTHORIZED';
-      throw err;
-    }
-    return json.rows || [];
+    throw lastErr;
   }
 }
 
 async function fetchAll() {
-  const [pacientes, visitas, meds, config] = await Promise.all([
-    fetchTab('Pacientes'),
-    fetchTab('Visitas'),
-    fetchTab('Medicamentos'),
-    fetchTab('Config'),
-  ]);
+  // Serialize reads so Apps Script redirect chain doesn't clobber itself under parallel load
+  const pacientes = await fetchTab('Pacientes');
+  const visitas   = await fetchTab('Visitas');
+  const meds      = await fetchTab('Medicamentos');
+  const config    = await fetchTab('Config');
   return { pacientes, visitas, meds, config };
 }
 
