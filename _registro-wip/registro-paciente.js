@@ -225,7 +225,7 @@ function render() {
     <!-- LAUNCH TOOLS -->
     <div class="sec-card">
       <h2><span>${t('pat_complete_tool')}</span></h2>
-      <p style="font-size: var(--text-sm); color: var(--color-text-muted); margin-bottom: var(--space-3);">${t('pat_tools_help')}</p>
+      <p style="font-size: 10.5px; line-height: 1.4; color: var(--color-text-muted); margin-bottom: var(--space-3);">${t('pat_tools_help')}</p>
       <div class="tool-launch-grid">
         ${toolKeys.map(tk => {
           const hasBase = !!TOOL_URL_MAP[tk];
