@@ -436,7 +436,7 @@ async function submitNewPatient(skipDupCheck=false) {
         ? `Open PSC-17 (qualifying screening) for ${firstName} now?\n\nThis is the one-time screening that determines CoCM eligibility and primary condition.`
         : `¿Abrir PSC-17 (cribado de ingreso) para ${firstName} ahora?\n\nEs el cribado inicial que determina la elegibilidad para CoCM y la condición principal.`;
       if (window.confirm(msg)) {
-        window.open('https://troyfowlermd.github.io/cocm-pediatrico-honduras/psc17.html', '_blank', 'noopener');
+        window.open('https://cocm-camasca.github.io/cocm-pediatrico-honduras/psc17.html', '_blank', 'noopener');
       }
     }, 400);
   }
@@ -1134,8 +1134,8 @@ async function authGate() {
     renderAuthBlock(
       isEN ? 'Access denied' : 'Acceso denegado',
       isEN
-        ? `<p>The account <strong>${email}</strong> is not authorized to use the CoCM Camasca registry.</p><p>If you believe this is an error, contact <a href="mailto:troyfowlermd@gmail.com">troyfowlermd@gmail.com</a> to be added.</p><p style="color:#6b7280; font-size:13px; margin-top:16px;">Signed in with the wrong account? Switch Google accounts and reload this page.</p>`
-        : `<p>La cuenta <strong>${email}</strong> no está autorizada para usar el registro CoCM Camasca.</p><p>Si cree que es un error, contacte a <a href="mailto:troyfowlermd@gmail.com">troyfowlermd@gmail.com</a> para ser agregado.</p><p style="color:#6b7280; font-size:13px; margin-top:16px;">¿Inició sesión con la cuenta incorrecta? Cambie de cuenta de Google y recargue esta página.</p>`,
+        ? `<p>The account <strong>${email}</strong> is not authorized to use the CoCM Camasca registry.</p><p>If you believe this is an error, contact <a href="mailto:cocm.camasca@gmail.com">cocm.camasca@gmail.com</a> to be added.</p><p style="color:#6b7280; font-size:13px; margin-top:16px;">Signed in with the wrong account? Switch Google accounts and reload this page.</p>`
+        : `<p>La cuenta <strong>${email}</strong> no está autorizada para usar el registro CoCM Camasca.</p><p>Si cree que es un error, contacte a <a href="mailto:cocm.camasca@gmail.com">cocm.camasca@gmail.com</a> para ser agregado.</p><p style="color:#6b7280; font-size:13px; margin-top:16px;">¿Inició sesión con la cuenta incorrecta? Cambie de cuenta de Google y recargue esta página.</p>`,
       null, null
     );
     return { status: 'blocked' };
