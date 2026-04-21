@@ -10,6 +10,7 @@ let STATE = {
   tools: {},         // {SMFQ-C: {remission, mild, ...}, ...}
   conditions: {},    // {depression: {es, en}}
   team: [],          // [{name, role}]
+  authorizedUsers: [], // v1.1: from AuthorizedUsers tab
   enrichedPatients: [],
   user: '',
   dataset: 'real',   // 'real' | 'test'
@@ -380,10 +381,15 @@ async function submitNewPatient(skipDupCheck=false) {
   }, 0);
   const nextId = `CCM-${String(maxId+1).padStart(4,'0')}`;
   const now = new Date().toISOString();
+  // Auto-compute initials from patient name
+  const _nameParts = name.trim().split(/\s+/).filter(Boolean);
+  const _initials = _nameParts.length >= 2
+    ? (_nameParts[0][0] + _nameParts[_nameParts.length-1][0]).toUpperCase()
+    : (_nameParts[0]?.[0] || '').toUpperCase();
   const row = {
     Patient_ID: nextId,
     Patient_Name: name,
-    Initials: '',
+    Initials: _initials,
     DOB: dobStr,
     Age: ageStr,
     Sex: document.getElementById('npSex')?.value || '',
@@ -473,6 +479,7 @@ async function loadAndRender() {
     STATE.visitas   = data.visitas;
     STATE.meds      = data.meds;
     STATE.config    = data.config;
+    STATE.authorizedUsers = data.authorizedUsers || [];
   } catch (err) {
     status.textContent = t('generic_error', { msg: err.message });
     status.className = 'err';
