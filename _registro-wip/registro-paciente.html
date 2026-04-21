@@ -131,6 +131,57 @@
       border-radius: var(--radius-full);
       white-space: nowrap; display: inline-block;
     }
+    /* ── v2.5.4 text-size trims (user-selected) ── */
+    /* #4: "Conditions:" label only — chips stay at current size */
+    .pat-header-card .cond-label {
+      font-size: 10.5px !important;
+      letter-spacing: 0.04em;
+    }
+    /* "Notes: [text]" line — shrink more than conditions (both label + data) */
+    .pat-header-card .pat-notes-line {
+      font-size: 11.5px !important;
+      line-height: 1.4;
+    }
+    .pat-header-card .pat-notes-line strong {
+      font-size: 10.5px !important;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    /* #6: Safety + Brigade banners — tighten on desktop too */
+    .pat-safety-banner {
+      font-size: 12.5px !important;
+      padding: 8px 14px !important;
+    }
+    .pat-safety-banner button {
+      font-size: 11.5px !important;
+      padding: 4px 10px !important;
+    }
+    .pat-brigade-banner {
+      font-size: 12.5px !important;
+      padding: 8px 14px !important;
+    }
+    /* #7: last-visit-nudge in header top-right */
+    .pat-header-top > span:last-child {
+      font-size: 10.5px !important;
+    }
+    /* Registry back button, top-left */
+    .app-layout.no-sidebar .page-content a[href="registro.html"] {
+      font-size: 11.5px !important;
+      padding: 4px 8px !important;
+    }
+    /* To-do card — all text shrinks EXCEPT the h2 title */
+    #todoCard p,
+    #todoCard .todo-text,
+    #todoCard #todoInput,
+    #todoCard button,
+    #todoCard #todoList span {
+      font-size: 11.5px !important;
+    }
+    #todoCard #todoInput,
+    #todoCard button[onclick="addTodo()"] {
+      padding: 6px 10px !important;
+    }
+
     @media (max-width: 600px) {
       .cocm-row { grid-template-columns: 1fr; gap: 2px; }
       .cocm-label { margin-top: var(--space-2); }
