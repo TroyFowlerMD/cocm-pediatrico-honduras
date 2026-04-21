@@ -1215,7 +1215,7 @@ async function _pacAuthGate() {
   const result = await pingAuth();
   if (result.status === 'ok' || result.status === 'no_relay') return result.status === 'ok' ? result : { status: 'ok', user: { email: '', name: '', role: '' } };
   const isEN = (document.documentElement.getAttribute('data-lang') === 'en');
-  const host = document.querySelector('.reg-page') || document.body;
+  const host = document.querySelector('.page-content') || document.querySelector('.main-content') || document.querySelector('.reg-page') || document.body;
   let title, bodyHtml, ctaLabel = null, ctaHref = null;
   if (result.status === 'signin_required') {
     title = isEN ? 'Google sign-in required' : 'Requiere inicio de sesión con Google';
