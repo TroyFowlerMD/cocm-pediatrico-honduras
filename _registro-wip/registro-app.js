@@ -1252,6 +1252,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (label) label.textContent = gate.user.name || gate.user.email;
     const chip = document.getElementById('userChip');
     if (chip) chip.title = `${gate.user.email} · ${gate.user.role || ''}`;
+    // v2.5.7 — stamp into new topbar tag
+    const stag = document.getElementById('signedInEmail');
+    if (stag) stag.textContent = gate.user.email;
+    const stagWrap = document.getElementById('signedInTag');
+    if (stagWrap) stagWrap.title = `${gate.user.name || ''}${gate.user.role ? ' · ' + gate.user.role : ''}`.trim();
   }
   loadAndRender();
 });
