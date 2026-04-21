@@ -160,8 +160,15 @@ function render() {
         </div>
       ` : ''}
       <div class="quick-actions">
-        <button class="primary" onclick="openVisitModal()">${t('action_add_visit')}</button>
-        <button class="ghost" onclick="openScoreModal()" title="${getLang()==='en' ? 'Log a questionnaire score without a visit (e.g. teacher/parent returned form)' : 'Registrar puntaje de cuestionario sin visita (p. ej. formulario de maestro/padre)'}">📊 ${getLang()==='en' ? 'Log score' : 'Registrar puntaje'}</button>
+        <div class="log-split-btn" style="position:relative;display:inline-flex;">
+          <button class="primary" onclick="openVisitModal()" style="border-top-right-radius:0;border-bottom-right-radius:0;">${t('action_add_visit')}</button>
+          <button class="primary" onclick="toggleLogMenu(event)" aria-haspopup="true" aria-expanded="false" id="logMenuBtn" title="${getLang()==='en' ? 'More entry options' : 'Más opciones de entrada'}" style="padding:8px 10px;border-left:1px solid oklch(from var(--color-primary) l c h / 0.35);border-top-left-radius:0;border-bottom-left-radius:0;">▾</button>
+          <div id="logMenu" role="menu" style="display:none;position:absolute;top:calc(100% + 4px);right:0;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);box-shadow:0 4px 12px rgba(0,0,0,0.15);min-width:240px;z-index:50;overflow:hidden;">
+            <button role="menuitem" class="log-menu-item" onclick="openVisitModal(); closeLogMenu();" style="display:block;width:100%;text-align:left;padding:10px 14px;background:transparent;border:none;color:var(--color-text);cursor:pointer;font-size:var(--text-sm);">📋 ${getLang()==='en'?'Log visit with score':'Registrar visita con puntaje'}</button>
+            <button role="menuitem" class="log-menu-item" onclick="openVisitOnlyModal(); closeLogMenu();" style="display:block;width:100%;text-align:left;padding:10px 14px;background:transparent;border:none;color:var(--color-text);cursor:pointer;font-size:var(--text-sm);border-top:1px solid var(--color-border);">🗒 ${getLang()==='en'?'Log visit (no score)':'Registrar visita (sin puntaje)'}</button>
+            <button role="menuitem" class="log-menu-item" onclick="openScoreModal(); closeLogMenu();" style="display:block;width:100%;text-align:left;padding:10px 14px;background:transparent;border:none;color:var(--color-text);cursor:pointer;font-size:var(--text-sm);border-top:1px solid var(--color-border);">📊 ${getLang()==='en'?'Log score only (no visit)':'Registrar puntaje (sin visita)'}</button>
+          </div>
+        </div>
         <button class="ghost" onclick="openMedModal()">${t('action_add_med2')}</button>
         ${!safetyActive ? `<button class="danger" onclick="raiseSafety()">${t('action_raise_safety')}</button>` : ''}
         <button class="ghost" onclick="toggleStatus()">${t('action_change_status')}</button>
@@ -694,14 +701,19 @@ function renderVisits(lang) {
     const typeBadge = isScore
       ? `<span class="entry-type-chip type-score" title="${en?'Score only (no visit)':'Solo puntaje (sin visita)'}">${en?'Score':'Puntaje'}</span>`
       : `<span class="entry-type-chip type-visit">${en?'Visit':'Visita'}</span>`;
+    const creator = v.Created_By || '';
+    const updatedBadge = v.Updated_At ? ` <span title="${en?'Edited ':'Editado '}${escapeHtml(v.Updated_At)}${v.Updated_By ? (en?' by ':' por ')+escapeHtml(v.Updated_By) : ''}" style="font-size:10px;color:var(--color-text-muted);font-style:italic;">(${en?'edited':'editado'})</span>` : '';
+    const creatorLine = creator ? `<div class="vcreator" style="font-size:var(--text-xs);color:var(--color-text-muted);font-style:italic;margin-top:2px;">— ${escapeHtml(creator)}${updatedBadge}</div>` : '';
+    const editBtn = `<button class="vedit-btn" onclick="openEditVisitModal('${escapeHtml(v.Visit_ID)}')" title="${en?'Edit visit':'Editar visita'}" style="background:transparent;border:none;color:var(--color-text-muted);cursor:pointer;padding:4px 6px;border-radius:var(--radius-sm);font-size:14px;">✎</button>`;
     return `
       <div class="visit-row${isScore?' visit-row-score':''}">
         <div class="vdate">${v.Visit_Date}</div>
         <div class="vtype">${typeBadge}</div>
         <div class="vtool">${v.Tool||'—'}</div>
-        <div class="vnote">${escapeHtml(v.Visit_Note||'')} ${siBadge}</div>
+        <div class="vnote">${escapeHtml(v.Visit_Note||'')} ${siBadge}${creatorLine}</div>
         <div class="vscore">${v.Score||'—'}</div>
         <div class="vtier ${tierCls}">${tierLbl}</div>
+        <div class="vedit">${editBtn}</div>
       </div>
     `;
   }).join('') + `</div>`;
@@ -1051,6 +1063,17 @@ async function submitVisit() {
     PSTATE.patient.Safety_Flag = 'TRUE';
     PSTATE.patient.Safety_Flag_Ack_At = '';
   }
+  // Auto-update Last_BHCM_Contact_Date to this visit's date
+  try {
+    await updateRow('Pacientes', PSTATE.patient.Patient_ID, {
+      Last_BHCM_Contact_Date: visitDate,
+      Last_BHCM_Contact_Note: visitNote || '',
+      Updated_By: PSTATE.user || '', Updated_At: now,
+    });
+    PSTATE.patient.Last_BHCM_Contact_Date = visitDate;
+    PSTATE.patient.Last_BHCM_Contact_Note = visitNote || '';
+  } catch (_) { /* non-fatal */ }
+
   createdRows.reverse().forEach(r => PSTATE.visits.unshift(r));
   closeVisitModal();
   render();
@@ -1337,6 +1360,10 @@ function openEditPatientModal() {
           <option value="Otro" ${sexVal && !['F','M',''].includes(sexVal) ? 'selected' : ''}>${en?'Other':'Otro'}</option>
         </select>
       </div>
+      <div>
+        <label class="np-label">${en?'Enrollment date':'Fecha de ingreso'}</label>
+        <input type="date" id="epEnrolled" value="${escapeHtml(p.Enrollment_Date||'')}" style="${inputStyle}"/>
+      </div>
       <div style="grid-column:1 / -1;">
         <label class="np-label">${en?'Therapist':'Terapeuta'}</label>
         ${(() => {
@@ -1430,6 +1457,7 @@ async function submitEditPatient() {
     DOB: p.DOB || '',
     Age: p.Age || '',
     Sex: p.Sex || '',
+    Enrollment_Date: p.Enrollment_Date || '',
     Therapist: p.Therapist || '',
     Conditions: p.Conditions || '',
     Primary_Condition: p.Primary_Condition || '',
@@ -1439,12 +1467,14 @@ async function submitEditPatient() {
     Brigade_Flag: p.Brigade_Flag || '',
     Brigade_Reason: p.Brigade_Reason || '',
   };
+  const enrolled = (document.getElementById('epEnrolled')?.value || '').trim();
   const updates = {
     Patient_Name: name,
     Initials: initials,
     DOB: dob,
     Age: ageVal,
     Sex: sex,
+    Enrollment_Date: enrolled,
     Therapist: therapist,
     Conditions: conds,
     Primary_Condition: primaryCondition,
@@ -1646,6 +1676,17 @@ async function submitScore() {
     reenable();
     return;
   }
+  // Auto-update Last_BHCM_Contact_Date (score receipt counts as a contact)
+  try {
+    await updateRow('Pacientes', PSTATE.patient.Patient_ID, {
+      Last_BHCM_Contact_Date: row.Visit_Date,
+      Last_BHCM_Contact_Note: row.Visit_Note || '',
+      Updated_By: PSTATE.user || '', Updated_At: now,
+    });
+    PSTATE.patient.Last_BHCM_Contact_Date = row.Visit_Date;
+    PSTATE.patient.Last_BHCM_Contact_Note = row.Visit_Note || '';
+  } catch (_) { /* non-fatal */ }
+
   PSTATE.visits.unshift(row);
   closeScoreModal();
   render();
@@ -1746,3 +1787,310 @@ document.addEventListener('DOMContentLoaded', async () => {
   }
   load();
 });
+
+
+// ════════════════════════════════════════════════════════════════
+// PHASE 2.5 — LOG MENU (split-button dropdown)
+// ════════════════════════════════════════════════════════════════
+function toggleLogMenu(ev) {
+  if (ev) ev.stopPropagation();
+  const m = document.getElementById('logMenu');
+  const btn = document.getElementById('logMenuBtn');
+  if (!m) return;
+  const show = m.style.display === 'none' || !m.style.display;
+  m.style.display = show ? 'block' : 'none';
+  if (btn) btn.setAttribute('aria-expanded', show ? 'true' : 'false');
+  if (show) {
+    setTimeout(() => {
+      document.addEventListener('click', closeLogMenuOnOutside, { once: true });
+    }, 0);
+  }
+}
+function closeLogMenu() {
+  const m = document.getElementById('logMenu');
+  const btn = document.getElementById('logMenuBtn');
+  if (m) m.style.display = 'none';
+  if (btn) btn.setAttribute('aria-expanded', 'false');
+}
+function closeLogMenuOnOutside(e) {
+  const m = document.getElementById('logMenu');
+  const btn = document.getElementById('logMenuBtn');
+  if (!m) return;
+  if (m.contains(e.target) || (btn && btn.contains(e.target))) {
+    document.addEventListener('click', closeLogMenuOnOutside, { once: true });
+    return;
+  }
+  closeLogMenu();
+}
+if (typeof window !== 'undefined') {
+  window.toggleLogMenu = toggleLogMenu;
+  window.closeLogMenu = closeLogMenu;
+}
+
+// ════════════════════════════════════════════════════════════════
+// PHASE 2.5 — LOG VISIT (NO SCORE) MODAL
+// Entry_Type='Visit', Tool/Score blank. Required: date + note.
+// ════════════════════════════════════════════════════════════════
+function openVisitOnlyModal() {
+  const en = getLang() === 'en';
+  const primaryConds = (PSTATE.patient.Conditions||'').split(',').map(s=>s.trim());
+  const needsSafetyFirst = primaryConds.some(c => /depress|anxiety|mdd|gad/i.test(c));
+  const safetySection = needsSafetyFirst ? `
+    <div style="background:oklch(from var(--color-error) l c h / 0.08);border:1px solid oklch(from var(--color-error) l c h / 0.3);border-radius:var(--radius-md);padding:var(--space-3);margin-bottom:var(--space-3);">
+      <div style="font-weight:700;color:var(--color-error);font-size:var(--text-sm);margin-bottom:6px;">⚠ ${t('safety_concern_title')}</div>
+      <label style="display:flex;gap:10px;align-items:center;font-size:var(--text-sm);cursor:pointer;">
+        <input type="checkbox" id="voSI" style="width:18px;height:18px;cursor:pointer;" />
+        <span>${t('safety_si_prompt')}</span>
+      </label>
+      <div style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:6px;margin-left:28px;">${en ? 'Checking this will auto-raise a safety flag for this patient.' : 'Marcar esto activa automáticamente una bandera de seguridad para el paciente.'}</div>
+    </div>
+  ` : `<input type="hidden" id="voSI" />`;
+  const inputSt = 'width:100%;padding:8px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);';
+  let host = document.getElementById('visitOnlyModal');
+  if (!host) {
+    host = document.createElement('div');
+    host.id = 'visitOnlyModal';
+    host.className = 'modal-backdrop';
+    host.style.display = 'none';
+    host.innerHTML = `
+      <div class="modal" style="max-width:520px;">
+        <div class="modal-header">
+          <h3>${en?'Log visit (no score)':'Registrar visita (sin puntaje)'}</h3>
+          <button class="modal-close" onclick="closeVisitOnlyModal()">×</button>
+        </div>
+        <div class="modal-body" id="visitOnlyForm"></div>
+        <div class="modal-footer">
+          <button class="ghost" onclick="closeVisitOnlyModal()">${en?'Cancel':'Cancelar'}</button>
+          <button class="primary" id="visitOnlySaveBtn" onclick="submitVisitOnly()">${en?'Save':'Guardar'}</button>
+        </div>
+      </div>`;
+    document.body.appendChild(host);
+  }
+  document.getElementById('visitOnlyForm').innerHTML = `
+    <div style="background:oklch(from var(--color-primary) l c h / 0.06);border:1px solid oklch(from var(--color-primary) l c h / 0.25);border-radius:var(--radius-md);padding:var(--space-2) var(--space-3);margin-bottom:var(--space-3);font-size:var(--text-xs);color:var(--color-text-muted);">
+      ${en ? 'Use this for clinical visits without a psychometric score (safety check, medication titration, family session, missed assessment, etc.).' : 'Usar para visitas clínicas sin puntaje (chequeo de seguridad, titulación de medicamento, sesión familiar, cita sin cuestionario, etc.).'}
+    </div>
+    ${safetySection}
+    <div>
+      <label class="np-label">${t('label_date')}</label>
+      <input type="date" id="voDate" value="${new Date().toISOString().slice(0,10)}" style="${inputSt}max-width:200px;"/>
+    </div>
+    <div style="margin-top:var(--space-3);">
+      <label class="np-label">${t('label_note')} <span style="color:var(--color-error);">*</span></label>
+      <textarea id="voNote" rows="3" placeholder="${en?'What happened this visit? (required)':'¿Qué ocurrió en esta visita? (obligatorio)'}" style="${inputSt}"></textarea>
+    </div>
+  `;
+  host.style.display = 'flex';
+  setTimeout(() => document.getElementById('voNote')?.focus(), 50);
+}
+function closeVisitOnlyModal() {
+  const m = document.getElementById('visitOnlyModal');
+  if (m) m.style.display = 'none';
+}
+async function submitVisitOnly() {
+  const btn = document.getElementById('visitOnlySaveBtn');
+  if (btn && btn.disabled) return;
+  const en = getLang() === 'en';
+  const reenable = () => { if (btn) { btn.disabled = false; btn.textContent = en ? 'Save' : 'Guardar'; } };
+  const visitDate = document.getElementById('voDate').value;
+  const visitNote = (document.getElementById('voNote').value || '').trim();
+  if (!visitDate) { showToast(en?'Date required':'Fecha obligatoria', { variant:'warn' }); return; }
+  if (!visitNote) { showToast(en?'Note required for a no-score visit':'Se requiere una nota para visita sin puntaje', { variant:'warn' }); return; }
+  const siEl = document.getElementById('voSI');
+  const siPositive = siEl && siEl.type === 'checkbox' ? (siEl.checked ? 'TRUE' : 'FALSE') : 'FALSE';
+  const now = new Date().toISOString();
+  const row = {
+    Visit_ID: `V-${Date.now()}`,
+    Patient_ID: PSTATE.patient.Patient_ID,
+    Visit_Date: visitDate,
+    Therapist: PSTATE.user || PSTATE.patient.Therapist || '',
+    Tool: '',
+    Score: '',
+    Baseline_Score: '',
+    Subscale_Scores: '',
+    SI_Positive: siPositive,
+    Not_Improving_Flag: '',
+    Visit_Note: visitNote,
+    Entry_Type: 'Visit',
+    Created_By: PSTATE.user || 'unknown',
+    Created_At: now,
+    Updated_By: '',
+    Updated_At: '',
+    Schema_Version: '1.0',
+  };
+  if (btn) { btn.disabled = true; btn.textContent = en ? 'Saving…' : 'Guardando…'; }
+  try {
+    await writeRow('Visitas', row);
+    showToast(en?'Visit saved':'Visita guardada', { variant: 'success' });
+  } catch (err) {
+    showToast(t('generic_error', { msg: err.message }), { variant: 'error', retry: () => submitVisitOnly() });
+    reenable();
+    return;
+  }
+  // Auto-raise safety if SI positive
+  if (siPositive === 'TRUE' && PSTATE.patient.Safety_Flag !== 'TRUE') {
+    try {
+      await updateRow('Pacientes', PSTATE.patient.Patient_ID, {
+        Safety_Flag: 'TRUE', Updated_By: PSTATE.user || '', Updated_At: now,
+      });
+    } catch (_) {}
+    PSTATE.patient.Safety_Flag = 'TRUE';
+    PSTATE.patient.Safety_Flag_Ack_At = '';
+  }
+  // Auto-update Last_BHCM_Contact_Date
+  try {
+    await updateRow('Pacientes', PSTATE.patient.Patient_ID, {
+      Last_BHCM_Contact_Date: visitDate,
+      Last_BHCM_Contact_Note: visitNote,
+      Updated_By: PSTATE.user || '', Updated_At: now,
+    });
+    PSTATE.patient.Last_BHCM_Contact_Date = visitDate;
+    PSTATE.patient.Last_BHCM_Contact_Note = visitNote;
+  } catch (_) {}
+  PSTATE.visits.unshift(row);
+  closeVisitOnlyModal();
+  render();
+}
+if (typeof window !== 'undefined') {
+  window.openVisitOnlyModal = openVisitOnlyModal;
+  window.closeVisitOnlyModal = closeVisitOnlyModal;
+  window.submitVisitOnly = submitVisitOnly;
+}
+
+// ════════════════════════════════════════════════════════════════
+// PHASE 2.5 — EDIT VISIT MODAL
+// Allows editing: Date, Tool, Score, Note, Entry_Type
+// Audit fields (Updated_By, Updated_At) auto-populate.
+// ════════════════════════════════════════════════════════════════
+function openEditVisitModal(visitId) {
+  const v = (PSTATE.visits || []).find(x => x.Visit_ID === visitId);
+  if (!v) { showToast(getLang()==='en'?'Visit not found':'Visita no encontrada', { variant:'warn' }); return; }
+  const en = getLang() === 'en';
+  const patientTools = (PSTATE.patient.Tools||'').split(',').map(s=>s.trim()).filter(Boolean);
+  const otherTools = Object.keys(PSTATE.tools||{}).filter(tk => !patientTools.includes(tk));
+  const toolOptions = [
+    { v: '', l: en?'— (no tool)':'— (sin herramienta)' },
+    ...patientTools.map(tk => ({ v: tk, l: tk })),
+    ...otherTools.map(tk => ({ v: tk, l: tk + ' *' })),
+  ];
+  const inputSt = 'width:100%;padding:8px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);';
+  let host = document.getElementById('editVisitModal');
+  if (!host) {
+    host = document.createElement('div');
+    host.id = 'editVisitModal';
+    host.className = 'modal-backdrop';
+    host.style.display = 'none';
+    host.innerHTML = `
+      <div class="modal" style="max-width:560px;">
+        <div class="modal-header">
+          <h3 id="evModalTitle">${en?'Edit visit':'Editar visita'}</h3>
+          <button class="modal-close" onclick="closeEditVisitModal()">×</button>
+        </div>
+        <div class="modal-body" id="editVisitForm"></div>
+        <div class="modal-footer">
+          <button class="ghost" onclick="closeEditVisitModal()">${en?'Cancel':'Cancelar'}</button>
+          <button class="primary" id="editVisitSaveBtn" onclick="submitEditVisit()">${en?'Save':'Guardar'}</button>
+        </div>
+      </div>`;
+    document.body.appendChild(host);
+  }
+  const curEntry = (v.Entry_Type || 'Visit').toLowerCase();
+  document.getElementById('editVisitForm').innerHTML = `
+    <input type="hidden" id="evVisitId" value="${escapeHtml(v.Visit_ID)}"/>
+    <div style="background:oklch(from var(--color-primary) l c h / 0.06);border:1px solid oklch(from var(--color-primary) l c h / 0.25);border-radius:var(--radius-md);padding:var(--space-2) var(--space-3);margin-bottom:var(--space-3);font-size:var(--text-xs);color:var(--color-text-muted);">
+      ${en ? 'Changes are logged to the audit trail. The original Created_By + Created_At are preserved.' : 'Los cambios se registran en el historial de auditoría. Se conservan Created_By y Created_At originales.'}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);">
+      <div>
+        <label class="np-label">${en?'Entry type':'Tipo de entrada'}</label>
+        <select id="evEntryType" style="${inputSt}">
+          <option value="Visit" ${curEntry==='visit'?'selected':''}>${en?'Visit':'Visita'}</option>
+          <option value="Score" ${curEntry==='score'?'selected':''}>${en?'Score only':'Solo puntaje'}</option>
+        </select>
+      </div>
+      <div>
+        <label class="np-label">${t('label_date')}</label>
+        <input type="date" id="evDate" value="${escapeHtml(v.Visit_Date||'')}" style="${inputSt}"/>
+      </div>
+      <div>
+        <label class="np-label">${t('label_tool')}</label>
+        <select id="evTool" style="${inputSt}">
+          ${toolOptions.map(o => `<option value="${escapeHtml(o.v)}" ${o.v===(v.Tool||'')?'selected':''}>${escapeHtml(o.l)}</option>`).join('')}
+        </select>
+      </div>
+      <div>
+        <label class="np-label">${t('label_score')}</label>
+        <input type="number" id="evScore" value="${escapeHtml(v.Score||'')}" style="${inputSt}"/>
+      </div>
+      <div style="grid-column:1/-1;">
+        <label class="np-label">${t('label_note')}</label>
+        <textarea id="evNote" rows="3" style="${inputSt}">${escapeHtml(v.Visit_Note||'')}</textarea>
+      </div>
+    </div>
+  `;
+  host.style.display = 'flex';
+}
+function closeEditVisitModal() {
+  const m = document.getElementById('editVisitModal');
+  if (m) m.style.display = 'none';
+}
+async function submitEditVisit() {
+  const btn = document.getElementById('editVisitSaveBtn');
+  if (btn && btn.disabled) return;
+  const en = getLang() === 'en';
+  const visitId = document.getElementById('evVisitId').value;
+  const v = (PSTATE.visits || []).find(x => x.Visit_ID === visitId);
+  if (!v) { showToast(en?'Visit not found':'Visita no encontrada', { variant:'warn' }); return; }
+  const entryType = document.getElementById('evEntryType').value;
+  const visitDate = document.getElementById('evDate').value;
+  const tool = document.getElementById('evTool').value;
+  const score = document.getElementById('evScore').value;
+  const note = document.getElementById('evNote').value.trim();
+  if (!visitDate) { showToast(en?'Date is required':'La fecha es obligatoria', { variant:'warn' }); return; }
+  if (score !== '' && !isNaN(Number(score)) && (Number(score) < 0 || Number(score) > 100)) {
+    showToast(t('err_score_range', { tool: tool || '—' }), { variant:'warn' }); return;
+  }
+  // For Score entry_type, require tool+score
+  if (entryType === 'Score') {
+    if (!tool || score === '') { showToast(t('err_tool_score_req'), { variant:'warn' }); return; }
+  }
+  const now = new Date().toISOString();
+  const prev = {
+    Visit_Date: v.Visit_Date || '',
+    Tool: v.Tool || '',
+    Score: v.Score || '',
+    Visit_Note: v.Visit_Note || '',
+    Entry_Type: v.Entry_Type || '',
+    Updated_By: v.Updated_By || '',
+    Updated_At: v.Updated_At || '',
+  };
+  const updates = {
+    Visit_Date: visitDate,
+    Tool: tool,
+    Score: score,
+    Visit_Note: note,
+    Entry_Type: entryType,
+    Updated_By: PSTATE.user || '',
+    Updated_At: now,
+  };
+  if (btn) { btn.disabled = true; btn.textContent = en ? 'Saving…' : 'Guardando…'; }
+  try {
+    await updateRow('Visitas', visitId, updates);
+    Object.assign(v, updates);
+    showToast(t('saved'), { variant:'success', undo: async () => {
+      await updateRow('Visitas', visitId, prev);
+      Object.assign(v, prev);
+      render();
+    }});
+    closeEditVisitModal();
+    render();
+  } catch (err) {
+    if (btn) { btn.disabled = false; btn.textContent = en ? 'Save' : 'Guardar'; }
+    showToast(t('generic_error', { msg: err.message }), { variant:'error', retry: () => submitEditVisit() });
+  }
+}
+if (typeof window !== 'undefined') {
+  window.openEditVisitModal = openEditVisitModal;
+  window.closeEditVisitModal = closeEditVisitModal;
+  window.submitEditVisit = submitEditVisit;
+}
