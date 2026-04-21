@@ -171,7 +171,7 @@ const REG_GIDS_TEST = {
 
 // ── Tool → portal URL map ───────────────────────────────────────
 // Links to live CoCM Pediátrico hub — each tool opens in a new tab.
-const COCM_TOOLS_BASE = "https://troyfowlermd.github.io/cocm-pediatrico-honduras/";
+const COCM_TOOLS_BASE = "https://cocm-camasca.github.io/cocm-pediatrico-honduras/";
 const TOOL_URL_MAP = {
   "PHQ-A":             COCM_TOOLS_BASE + "phqa.html",
   "GAD-7":             COCM_TOOLS_BASE + "gad7.html",
