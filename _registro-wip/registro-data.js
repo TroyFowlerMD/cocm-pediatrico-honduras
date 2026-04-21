@@ -381,7 +381,7 @@ async function fetchTab(tabName) {
     const url = cfgGet(REG_LS.APPS_SCRIPT_URL);
     const email = getClientEmail();
     const emailParam = email ? `&email=${encodeURIComponent(email)}` : '';
-    const res = await fetch(`${url}?op=read&tab=${encodeURIComponent(resolved)}${emailParam}`, { credentials: 'include' });
+    const res = await fetch(`${url}?op=read&tab=${encodeURIComponent(resolved)}${emailParam}`);
     if (!res.ok) throw new Error(`Apps Script fetch failed for ${resolved}: ${res.status}`);
     // Detect Google Sign-In redirect (HTML response instead of JSON)
     const ct = res.headers.get('content-type') || '';
@@ -427,7 +427,6 @@ async function writeRow(tab, row) {
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    credentials: 'include',
     body: JSON.stringify({ op: 'append', tab: resolved, row, email: getClientEmail() }),
   });
   const json = await res.json();
@@ -446,7 +445,6 @@ async function updateRow(tab, rowId, updates) {
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-    credentials: 'include',
     body: JSON.stringify({ op: 'update', tab: resolved, rowId, updates, email: getClientEmail() }),
   });
   return await res.json();
@@ -467,7 +465,7 @@ async function pingAuth() {
   try {
     const email = getClientEmail({ promptIfMissing: true });
     if (!email) return { status: 'unauthorized', email: '' };
-    const res = await fetch(`${url}?op=ping&email=${encodeURIComponent(email)}`, { credentials: 'include' });
+    const res = await fetch(`${url}?op=ping&email=${encodeURIComponent(email)}`);
     const ct = res.headers.get('content-type') || '';
     if (!ct.includes('application/json')) {
       return { status: 'signin_required', signInUrl: url };
