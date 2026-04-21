@@ -134,7 +134,7 @@ const REG_HEADERS = {
   //   Baseline_Date            — date baseline was collected (optional)
   // All new fields are OPTIONAL. Missing values render as "—" and never
   // break layout or derived flags.
-  Pacientes: ["Patient_ID","Patient_Name","Initials","DOB","Age","Sex","Therapist","Conditions","Primary_Condition","Primary_Condition_Verified","Tools","Enrollment_Date","Status","Priority","Safety_Flag","Safety_Flag_Ack_By","Safety_Flag_Ack_At","Notes","Last_Psych_Consult_Date","Last_BHCM_Contact_Date","Last_BHCM_Contact_Note","Review_Flag","Baseline_Tool","Baseline_Score","Baseline_Date","Brigade_Flag","Brigade_Reason","Todo_Items","Created_By","Created_At","Updated_By","Updated_At","Schema_Version"],
+  Pacientes: ["Patient_ID","Patient_Name","Initials","DOB","Age","Sex","Therapist","Conditions","Primary_Condition","Primary_Condition_Verified","Tools","Enrollment_Date","Status","Priority","Safety_Flag","Safety_Flag_Ack_By","Safety_Flag_Ack_At","Notes","Last_Psych_Consult_Date","Last_BHCM_Contact_Date","Last_BHCM_Contact_Note","Last_BHCM_Contact_By","Review_Flag","Baseline_Tool","Baseline_Score","Baseline_Date","Brigade_Flag","Brigade_Reason","Todo_Items","Created_By","Created_At","Updated_By","Updated_At","Schema_Version"],
   Visitas:   ["Visit_ID","Patient_ID","Visit_Date","Therapist","Tool","Score","Baseline_Score","Subscale_Scores","SI_Positive","Not_Improving_Flag","Visit_Note","Entry_Type","Created_By","Created_At","Updated_By","Updated_At","Schema_Version"],
   Medicamentos: ["Med_ID","Patient_ID","Date","Medication","Dose","Frequency","Action","Prescriber","Reason","Notes","Created_By","Created_At","Schema_Version"],
   Config:    ["Category","Key","Value","Display_ES","Display_EN","Active","Notes"],
@@ -429,6 +429,57 @@ async function fetchTab(tabName) {
     throw lastErr;
   }
 }
+
+
+// ── User profile helpers (Phase 2.5.1) ─────────────────────────
+// Given an email, look up Display_Name + role from a cached AuthorizedUsers list.
+// Falls back to the email local-part capitalized if no match.
+function getUserProfile(email, authUsers) {
+  if (!email) return { email: '', name: '', role: '' };
+  const norm = String(email).trim().toLowerCase();
+  const u = (authUsers || []).find(r => String(r.email || '').trim().toLowerCase() === norm);
+  if (u) return { email: norm, name: String(u.name || '').trim() || norm, role: String(u.role || '').trim().toLowerCase() };
+  return { email: norm, name: norm, role: '' };
+}
+function getUserDisplayName(email, authUsers) {
+  const p = getUserProfile(email, authUsers);
+  return p.name || p.email;
+}
+function getUserRole(email, authUsers) {
+  return getUserProfile(email, authUsers).role;
+}
+function isTherapistRole(email, authUsers) {
+  return getUserRole(email, authUsers) === 'therapist';
+}
+if (typeof window !== 'undefined') {
+  window.getUserProfile = getUserProfile;
+  window.getUserDisplayName = getUserDisplayName;
+  window.getUserRole = getUserRole;
+  window.isTherapistRole = isTherapistRole;
+}
+
+// ── Minimal Markdown → HTML (bold/italic only) — safe for note fields ──
+// Supports: **bold**, __bold__, *italic*, _italic_
+// Escapes HTML first. No links, no images, no code blocks.
+function renderMarkdownInline(text) {
+  if (!text) return '';
+  // HTML-escape first
+  let s = String(text)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+  // Bold: **x** or __x__ (non-greedy)
+  s = s.replace(/\*\*([^*\n]+?)\*\*/g, '<strong>$1</strong>');
+  s = s.replace(/__([^_\n]+?)__/g, '<strong>$1</strong>');
+  // Italic: *x* or _x_  (avoid partial matches inside words like 2_week)
+  s = s.replace(/(^|[^\w*])\*([^*\n]+?)\*(?=[^\w*]|$)/g, '$1<em>$2</em>');
+  s = s.replace(/(^|[^\w_])_([^_\n]+?)_(?=[^\w_]|$)/g, '$1<em>$2</em>');
+  // Convert \n to <br>
+  s = s.replace(/\n/g, '<br>');
+  return s;
+}
+if (typeof window !== 'undefined') window.renderMarkdownInline = renderMarkdownInline;
+
 
 async function fetchAll() {
   // v1.1: parallelize reads now that fetchTab has timeouts + retries.
