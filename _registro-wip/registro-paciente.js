@@ -159,21 +159,20 @@ function render() {
           <button onclick="acknowledgeSafety()">${t('action_ack')}</button>
         </div>
       ` : ''}
-      <div class="quick-actions">
-        <div class="log-split-btn" style="position:relative;display:inline-flex;">
-          <button class="primary" onclick="openVisitModal()" style="border-top-right-radius:0;border-bottom-right-radius:0;">${t('action_add_visit')}</button>
-          <button class="primary" onclick="toggleLogMenu(event)" aria-haspopup="true" aria-expanded="false" id="logMenuBtn" title="${getLang()==='en' ? 'More entry options' : 'Más opciones de entrada'}" style="padding:8px 10px;border-left:1px solid oklch(from var(--color-primary) l c h / 0.35);border-top-left-radius:0;border-bottom-left-radius:0;">▾</button>
-          <div id="logMenu" role="menu" style="display:none;position:absolute;top:calc(100% + 4px);right:0;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);box-shadow:0 4px 12px rgba(0,0,0,0.15);min-width:240px;z-index:50;overflow:hidden;">
-            <button role="menuitem" class="log-menu-item" onclick="openVisitModal(); closeLogMenu();" style="display:block;width:100%;text-align:left;padding:10px 14px;background:transparent;border:none;color:var(--color-text);cursor:pointer;font-size:var(--text-sm);">📋 ${getLang()==='en'?'Log visit with score':'Registrar visita con puntaje'}</button>
-            <button role="menuitem" class="log-menu-item" onclick="openVisitOnlyModal(); closeLogMenu();" style="display:block;width:100%;text-align:left;padding:10px 14px;background:transparent;border:none;color:var(--color-text);cursor:pointer;font-size:var(--text-sm);border-top:1px solid var(--color-border);">🗒 ${getLang()==='en'?'Log visit (no score)':'Registrar visita (sin puntaje)'}</button>
-            <button role="menuitem" class="log-menu-item" onclick="openScoreModal(); closeLogMenu();" style="display:block;width:100%;text-align:left;padding:10px 14px;background:transparent;border:none;color:var(--color-text);cursor:pointer;font-size:var(--text-sm);border-top:1px solid var(--color-border);">📊 ${getLang()==='en'?'Log score only (no visit)':'Registrar puntaje (sin visita)'}</button>
-          </div>
+      ${isTruthyFlag(p.Brigade_Flag) ? `
+        <div class="pat-brigade-banner">
+          <span>🚩 <strong>${t('brigade_banner_title')}</strong>${p.Brigade_Reason ? ` — ${escapeHtml(p.Brigade_Reason)}` : ''}</span>
         </div>
+      ` : ''}
+      <div class="quick-actions">
+        <button class="primary" onclick="openVisitModal()" title="${getLang()==='en' ? 'Log a visit with a psychometric score' : 'Registrar visita con puntaje'}">${t('action_add_visit')}</button>
+        <button class="primary" onclick="openVisitOnlyModal()" title="${getLang()==='en' ? 'Log a visit without a score' : 'Registrar visita sin puntaje'}">🗒 ${getLang()==='en'?'Log visit (no score)':'Registrar visita (sin puntaje)'}</button>
+        <button class="primary" onclick="openScoreModal()" title="${getLang()==='en' ? 'Log a score without a visit' : 'Registrar puntaje sin visita'}">📊 ${getLang()==='en'?'Log score only':'Solo puntaje'}</button>
         <button class="ghost" onclick="openMedModal()">${t('action_add_med2')}</button>
         ${!safetyActive ? `<button class="danger" onclick="raiseSafety()">${t('action_raise_safety')}</button>` : ''}
         <button class="ghost" onclick="toggleStatus()">${t('action_change_status')}</button>
         <button class="ghost" onclick="openEditPatientModal()" title="${getLang()==='en' ? 'Edit demographics, conditions, or monitored tools' : 'Editar datos demográficos, condiciones o herramientas monitoreadas'}">✏️ ${getLang()==='en' ? 'Edit patient' : 'Editar paciente'}</button>
-        ${isTruthyFlag(p.Brigade_Flag) ? `<span class="brigade-badge" title="${escapeHtml(p.Brigade_Reason||'')}">🚩 ${getLang()==='en' ? 'Brigade' : 'Brigada'}${p.Brigade_Reason ? `: ${escapeHtml(p.Brigade_Reason)}`:''}</span>` : ''}
+        <!-- brigade indicator shown in the banner above; row flag shown on registry -->
       </div>
     </div>
 
@@ -224,7 +223,7 @@ function render() {
     <!-- VISITS TIMELINE -->
     <div class="sec-card">
       <h2>
-        <span>${t('pat_visit_history')}</span>
+        <span>${t('visit_score_history')}</span>
         <span style="font-size: var(--text-sm); color: var(--color-text-muted); font-weight: 400;">${PSTATE.visits.length} ${PSTATE.visits.length === 1 ? t('visit_singular') : t('visits')}</span>
       </h2>
       ${renderVisits(lang)}
@@ -276,12 +275,17 @@ function renderCoCMTracking(p, lang) {
       </div>`);
   }
   if (showContact) {
+    const bhcmByName = p.Last_BHCM_Contact_By
+      ? getUserDisplayName(p.Last_BHCM_Contact_By, PSTATE.authorizedUsers || [])
+      : '';
+    const noteHtml = p.Last_BHCM_Contact_Note ? renderMarkdownInline(p.Last_BHCM_Contact_Note) : '';
     rows.push(`
       <div class="cocm-row">
-        <div class="cocm-label">${t('bhcm_contact_label')}</div>
+        <div class="cocm-label">${t('last_contact_label')}</div>
         <div class="cocm-value">
           ${ds(p.Last_BHCM_Contact_Date)}
-          ${p.Last_BHCM_Contact_Note ? `<div style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:2px;">${escapeHtml(p.Last_BHCM_Contact_Note)}</div>` : ''}
+          ${noteHtml ? `<div class="bhcm-note">${noteHtml}</div>` : ''}
+          ${bhcmByName ? `<div class="bhcm-by">— ${t('last_contact_by')} ${escapeHtml(bhcmByName)}</div>` : ''}
         </div>
         <div class="cocm-actions">
           <button class="ghost sm" onclick="editBHCMContact()">${t('edit')}</button>
@@ -334,12 +338,12 @@ async function editBHCMContact() {
   const trimmed = val.trim();
   if (trimmed && !_validISO(trimmed)) { alert('YYYY-MM-DD'); return; }
   const noteVal = prompt(t('bhcm_contact_note_prompt'), PSTATE.patient.Last_BHCM_Contact_Note || '');
-  const patch = { Last_BHCM_Contact_Date: trimmed };
+  const patch = { Last_BHCM_Contact_Date: trimmed, Last_BHCM_Contact_By: PSTATE.user || '' };
   if (noteVal !== null) patch.Last_BHCM_Contact_Note = noteVal.trim();
   await _patchPatient(patch);
 }
 async function setBHCMContactToday() {
-  await _patchPatient({ Last_BHCM_Contact_Date: todayISO() });
+  await _patchPatient({ Last_BHCM_Contact_Date: todayISO(), Last_BHCM_Contact_By: PSTATE.user || '' });
 }
 async function toggleReviewFlag(checked) {
   await _patchPatient({ Review_Flag: checked ? 'TRUE' : '' });
@@ -691,7 +695,18 @@ function bigSparkline(values, cutoffs) {
 function renderVisits(lang) {
   if (!PSTATE.visits.length) return `<p style="color:var(--color-text-muted);">${t('no_visits')}</p>`;
   const en = lang === 'en';
-  return `<div class="visit-timeline">` + PSTATE.visits.map(v => {
+  const authUsers = PSTATE.authorizedUsers || [];
+  const header = `
+    <div class="visit-row visit-row-header">
+      <div class="vdate">${t('label_date')}</div>
+      <div class="vtype">${en?'Type':'Tipo'}</div>
+      <div class="vtool">${t('label_tool')}</div>
+      <div class="vnote">${t('label_note')}</div>
+      <div class="vscore">${t('score_col_label')}</div>
+      <div class="vtier">${en?'Tier':'Nivel'}</div>
+      <div class="vedit"></div>
+    </div>`;
+  return `<div class="visit-timeline">` + header + PSTATE.visits.map(v => {
     const tier = scoreToTier(v.Score, PSTATE.tools[v.Tool]);
     const tierCls = TIER_CLASS[tier] || 'tier-nodata';
     const tierLbl = translateTier(tier);
@@ -702,15 +717,18 @@ function renderVisits(lang) {
       ? `<span class="entry-type-chip type-score" title="${en?'Score only (no visit)':'Solo puntaje (sin visita)'}">${en?'Score':'Puntaje'}</span>`
       : `<span class="entry-type-chip type-visit">${en?'Visit':'Visita'}</span>`;
     const creator = v.Created_By || '';
-    const updatedBadge = v.Updated_At ? ` <span title="${en?'Edited ':'Editado '}${escapeHtml(v.Updated_At)}${v.Updated_By ? (en?' by ':' por ')+escapeHtml(v.Updated_By) : ''}" style="font-size:10px;color:var(--color-text-muted);font-style:italic;">(${en?'edited':'editado'})</span>` : '';
-    const creatorLine = creator ? `<div class="vcreator" style="font-size:var(--text-xs);color:var(--color-text-muted);font-style:italic;margin-top:2px;">— ${escapeHtml(creator)}${updatedBadge}</div>` : '';
-    const editBtn = `<button class="vedit-btn" onclick="openEditVisitModal('${escapeHtml(v.Visit_ID)}')" title="${en?'Edit visit':'Editar visita'}" style="background:transparent;border:none;color:var(--color-text-muted);cursor:pointer;padding:4px 6px;border-radius:var(--radius-sm);font-size:14px;">✎</button>`;
+    const creatorDisplay = creator ? getUserDisplayName(creator, authUsers) : '';
+    const updatedName = v.Updated_By ? getUserDisplayName(v.Updated_By, authUsers) : '';
+    const updatedBadge = v.Updated_At ? ` <span title="${en?'Edited ':'Editado '}${escapeHtml(v.Updated_At)}${updatedName ? (en?' by ':' por ')+escapeHtml(updatedName) : ''}" class="vupdated">(${en?'edited':'editado'})</span>` : '';
+    const creatorLine = creatorDisplay ? `<div class="vcreator">— ${escapeHtml(creatorDisplay)}${updatedBadge}</div>` : '';
+    const editBtn = `<button class="vedit-btn" onclick="openEditVisitModal('${escapeHtml(v.Visit_ID)}')" title="${en?'Edit visit':'Editar visita'}">✎</button>`;
+    const noteHtml = v.Visit_Note ? renderMarkdownInline(v.Visit_Note) : '';
     return `
       <div class="visit-row${isScore?' visit-row-score':''}">
         <div class="vdate">${v.Visit_Date}</div>
         <div class="vtype">${typeBadge}</div>
         <div class="vtool">${v.Tool||'—'}</div>
-        <div class="vnote">${escapeHtml(v.Visit_Note||'')} ${siBadge}${creatorLine}</div>
+        <div class="vnote">${noteHtml} ${siBadge}${creatorLine}</div>
         <div class="vscore">${v.Score||'—'}</div>
         <div class="vtier ${tierCls}">${tierLbl}</div>
         <div class="vedit">${editBtn}</div>
@@ -923,7 +941,7 @@ function openVisitModal() {
     <button type="button" id="vAddToolBtn" onclick="addVisitToolRow()" style="margin-top:var(--space-2);background:transparent;border:1px dashed var(--color-border);color:var(--color-primary);padding:6px 12px;border-radius:var(--radius-md);font-size:var(--text-sm);cursor:pointer;">+ ${en?'Add another tool':'Agregar otra herramienta'}</button>
     <div style="margin-top: var(--space-3);">
       <label class="np-label">${t('label_note')} <span style="font-size:var(--text-xs);color:var(--color-text-muted);font-weight:400;text-transform:none;">(${t('label_optional')})</span></label>
-      <textarea id="vNote" rows="2" style="${inputSt}"></textarea>
+      <textarea id="vNote" rows="2" style="${inputSt}" placeholder="${en?'Visit note (supports **bold** / *italic*)':'Nota de visita (admite **negrita** / *cursiva*)'}"></textarea>
     </div>
     <template id="vToolRowTmpl">
       <div class="v-tool-row" style="display:grid;grid-template-columns:1fr 1fr auto;gap:var(--space-2);align-items:end;">
@@ -1063,16 +1081,21 @@ async function submitVisit() {
     PSTATE.patient.Safety_Flag = 'TRUE';
     PSTATE.patient.Safety_Flag_Ack_At = '';
   }
-  // Auto-update Last_BHCM_Contact_Date to this visit's date
-  try {
-    await updateRow('Pacientes', PSTATE.patient.Patient_ID, {
-      Last_BHCM_Contact_Date: visitDate,
-      Last_BHCM_Contact_Note: visitNote || '',
-      Updated_By: PSTATE.user || '', Updated_At: now,
-    });
-    PSTATE.patient.Last_BHCM_Contact_Date = visitDate;
-    PSTATE.patient.Last_BHCM_Contact_Note = visitNote || '';
-  } catch (_) { /* non-fatal */ }
+  // Auto-update Last_BHCM_Contact_Date — therapist-only (aligns with AIMS CoCM).
+  // Psychiatrist contacts show in Visit history instead; they don't overwrite the BHCM contact row.
+  if (isTherapistRole(PSTATE.user, PSTATE.authorizedUsers || [])) {
+    try {
+      await updateRow('Pacientes', PSTATE.patient.Patient_ID, {
+        Last_BHCM_Contact_Date: visitDate,
+        Last_BHCM_Contact_Note: visitNote || '',
+        Last_BHCM_Contact_By: PSTATE.user || '',
+        Updated_By: PSTATE.user || '', Updated_At: now,
+      });
+      PSTATE.patient.Last_BHCM_Contact_Date = visitDate;
+      PSTATE.patient.Last_BHCM_Contact_Note = visitNote || '';
+      PSTATE.patient.Last_BHCM_Contact_By = PSTATE.user || '';
+    } catch (_) { /* non-fatal */ }
+  }
 
   createdRows.reverse().forEach(r => PSTATE.visits.unshift(r));
   closeVisitModal();
@@ -1400,12 +1423,12 @@ function openEditPatientModal() {
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;">${toolRows || `<span style="font-size:var(--text-xs);color:var(--color-text-muted);">${en?'No tools configured':'No hay herramientas configuradas'}</span>`}</div>
     </div>
     <div style="margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--color-border);">
-      <label style="display:flex;gap:10px;align-items:center;font-size:var(--text-sm);cursor:pointer;font-weight:600;">
+      <label style="display:flex;gap:10px;align-items:center;font-size:var(--text-sm);cursor:pointer;font-weight:600;" title="${en?'Flag this patient to be seen by the next brigade visit.':'Marcar este paciente para ser visto en la próxima visita de brigada.'}">
         <input type="checkbox" id="epBrigadeFlag" ${isTruthyFlag(p.Brigade_Flag)?'checked':''} style="width:18px;height:18px;cursor:pointer;"/>
-        <span>🚩 ${en?'Brigade patient':'Paciente de brigada'}</span>
+        <span>🚩 ${en?'Flag for next brigade':'Marcar para próxima brigada'}</span>
       </label>
       <input type="text" id="epBrigadeReason" placeholder="${en?'Reason / details (optional)':'Razón / detalles (opcional)'}" value="${escapeHtml(p.Brigade_Reason||'')}" style="${inputStyle}margin-top:6px;"/>
-      <div style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:4px;">${en?'Flags patient as seen on brigade; shows Brigade filter chip on registry.':'Marca al paciente como visto en brigada; muestra chip de filtro Brigada en el registro.'}</div>
+      <div style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:4px;">${en?'Flags this patient to be seen by the next brigade. Appears on the registry Brigade filter chip.':'Marca a este paciente para ser visto en la próxima brigada. Aparece en el filtro de Brigada del registro.'}</div>
     </div>
     <div style="margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--color-border);">
       <label class="np-label">${en?'Notes':'Notas'}</label>
@@ -1676,16 +1699,20 @@ async function submitScore() {
     reenable();
     return;
   }
-  // Auto-update Last_BHCM_Contact_Date (score receipt counts as a contact)
-  try {
-    await updateRow('Pacientes', PSTATE.patient.Patient_ID, {
-      Last_BHCM_Contact_Date: row.Visit_Date,
-      Last_BHCM_Contact_Note: row.Visit_Note || '',
-      Updated_By: PSTATE.user || '', Updated_At: now,
-    });
-    PSTATE.patient.Last_BHCM_Contact_Date = row.Visit_Date;
-    PSTATE.patient.Last_BHCM_Contact_Note = row.Visit_Note || '';
-  } catch (_) { /* non-fatal */ }
+  // Auto-update Last_BHCM_Contact_Date — therapist-only
+  if (isTherapistRole(PSTATE.user, PSTATE.authorizedUsers || [])) {
+    try {
+      await updateRow('Pacientes', PSTATE.patient.Patient_ID, {
+        Last_BHCM_Contact_Date: row.Visit_Date,
+        Last_BHCM_Contact_Note: row.Visit_Note || '',
+        Last_BHCM_Contact_By: PSTATE.user || '',
+        Updated_By: PSTATE.user || '', Updated_At: now,
+      });
+      PSTATE.patient.Last_BHCM_Contact_Date = row.Visit_Date;
+      PSTATE.patient.Last_BHCM_Contact_Note = row.Visit_Note || '';
+      PSTATE.patient.Last_BHCM_Contact_By = PSTATE.user || '';
+    } catch (_) { /* non-fatal */ }
+  }
 
   PSTATE.visits.unshift(row);
   closeScoreModal();
@@ -1877,7 +1904,12 @@ function openVisitOnlyModal() {
     </div>
     <div style="margin-top:var(--space-3);">
       <label class="np-label">${t('label_note')} <span style="color:var(--color-error);">*</span></label>
-      <textarea id="voNote" rows="3" placeholder="${en?'What happened this visit? (required)':'¿Qué ocurrió en esta visita? (obligatorio)'}" style="${inputSt}"></textarea>
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;">
+        <button type="button" class="chip-fill" onclick="voNoteFill('${en?'Routine follow-up':'Seguimiento de rutina'}')">${en?'Routine follow-up':'Seguimiento de rutina'}</button>
+        <button type="button" class="chip-fill" onclick="voNoteFill('${en?'Parent/caregiver contact':'Contacto con padre/cuidador'}')">${en?'Parent/caregiver contact':'Contacto con padre/cuidador'}</button>
+      </div>
+      <textarea id="voNote" rows="3" placeholder="${en?'What happened this visit? (supports **bold** / *italic*)':'¿Qué ocurrió en esta visita? (admite **negrita** / *cursiva*)'}" style="${inputSt}"></textarea>
+      <div style="font-size:10px;color:var(--color-text-muted);margin-top:2px;">${en?'Markdown: **bold**, *italic*':'Markdown: **negrita**, *cursiva*'}</div>
     </div>
   `;
   host.style.display = 'flex';
@@ -1937,24 +1969,35 @@ async function submitVisitOnly() {
     PSTATE.patient.Safety_Flag = 'TRUE';
     PSTATE.patient.Safety_Flag_Ack_At = '';
   }
-  // Auto-update Last_BHCM_Contact_Date
-  try {
-    await updateRow('Pacientes', PSTATE.patient.Patient_ID, {
-      Last_BHCM_Contact_Date: visitDate,
-      Last_BHCM_Contact_Note: visitNote,
-      Updated_By: PSTATE.user || '', Updated_At: now,
-    });
-    PSTATE.patient.Last_BHCM_Contact_Date = visitDate;
-    PSTATE.patient.Last_BHCM_Contact_Note = visitNote;
-  } catch (_) {}
+  // Auto-update Last_BHCM_Contact_Date — therapist-only
+  if (isTherapistRole(PSTATE.user, PSTATE.authorizedUsers || [])) {
+    try {
+      await updateRow('Pacientes', PSTATE.patient.Patient_ID, {
+        Last_BHCM_Contact_Date: visitDate,
+        Last_BHCM_Contact_Note: visitNote,
+        Last_BHCM_Contact_By: PSTATE.user || '',
+        Updated_By: PSTATE.user || '', Updated_At: now,
+      });
+      PSTATE.patient.Last_BHCM_Contact_Date = visitDate;
+      PSTATE.patient.Last_BHCM_Contact_Note = visitNote;
+      PSTATE.patient.Last_BHCM_Contact_By = PSTATE.user || '';
+    } catch (_) {}
+  }
   PSTATE.visits.unshift(row);
   closeVisitOnlyModal();
   render();
+}
+function voNoteFill(phrase) {
+  const ta = document.getElementById('voNote');
+  if (!ta) return;
+  ta.value = phrase;
+  ta.focus();
 }
 if (typeof window !== 'undefined') {
   window.openVisitOnlyModal = openVisitOnlyModal;
   window.closeVisitOnlyModal = closeVisitOnlyModal;
   window.submitVisitOnly = submitVisitOnly;
+  window.voNoteFill = voNoteFill;
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -2024,7 +2067,7 @@ function openEditVisitModal(visitId) {
       </div>
       <div style="grid-column:1/-1;">
         <label class="np-label">${t('label_note')}</label>
-        <textarea id="evNote" rows="3" style="${inputSt}">${escapeHtml(v.Visit_Note||'')}</textarea>
+        <textarea id="evNote" rows="3" placeholder="${en?'Visit note (supports **bold** / *italic*)':'Nota de visita (admite **negrita** / *cursiva*)'}" style="${inputSt}">${escapeHtml(v.Visit_Note||'')}</textarea>
       </div>
     </div>
   `;
