@@ -500,7 +500,7 @@ async function reloadData() { await loadAndRender(); }
 
 function populateUserDropdown() {
   const sel = document.getElementById('userSelect');
-  if (!sel) { location.reload(); return; }
+  if (!sel) return; // element missing (likely wiped by auth block) — skip rather than crash
   sel.innerHTML = '<option value="">—</option>' +
     STATE.team.map(tm => `<option value="${tm.name}">${tm.name}</option>`).join('');
   const saved = localStorage.getItem(REG_LS.USER);
@@ -1080,8 +1080,13 @@ function goPatient(id) {
 // AUTH GATE — Google Sign-In via Apps Script
 // ════════════════════════════════════════════════════════════════
 function renderAuthBlock(title, body, ctaLabel, ctaHref) {
-  // Clear the main UI and show a full-screen block message.
-  const host = document.querySelector('.reg-page') || document.body;
+  // Clear the main UI content and show a full-screen block message.
+  // IMPORTANT: must scope to .page-content, NOT document.body, so the header
+  // toolbar (including #userSelect, which populateUserDropdown expects) survives.
+  const host = document.querySelector('.page-content')
+             || document.querySelector('.main-content')
+             || document.querySelector('.reg-page')
+             || document.body;
   host.innerHTML = `
     <div style="max-width: 520px; margin: 10vh auto; padding: 32px 28px; background: var(--color-surface, #fff); border: 1px solid var(--color-border, #e5e7eb); border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,.06); text-align: left; font-family: var(--font-body, system-ui);">
       <div style="display:flex; align-items:center; gap:10px; margin-bottom: 12px;">
