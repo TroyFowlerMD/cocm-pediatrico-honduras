@@ -9,6 +9,7 @@ let PSTATE = {
   tools: {},
   conditions: {},
   team: [],
+  authorizedUsers: [],
   user: '',
   dataset: 'real',
 };
@@ -77,8 +78,9 @@ async function load() {
   }
   if (!PSTATE.user) PSTATE.user = localStorage.getItem(REG_LS.USER) || '';
   try {
-    const [pacientes, visitas, meds, config] = await Promise.all([
-      fetchTab('Pacientes'), fetchTab('Visitas'), fetchTab('Medicamentos'), fetchTab('Config')
+    const [pacientes, visitas, meds, config, authUsers] = await Promise.all([
+      fetchTab('Pacientes'), fetchTab('Visitas'), fetchTab('Medicamentos'), fetchTab('Config'),
+      fetchTab('AuthorizedUsers').catch(() => []),
     ]);
     PSTATE.patient = pacientes.find(p => p.Patient_ID === id);
     PSTATE.visits = visitas.filter(v => v.Patient_ID === id)
@@ -90,6 +92,7 @@ async function load() {
       config.filter(r => r.Category==='condition' && isActiveRow(r)).map(r => [r.Key, {es:r.Display_ES, en:r.Display_EN}])
     );
     PSTATE.team = config.filter(r => r.Category==='team' && isActiveRow(r)).map(r => ({name:r.Key, role:r.Value}));
+    PSTATE.authorizedUsers = authUsers;
   } catch (err) {
     document.getElementById('patBody').innerHTML = `<div class="empty-state"><p>${t('generic_error', { msg: err.message })}</p></div>`;
     showToast(t('conn_lost'), { variant: 'error', retry: () => load() });
@@ -573,16 +576,30 @@ function renderTrends(toolKeys, lang) {
 }
 
 function bigSparkline(values, cutoffs) {
-  if (!values || values.length < 2) return '<svg class="big-spark"></svg>';
+  const en = getLang() === 'en';
+  // Single-point or no data: show placeholder message instead of chart
+  if (!values || values.length < 2) {
+    const msg = en ? 'Add another score to see trend' : 'Agregue otro puntaje para ver la tendencia';
+    return `<div style="font-size:var(--text-xs);color:var(--color-text-muted);padding:8px 0;font-style:italic;">${msg}</div>`;
+  }
   // Fixed chart geometry with space for axis labels on left
   const w = 300, h = 90, padL = 34, padR = 6, padT = 6, padB = 16;
   const plotW = w - padL - padR;
   const plotH = h - padT - padB;
 
-  // Determine y-axis range: prefer cutoff-based range when available
+  // Determine y-axis range:
+  // 1. Use cutoffs.max_score if present (non-null integer in Config Value JSON)
+  // 2. For categorical tools (severe===999 or max_score===null), fall back to data-based range
+  // 3. Otherwise use cutoff-based range
   let yMin = 0, yMax = 27;
   const hasCutoffs = cutoffs && (typeof cutoffs.severe === 'number' || typeof cutoffs.moderate === 'number');
-  if (hasCutoffs) {
+  const isCategorical = cutoffs && (cutoffs.severe === 999 || cutoffs.max_score === null);
+  if (cutoffs && typeof cutoffs.max_score === 'number' && cutoffs.max_score !== null && !isCategorical) {
+    // Use explicit max_score from Config sheet
+    const dataMax = Math.max(...values);
+    yMax = Math.max(cutoffs.max_score, dataMax);
+    yMin = 0;
+  } else if (hasCutoffs && !isCategorical) {
     // Max from cutoff.severe or data max, plus headroom
     const dataMax = Math.max(...values);
     const cutMax = Math.max(cutoffs.severe || 0, cutoffs.moderate || 0, cutoffs.mild || 0, cutoffs.remission || 0);
@@ -672,8 +689,8 @@ function renderVisits(lang) {
     const tierCls = TIER_CLASS[tier] || 'tier-nodata';
     const tierLbl = translateTier(tier);
     const siBadge = v.SI_Positive==='TRUE' ? '<span class="pat-row-safety" style="font-size:10px;padding:1px 6px;background:var(--color-error);color:white;border-radius:999px;">SI+</span>' : '';
-    const entryType = v.Entry_Type || 'visit';
-    const isScore = entryType === 'score';
+    const entryType = v.Entry_Type || 'Visit';
+    const isScore = entryType.toLowerCase() === 'score';
     const typeBadge = isScore
       ? `<span class="entry-type-chip type-score" title="${en?'Score only (no visit)':'Solo puntaje (sin visita)'}">${en?'Score':'Puntaje'}</span>`
       : `<span class="entry-type-chip type-visit">${en?'Visit':'Visita'}</span>`;
@@ -1005,7 +1022,7 @@ async function submitVisit() {
         SI_Positive: i === 0 ? siPositive : 'FALSE', // SI attaches to first row only
         Not_Improving_Flag: '',
         Visit_Note: i === 0 ? visitNote : '',
-        Entry_Type: 'visit',
+        Entry_Type: 'Visit',
         Created_By: PSTATE.user || 'unknown',
         Created_At: now,
         Updated_By: '',
@@ -1246,6 +1263,16 @@ async function _pacAuthGate() {
 }
 
 // ── Edit Patient modal (demographics + conditions + monitored tools) ──
+// Live DOB → Age helper for edit modal
+function updateEpAge(dobVal) {
+  const el = document.getElementById('epAgeDisplay');
+  if (!el) return;
+  if (!dobVal) { el.textContent = '—'; return; }
+  const age = Math.floor((Date.now() - new Date(dobVal).getTime()) / 31557600000);
+  el.textContent = isNaN(age) || age < 0 ? '—' : String(age);
+}
+if (typeof window !== 'undefined') window.updateEpAge = updateEpAge;
+
 function openEditPatientModal() {
   const p = PSTATE.patient || {};
   const en = getLang() === 'en';
@@ -1294,16 +1321,12 @@ function openEditPatientModal() {
         <input type="text" id="epName" value="${escapeHtml(p.Patient_Name||'')}" style="${inputStyle}"/>
       </div>
       <div>
-        <label class="np-label">${en?'Initials':'Iniciales'}</label>
-        <input type="text" id="epInitials" maxlength="6" value="${escapeHtml(p.Initials||'')}" style="${inputStyle}"/>
-      </div>
-      <div>
         <label class="np-label">${en?'Date of birth':'Fecha de nacimiento'}</label>
-        <input type="date" id="epDOB" value="${escapeHtml(p.DOB||'')}" style="${inputStyle}"/>
+        <input type="date" id="epDOB" value="${escapeHtml(p.DOB||'')}" style="${inputStyle}" oninput="updateEpAge(this.value)"/>
       </div>
       <div>
         <label class="np-label">${en?'Age':'Edad'}</label>
-        <input type="number" id="epAge" min="0" max="99" value="${escapeHtml(p.Age||'')}" style="${inputStyle}"/>
+        <div id="epAgeDisplay" style="${inputStyle}background:var(--color-surface-3,var(--color-surface-2));color:var(--color-text-muted);cursor:default;">${escapeHtml(p.DOB ? String(Math.floor((Date.now()-new Date(p.DOB).getTime())/31557600000)) : (p.Age||'—'))}</div>
       </div>
       <div>
         <label class="np-label">${en?'Sex':'Sexo'}</label>
@@ -1316,7 +1339,17 @@ function openEditPatientModal() {
       </div>
       <div style="grid-column:1 / -1;">
         <label class="np-label">${en?'Therapist':'Terapeuta'}</label>
-        <input type="text" id="epTherapist" value="${escapeHtml(p.Therapist||'')}" style="${inputStyle}"/>
+        ${(() => {
+          const therapistList = (PSTATE.authorizedUsers || []).filter(u => u.role === 'therapist' && (u.active === 'TRUE' || u.active === true));
+          if (therapistList.length === 0) {
+            // Fallback: use team list from Config if AuthorizedUsers unavailable
+            const teamTherapists = (PSTATE.team || []).filter(t => t.role === 'therapist');
+            const opts = teamTherapists.map(t => `<option value="${escapeHtml(t.name)}" ${p.Therapist===t.name?'selected':''}>${escapeHtml(t.name)}</option>`).join('');
+            return `<select id="epTherapist" style="${inputStyle}"><option value="">— ${en?'select':'seleccionar'} —</option>${opts}</select>`;
+          }
+          const opts = therapistList.map(u => { const n = escapeHtml(u.name||u.email||''); return `<option value="${n}" ${p.Therapist===n?'selected':''}>${n}</option>`; }).join('');
+          return `<select id="epTherapist" style="${inputStyle}"><option value="">— ${en?'select':'seleccionar'} —</option>${opts}</select>`;
+        })()} 
       </div>
     </div>
     <div style="margin-top:var(--space-4);padding-top:var(--space-3);border-top:1px solid var(--color-border);">
@@ -1373,11 +1406,15 @@ async function submitEditPatient() {
   const name = (document.getElementById('epName')?.value || '').trim();
   if (!name) { showToast(en?'Name is required':'El nombre es obligatorio', { variant:'warn' }); return; }
 
-  const initials = (document.getElementById('epInitials')?.value || '').trim();
   const dob      = (document.getElementById('epDOB')?.value || '').trim();
-  const ageVal   = (document.getElementById('epAge')?.value || '').trim();
+  const ageVal   = dob ? String(Math.floor((Date.now() - new Date(dob).getTime()) / 31557600000)) : (p.Age || '');
   const sex      = (document.getElementById('epSex')?.value || '').trim();
   const therapist= (document.getElementById('epTherapist')?.value || '').trim();
+  // Auto-compute initials: first letter of first word + first letter of last word, uppercase
+  const nameParts = name.trim().split(/\s+/).filter(Boolean);
+  const initials = nameParts.length >= 2
+    ? (nameParts[0][0] + nameParts[nameParts.length-1][0]).toUpperCase()
+    : (nameParts[0]?.[0] || '').toUpperCase();
   const notes    = (document.getElementById('epNotes')?.value || '').trim();
   const conds    = [...document.querySelectorAll('input[name="epCond"]:checked')].map(c=>c.value).join(',');
   const tools    = [...document.querySelectorAll('input[name="epTool"]:checked')].map(c=>c.value).join(',');
@@ -1389,7 +1426,7 @@ async function submitEditPatient() {
   // Capture previous values for undo
   const prev = {
     Patient_Name: p.Patient_Name || '',
-    Initials: p.Initials || '',
+    Initials: p.Initials || '', // kept for undo
     DOB: p.DOB || '',
     Age: p.Age || '',
     Sex: p.Sex || '',
@@ -1593,7 +1630,7 @@ async function submitScore() {
     SI_Positive: 'FALSE',
     Not_Improving_Flag: '',
     Visit_Note: document.getElementById('sNote').value.trim(),
-    Entry_Type: 'score',
+    Entry_Type: 'Score',
     Created_By: PSTATE.user || 'unknown',
     Created_At: now,
     Updated_By: '',
