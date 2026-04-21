@@ -114,12 +114,13 @@ const REG_DEFAULT_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxE
 
 // ── Spreadsheet layout (must match the deployed Sheet) ─────────
 const REG_GIDS = {
-  Pacientes:    1939309800,
-  Visitas:      2002702116,
-  Medicamentos: 135204510,
-  Config:       1274977205,
-  Auditoria:    690792597,
-  Sugerencias:  315401556,
+  Pacientes:       1939309800,
+  Visitas:         2002702116,
+  Medicamentos:    135204510,
+  Config:          1274977205,
+  Auditoria:       690792597,
+  Sugerencias:     315401556,
+  AuthorizedUsers: 129469619,
 };
 const REG_HEADERS = {
   // Pacientes: schema v2 adds AIMS-aligned tracking fields.
