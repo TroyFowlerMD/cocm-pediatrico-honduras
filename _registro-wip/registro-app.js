@@ -473,19 +473,91 @@ async function loadAndRender() {
   status.textContent = translateMode(mode);
   status.className   = mode==='demo' ? 'warn' : 'ok';
 
+  // v2.5.2 — Paint-from-cache first: if we have a recent cache, populate STATE
+  // and render immediately so the user sees the registry instantly, then refresh
+  // in the background and re-render when real data lands. Skipped on demo mode.
+  let paintedFromCache = false;
+  if (mode !== 'demo' && typeof readCache === 'function') {
+    const cached = readCache();
+    if (cached && Array.isArray(cached.pacientes) && cached.pacientes.length) {
+      STATE.pacientes = cached.pacientes;
+      STATE.visitas   = cached.visitas   || [];
+      STATE.meds      = cached.meds      || [];
+      STATE.config    = cached.config    || [];
+      STATE.authorizedUsers = cached.authorizedUsers || [];
+      STATE.tools = parseToolCutoffs(STATE.config);
+      STATE.conditions = Object.fromEntries(
+        STATE.config.filter(r => r.Category==='condition' && isActiveRow(r))
+                    .map(r => [r.Key, { es: r.Display_ES, en: r.Display_EN }])
+      );
+      STATE.team = STATE.config.filter(r => r.Category==='team' && isActiveRow(r))
+                               .map(r => ({ name: r.Key, role: r.Value }));
+      STATE.enrichedPatients = computePatientTiers(STATE.pacientes, STATE.visitas, STATE.tools);
+      populateUserDropdown();
+      populateTherapistFilter();
+      populateConditionFilter();
+      updateDatasetToggleUI();
+      renderAll();
+      paintedFromCache = true;
+      // Subtle "refreshing" indicator
+      if (status) { status.textContent = (getLang()==='en'?'Refreshing…':'Actualizando…'); status.className = 'ok'; }
+    }
+  }
+
+  // Staggered read: Pacientes + AuthorizedUsers first, then visits/meds/config.
+  // Paint Pacientes-only first so the list shows even before visit tiers finish.
+  let data;
   try {
-    const data = await fetchAll();
+    if (typeof fetchAllStaggered === 'function' && mode !== 'demo') {
+      const { firstWave, secondWave } = fetchAllStaggered();
+      const [pacientes, authorizedUsers] = await firstWave;
+      if (!paintedFromCache) {
+        STATE.pacientes = pacientes;
+        STATE.authorizedUsers = authorizedUsers || [];
+        // Visits/config arrive later — render with empty visit data first.
+        STATE.visitas = STATE.visitas || [];
+        STATE.meds    = STATE.meds    || [];
+        STATE.config  = STATE.config  || [];
+        STATE.tools   = parseToolCutoffs(STATE.config);
+        STATE.conditions = STATE.conditions || {};
+        STATE.team   = STATE.team || [];
+        STATE.enrichedPatients = computePatientTiers(STATE.pacientes, STATE.visitas, STATE.tools);
+        populateUserDropdown();
+        populateTherapistFilter();
+        populateConditionFilter();
+        updateDatasetToggleUI();
+        renderAll();
+      } else {
+        // Cache already painted — update patient roster silently.
+        STATE.pacientes = pacientes;
+        STATE.authorizedUsers = authorizedUsers || [];
+      }
+      const [visitas, meds, config] = await secondWave;
+      data = { pacientes, visitas, meds, config, authorizedUsers };
+    } else {
+      data = await fetchAll();
+    }
     STATE.pacientes = data.pacientes;
     STATE.visitas   = data.visitas;
     STATE.meds      = data.meds;
     STATE.config    = data.config;
     STATE.authorizedUsers = data.authorizedUsers || [];
+    if (typeof writeCache === 'function') writeCache(data);
   } catch (err) {
-    status.textContent = t('generic_error', { msg: err.message });
-    status.className = 'err';
-    console.error(err);
-    showToast(t('conn_lost'), { variant: 'error', retry: () => loadAndRender() });
-    return;
+    if (!paintedFromCache) {
+      status.textContent = t('generic_error', { msg: err.message });
+      status.className = 'err';
+      console.error(err);
+      showToast(t('conn_lost'), { variant: 'error', retry: () => loadAndRender() });
+      return;
+    } else {
+      // Cache painted; refresh failed — toast but keep cached view.
+      console.warn('[loadAndRender] refresh failed, keeping cache', err);
+      showToast(t('conn_lost'), { variant: 'warn', retry: () => loadAndRender() });
+      status.textContent = translateMode(mode);
+      status.className = mode==='demo' ? 'warn' : 'ok';
+      return;
+    }
   }
   STATE.tools = parseToolCutoffs(STATE.config);
   STATE.conditions = Object.fromEntries(
@@ -501,6 +573,9 @@ async function loadAndRender() {
   populateConditionFilter();
   updateDatasetToggleUI();
   renderAll();
+  // Final status
+  status.textContent = translateMode(mode);
+  status.className = mode==='demo' ? 'warn' : 'ok';
 }
 
 async function reloadData() { await loadAndRender(); }
