@@ -69,6 +69,9 @@ const REG_I18N = {
 
   // ── flags / actions ────────────────────────────────────────
   flag_safety:      { es: 'SEGURIDAD',           en: 'SAFETY' },
+  flag_brigade_short:  { es: 'BRIGADA',             en: 'BRIGADE' },
+  flag_brigade_tip:    { es: 'A ver en la próxima brigada', en: 'To be seen by next brigade' },
+  brigade_banner_title:{ es: 'Marcado para la próxima brigada', en: 'Flagged for next brigade' },
   safety_pinned:    { es: 'SEGURIDAD — FIJADOS', en: 'SAFETY — PINNED' },
   flag_not_improv:  { es: 'No mejora',           en: 'Not improving' },
   flag_stuck:       { es: 'Sin visita reciente', en: 'No recent visit' },
@@ -250,6 +253,8 @@ const REG_I18N = {
   pat_complete_tool: { es: 'Completar herramienta', en: 'Complete a tool' },
   pat_trends_by_tool: { es: 'Tendencias por herramienta', en: 'Trends by tool' },
   pat_visit_history: { es: 'Historial de visitas', en: 'Visit history' },
+  visit_score_history: { es: 'Historial de visitas / puntajes', en: 'Visit / Score history' },
+  score_col_label:     { es: 'Puntaje', en: 'Score' },
   pat_med_history: { es: 'Historial de medicamentos', en: 'Medication history' },
   pat_recommendations: { es: 'Recomendaciones', en: 'Recommendations' },
   pat_dob: { es: 'FdN',       en: 'DOB' },
@@ -335,6 +340,8 @@ const REG_I18N = {
   psych_consult_section: { es: 'Seguimiento CoCM', en: 'CoCM tracking' },
   psych_consult_label:   { es: 'Última consulta psiq.', en: 'Last psych review' },
   bhcm_contact_label:    { es: 'Último contacto de terapeuta', en: 'Last therapist contact' },
+  last_contact_label:    { es: 'Último contacto', en: 'Last contact' },
+  last_contact_by:       { es: 'por', en: 'by' },
   bhcm_contact_note_label: { es: 'Nota de contacto', en: 'Contact note' },
   review_flag_label:     { es: 'Marcar para revisión en la próxima reunión', en: 'Flag for next case review' },
   edit:                  { es: 'Editar', en: 'Edit' },
