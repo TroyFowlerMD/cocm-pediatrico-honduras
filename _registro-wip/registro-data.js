@@ -481,6 +481,46 @@ function renderMarkdownInline(text) {
 if (typeof window !== 'undefined') window.renderMarkdownInline = renderMarkdownInline;
 
 
+// ── v2.5.2 paint-from-cache helpers ──
+// Cache last-known registry data in localStorage so back-nav / repeat loads paint
+// instantly. Cache is ONLY used as a first-paint fallback; fresh data always
+// overwrites. Per-tab cache so bad writes can't corrupt others.
+const REG_CACHE_KEY = REG_LS.CACHE + '.v2'; // bump version to invalidate legacy
+function readCache() {
+  try {
+    const raw = localStorage.getItem(REG_CACHE_KEY);
+    if (!raw) return null;
+    const obj = JSON.parse(raw);
+    // Expire cache after 24h to avoid stale schema
+    if (!obj || !obj.ts || (Date.now() - obj.ts) > 86400000) return null;
+    return obj.data || null;
+  } catch (_) { return null; }
+}
+function writeCache(data) {
+  try {
+    localStorage.setItem(REG_CACHE_KEY, JSON.stringify({ ts: Date.now(), data }));
+  } catch (_) { /* quota errors ignored */ }
+}
+if (typeof window !== 'undefined') { window.readCache = readCache; window.writeCache = writeCache; }
+
+// ── Staggered fetch: resolve Pacientes + AuthorizedUsers FIRST (what the
+// registry first-paint needs), then visitas/meds/config in a follow-up wave.
+// Caller can await the first promise to paint, then the second to enrich.
+function fetchAllStaggered() {
+  const firstWave = Promise.all([
+    fetchTab('Pacientes').catch(e => { console.warn('[fetchAllStaggered] Pacientes failed', e); return []; }),
+    fetchTab('AuthorizedUsers').catch(() => []),
+  ]);
+  const secondWave = Promise.all([
+    fetchTab('Visitas').catch(e => { console.warn('[fetchAllStaggered] Visitas failed', e); return []; }),
+    fetchTab('Medicamentos').catch(e => { console.warn('[fetchAllStaggered] Medicamentos failed', e); return []; }),
+    fetchTab('Config').catch(e => { console.warn('[fetchAllStaggered] Config failed', e); return []; }),
+  ]);
+  return { firstWave, secondWave };
+}
+if (typeof window !== 'undefined') window.fetchAllStaggered = fetchAllStaggered;
+
+
 async function fetchAll() {
   // v1.1: parallelize reads now that fetchTab has timeouts + retries.
   // Falls back per-tab on individual failure so one bad tab doesn't nuke the page.
