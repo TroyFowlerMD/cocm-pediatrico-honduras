@@ -77,6 +77,34 @@ async function load() {
     return;
   }
   if (!PSTATE.user) PSTATE.user = localStorage.getItem(REG_LS.USER) || '';
+
+  // v2.5.3 — Paint from shared registry cache if we have it.
+  // The registry already caches all tabs; reuse that for instant patient-page first paint.
+  let painted = false;
+  if (typeof readCache === 'function') {
+    const cached = readCache();
+    if (cached && Array.isArray(cached.pacientes)) {
+      const p = cached.pacientes.find(x => x.Patient_ID === id);
+      if (p) {
+        PSTATE.patient = p;
+        PSTATE.visits = (cached.visitas || []).filter(v => v.Patient_ID === id)
+                                 .sort((a,b) => String(b.Visit_Date).localeCompare(String(a.Visit_Date)));
+        PSTATE.meds = (cached.meds || []).filter(m => m.Patient_ID === id)
+                                 .sort((a,b) => String(b.Date).localeCompare(String(a.Date)));
+        PSTATE.tools = parseToolCutoffs(cached.config || []);
+        PSTATE.conditions = Object.fromEntries(
+          (cached.config || []).filter(r => r.Category==='condition' && isActiveRow(r))
+                   .map(r => [r.Key, {es:r.Display_ES, en:r.Display_EN}])
+        );
+        PSTATE.team = (cached.config || []).filter(r => r.Category==='team' && isActiveRow(r))
+                                .map(r => ({name:r.Key, role:r.Value}));
+        PSTATE.authorizedUsers = cached.authorizedUsers || [];
+        render();
+        painted = true;
+      }
+    }
+  }
+
   try {
     const [pacientes, visitas, meds, config, authUsers] = await Promise.all([
       fetchTab('Pacientes'), fetchTab('Visitas'), fetchTab('Medicamentos'), fetchTab('Config'),
@@ -93,7 +121,16 @@ async function load() {
     );
     PSTATE.team = config.filter(r => r.Category==='team' && isActiveRow(r)).map(r => ({name:r.Key, role:r.Value}));
     PSTATE.authorizedUsers = authUsers;
+    // Refresh shared cache with latest.
+    if (typeof writeCache === 'function') {
+      writeCache({ pacientes, visitas, meds, config, authorizedUsers: authUsers });
+    }
   } catch (err) {
+    if (painted) {
+      console.warn('[patient load] refresh failed, keeping cached view', err);
+      showToast(t('conn_lost'), { variant: 'warn', retry: () => load() });
+      return;
+    }
     document.getElementById('patBody').innerHTML = `<div class="empty-state"><p>${t('generic_error', { msg: err.message })}</p></div>`;
     showToast(t('conn_lost'), { variant: 'error', retry: () => load() });
     return;
