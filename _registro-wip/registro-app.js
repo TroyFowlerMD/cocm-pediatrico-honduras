@@ -607,28 +607,7 @@ function populateTherapistFilter() {
   } catch(_) {}
 }
 
-// v2.5.12 — persist therapist filter selection across page loads
-// Hooked via event listener below (not inline onchange) to stay in scope.
-(function attachTherapistFilterPersistence() {
-  function hook() {
-    const sel = document.getElementById('filterTherapist');
-    if (!sel) return;
-    sel.addEventListener('change', () => {
-      try {
-        if (sel.value) {
-          localStorage.setItem(REG_LS.FILTER_THERAPIST, sel.value);
-        } else {
-          localStorage.removeItem(REG_LS.FILTER_THERAPIST);
-        }
-      } catch(_) {}
-    });
-  }
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', hook);
-  } else {
-    hook();
-  }
-})();
+
 
 // ── v2.5.11: Auto-filter to therapist's own patients on login ──
 function applyTherapistAutoFilter(user) {

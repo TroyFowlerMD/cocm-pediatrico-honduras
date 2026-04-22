@@ -571,7 +571,7 @@
 
         <div class="filter-group">
           <label for="filterTherapist" data-es="Terapeuta" data-en="Therapist">Terapeuta</label>
-          <select id="filterTherapist" onchange="renderAll()"><option value="">—</option></select>
+          <select id="filterTherapist" onchange="try{this.value?localStorage.setItem('coCMCamasca.filterTherapist',this.value):localStorage.removeItem('coCMCamasca.filterTherapist')}catch(e){}renderAll()"><option value="">—</option></select>
         </div>
 
         <div class="filter-group">
