@@ -225,8 +225,6 @@ function setLang(lang) {
 let SUG_STATE = { team: [], suggestions: [] };
 
 async function load() {
-  // Ensure we have an email before hitting Apps Script
-  getClientEmail({ promptIfMissing: true });
   const [config, suggestions] = await Promise.all([
     fetchTab('Config'),
     fetchTab('Sugerencias').catch(()=>[])
