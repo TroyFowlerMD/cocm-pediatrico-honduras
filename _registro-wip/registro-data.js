@@ -606,6 +606,30 @@ async function updateRow(tab, rowId, updates) {
   throw lastErr;
 }
 
+async function deleteRow(tab, rowId) {
+  const resolved = resolveTab(tab);
+  const url = cfgGet(REG_LS.APPS_SCRIPT_URL);
+  if (!url) {
+    showToast && showToast('Cannot delete — no Apps Script URL configured', { variant: 'error' });
+    return { ok: false };
+  }
+  let lastErr;
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    try {
+      const res = await fetchWithTimeout(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify({ op: 'delete', tab: resolved, rowId, email: getClientEmail() }),
+      }, 12000);
+      return await res.json();
+    } catch (e) {
+      lastErr = e;
+      if (attempt < 3) await new Promise(r => setTimeout(r, 500 * attempt));
+    }
+  }
+  throw lastErr;
+}
+
 // ════════════════════════════════════════════════════════════════
 // AUTH PING — verifies signed-in Google account is in AuthorizedUsers
 // ════════════════════════════════════════════════════════════════

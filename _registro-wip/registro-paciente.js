@@ -761,6 +761,7 @@ function renderVisits(lang) {
     const updatedBadge = v.Updated_At ? ` <span title="${en?'Edited ':'Editado '}${escapeHtml(v.Updated_At)}${updatedName ? (en?' by ':' por ')+escapeHtml(updatedName) : ''}" class="vupdated">(${en?'edited':'editado'})</span>` : '';
     const creatorLine = creatorDisplay ? `<div class="vcreator">— ${escapeHtml(creatorDisplay)}${updatedBadge}</div>` : '';
     const editBtn = `<button class="vedit-btn" onclick="openEditVisitModal('${escapeHtml(v.Visit_ID)}')" title="${en?'Edit visit':'Editar visita'}">✎</button>`;
+    const deleteBtn = `<button class="ghost" style="padding:4px 8px;font-size:var(--text-xs);color:var(--color-error);border-color:var(--color-error);" onclick="confirmDeleteVisit('${escapeHtml(v.Visit_ID)}')" title="${en?'Delete':'Eliminar'}">🗑</button>`;
     const noteHtml = v.Visit_Note ? renderMarkdownInline(v.Visit_Note) : '';
     return `
       <div class="visit-row${isScore?' visit-row-score':''}">
@@ -770,7 +771,7 @@ function renderVisits(lang) {
         <div class="vnote">${noteHtml} ${siBadge}${creatorLine}</div>
         <div class="vscore">${v.Score||'—'}</div>
         <div class="vtier ${tierCls}">${tierLbl}</div>
-        <div class="vedit">${editBtn}</div>
+        <div class="vedit">${editBtn}${deleteBtn}</div>
       </div>
     `;
   }).join('') + `</div>`;
@@ -1370,24 +1371,35 @@ function closeBrigadeModal() {
 }
 async function submitBrigade() {
   const btn = document.getElementById('brigadeSaveBtn');
+  if (btn && btn.disabled) return;
   if (btn) { btn.disabled = true; btn.textContent = '...'; }
   const brigadeFlag = document.getElementById('brigadeCheckbox')?.checked ? 'TRUE' : '';
   const brigadeReason = (document.getElementById('brigadeReason')?.value || '').trim();
   const p = PSTATE.patient || {};
-  const payload = { ...p, Brigade_Flag: brigadeFlag, Brigade_Reason: brigadeReason };
+  const en = getLang() === 'en';
   try {
-    const result = await savePatient(payload);
-    if (result && result.status === 'ok') {
+    const result = await updateRow('Pacientes', p.Patient_ID, {
+      Brigade_Flag: brigadeFlag,
+      Brigade_Reason: brigadeReason,
+      Updated_By: PSTATE.user || 'unknown',
+      Updated_At: new Date().toISOString(),
+    });
+    if (result && (result.status === 'ok' || result.ok)) {
       PSTATE.patient = { ...p, Brigade_Flag: brigadeFlag, Brigade_Reason: brigadeReason };
+      // Also update in shared STATE if available
+      if (typeof STATE !== 'undefined' && STATE.pacientes) {
+        const idx = STATE.pacientes.findIndex(x => x.Patient_ID === p.Patient_ID);
+        if (idx >= 0) STATE.pacientes[idx] = { ...STATE.pacientes[idx], Brigade_Flag: brigadeFlag, Brigade_Reason: brigadeReason };
+      }
       closeBrigadeModal();
       renderPatientPage();
     } else {
-      alert((getLang()==='en'?'Save failed: ':'Error al guardar: ') + (result?.message || 'unknown error'));
+      alert((en ? 'Save failed: ' : 'Error al guardar: ') + (result?.message || 'unknown error'));
+      if (btn) { btn.disabled = false; btn.textContent = en ? 'Save' : 'Guardar'; }
     }
   } catch(e) {
-    alert((getLang()==='en'?'Save failed: ':'Error al guardar: ') + e.message);
-  } finally {
-    if (btn) { btn.disabled = false; btn.textContent = getLang()==='en'?'Save':'Guardar'; }
+    alert((en ? 'Save failed: ' : 'Error al guardar: ') + e.message);
+    if (btn) { btn.disabled = false; btn.textContent = en ? 'Save' : 'Guardar'; }
   }
 }
 if (typeof window !== 'undefined') {
@@ -2100,6 +2112,9 @@ if (typeof window !== 'undefined') {
 // Audit fields (Updated_By, Updated_At) auto-populate.
 // ════════════════════════════════════════════════════════════════
 function openEditVisitModal(visitId) {
+  // Reset save button state in case prior save left it disabled
+  const editBtn = document.getElementById('editVisitSaveBtn');
+  if (editBtn) { editBtn.disabled = false; editBtn.textContent = getLang()==='en' ? 'Save' : 'Guardar'; }
   const v = (PSTATE.visits || []).find(x => x.Visit_ID === visitId);
   if (!v) { showToast(getLang()==='en'?'Visit not found':'Visita no encontrada', { variant:'warn' }); return; }
   const en = getLang() === 'en';
@@ -2226,6 +2241,55 @@ async function submitEditVisit() {
     showToast(t('generic_error', { msg: err.message }), { variant:'error', retry: () => submitEditVisit() });
   }
 }
+async function confirmDeleteVisit(visitId) {
+  const en = getLang() === 'en';
+  const msg = en ? 'Delete this entry? This cannot be undone.' : '¿Eliminar esta entrada? Esta acción no se puede deshacer.';
+  if (!confirm(msg)) return;
+  try {
+    const result = await deleteRow('Visitas', visitId);
+    if (result && (result.status === 'ok' || result.ok)) {
+      PSTATE.visits = PSTATE.visits.filter(v => v.Visit_ID !== visitId);
+      if (typeof STATE !== 'undefined' && STATE.visitas) {
+        STATE.visitas = STATE.visitas.filter(v => v.Visit_ID !== visitId);
+      }
+      showToast(en ? 'Entry deleted.' : 'Entrada eliminada.', { variant: 'success' });
+      renderPatientPage();
+    } else {
+      showToast((en ? 'Delete failed: ' : 'Error al eliminar: ') + (result?.message || 'unknown'), { variant: 'error' });
+    }
+  } catch(e) {
+    showToast((en ? 'Delete failed: ' : 'Error al eliminar: ') + e.message, { variant: 'error' });
+  }
+}
+if (typeof window !== 'undefined') window.confirmDeleteVisit = confirmDeleteVisit;
+
+async function confirmDeletePatient() {
+  const en = getLang() === 'en';
+  const p = PSTATE.patient;
+  if (!p) return;
+  const msg = en
+    ? `Permanently delete ${p.Patient_Name} (${p.Patient_ID})? This will NOT delete their visits or medication records. This cannot be undone.`
+    : `¿Eliminar permanentemente a ${p.Patient_Name} (${p.Patient_ID})? Esto NO eliminará sus visitas ni registros de medicamentos. No se puede deshacer.`;
+  if (!confirm(msg)) return;
+  try {
+    const result = await deleteRow('Pacientes', p.Patient_ID);
+    if (result && (result.status === 'ok' || result.ok)) {
+      if (typeof STATE !== 'undefined' && STATE.pacientes) {
+        STATE.pacientes = STATE.pacientes.filter(x => x.Patient_ID !== p.Patient_ID);
+        STATE.enrichedPatients = computePatientTiers(STATE.pacientes, STATE.visitas, STATE.tools);
+      }
+      showToast(en ? `${p.Patient_Name} deleted.` : `${p.Patient_Name} eliminado/a.`, { variant: 'success' });
+      // Navigate back to registry
+      window.location.href = 'registro.html';
+    } else {
+      showToast((en ? 'Delete failed: ' : 'Error al eliminar: ') + (result?.message || 'unknown'), { variant: 'error' });
+    }
+  } catch(e) {
+    showToast((en ? 'Delete failed: ' : 'Error al eliminar: ') + e.message, { variant: 'error' });
+  }
+}
+if (typeof window !== 'undefined') window.confirmDeletePatient = confirmDeletePatient;
+
 if (typeof window !== 'undefined') {
   window.openEditVisitModal = openEditVisitModal;
   window.closeEditVisitModal = closeEditVisitModal;

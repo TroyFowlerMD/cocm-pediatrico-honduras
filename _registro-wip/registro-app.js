@@ -262,6 +262,12 @@ function renderNewPatientForm(showAll) {
         <label class="np-label">${t('label_notes')}</label>
         <textarea id="npNotes" rows="3" style="width:100%;padding:8px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);"></textarea>
       </div>
+      <div style="margin-top: var(--space-3); border-top: 1px solid var(--color-border); padding-top: var(--space-3);">
+        <label class="np-label">${lang==='en'?'Baseline psychometric scores (optional)':'Puntajes psicométricos basales (opcional)'}</label>
+        <p style="font-size:var(--text-xs);color:var(--color-text-muted);margin-bottom:var(--space-2);">${lang==='en'?'If scores are available at enrollment, enter them here. Each will be logged as a baseline visit.':'Si hay puntajes disponibles al ingreso, ingréselos aquí. Cada uno se registrará como visita basal.'}</p>
+        <div id="npScoreRows"></div>
+        <button type="button" onclick="addNpScoreRow()" style="margin-top:var(--space-2);background:transparent;border:1px dashed var(--color-border);color:var(--color-primary);padding:6px 12px;border-radius:var(--radius-md);font-size:var(--text-xs);cursor:pointer;width:100%;">+ ${lang==='en'?'Add baseline score':'Agregar puntaje basal'}</button>
+      </div>
     </div>
   ` : '';
 
@@ -347,9 +353,41 @@ function findPossibleDuplicates(name, age) {
   });
 }
 
+function addNpScoreRow() {
+  const host = document.getElementById('npScoreRows');
+  if (!host) return;
+  const toolKeys = Object.keys(STATE.tools);
+  const lang = getLang();
+  const inputSt = 'width:100%;padding:8px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);font-size:var(--text-sm);';
+  const div = document.createElement('div');
+  div.className = 'np-score-row';
+  div.style.cssText = 'display:grid;grid-template-columns:1fr 1fr auto;gap:var(--space-2);align-items:end;margin-bottom:var(--space-2);';
+  div.innerHTML = `
+    <div>
+      <label class="np-label">${lang==='en'?'Tool':'Herramienta'}</label>
+      <select class="npScoreTool" style="${inputSt}">
+        <option value="">—</option>
+        ${toolKeys.map(k=>`<option value="${k}">${k}</option>`).join('')}
+      </select>
+    </div>
+    <div>
+      <label class="np-label">${lang==='en'?'Score':'Puntaje'}</label>
+      <input type="number" class="npScoreVal" style="${inputSt}" placeholder="0"/>
+    </div>
+    <button type="button" onclick="this.closest('.np-score-row').remove()" title="${lang==='en'?'Remove':'Quitar'}" style="background:transparent;border:1px solid var(--color-border);color:var(--color-text-muted);padding:8px 10px;border-radius:var(--radius-md);cursor:pointer;">×</button>
+  `;
+  host.appendChild(div);
+}
+if (typeof window !== 'undefined') window.addNpScoreRow = addNpScoreRow;
+
 async function submitNewPatient(skipDupCheck=false) {
+  const btn = document.getElementById('npSaveBtn');
+  if (btn && btn.disabled) return; // double-submit guard
+  if (btn) { btn.disabled = true; btn.textContent = getLang()==='en' ? 'Saving…' : 'Guardando…'; }
+  const reenable = () => { if (btn) { btn.disabled = false; btn.textContent = getLang()==='en' ? 'Save' : 'Guardar'; } };
   const name = document.getElementById('npName').value.trim();
   if (!name) {
+    reenable();
     showToast(t('err_name_required'), { variant: 'warn' });
     document.getElementById('npName')?.focus();
     return;
@@ -362,6 +400,7 @@ async function submitNewPatient(skipDupCheck=false) {
   if (!skipDupCheck) {
     const dups = findPossibleDuplicates(name, ageStr);
     if (dups.length) {
+      reenable();
       showDuplicateWarning(dups);
       return;
     }
@@ -422,10 +461,35 @@ async function submitNewPatient(skipDupCheck=false) {
     }
     saveOk = true;
   } catch (err) {
+    reenable();
     showToast(t('generic_error', { msg: err.message }), { variant: 'error', retry: () => submitNewPatient(true) });
+    return;
   }
   STATE.pacientes.push(row);
   STATE.enrichedPatients = computePatientTiers(STATE.pacientes, STATE.visitas, STATE.tools);
+  // Submit baseline scores if entered
+  const scoreRows = document.querySelectorAll('#npScoreRows .np-score-row');
+  const baselineDate = row.Enrollment_Date || new Date().toISOString().slice(0,10);
+  for (const sr of scoreRows) {
+    const tool = sr.querySelector('.npScoreTool')?.value;
+    const score = sr.querySelector('.npScoreVal')?.value;
+    if (tool && score !== '') {
+      const visitRow = {
+        Visit_ID: `V-${Date.now()}-${Math.random().toString(36).slice(2,6)}`,
+        Patient_ID: nextId,
+        Date: baselineDate,
+        Tool: tool,
+        Score: score,
+        Entry_Type: 'Score',
+        SI_Positive: 'FALSE',
+        Note: getLang()==='en' ? 'Baseline score at enrollment' : 'Puntaje basal al ingreso',
+        Baseline_Score: score,
+        Created_By: STATE.user || 'unknown',
+        Created_At: now,
+      };
+      try { await writeRow('Visitas', visitRow); STATE.visitas.push(visitRow); } catch(_) {}
+    }
+  }
   closeNewPatientModal();
   renderAll();
   // PSC-17 prompt: offer to open the qualifying screening for this new patient
