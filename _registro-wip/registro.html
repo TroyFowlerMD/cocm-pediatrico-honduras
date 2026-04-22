@@ -488,7 +488,8 @@
       .np-row-2 { grid-template-columns: 1fr; }
       table.pat-table thead { display: none; }
       table.pat-table, table.pat-table tbody, table.pat-table tr, table.pat-table td { display: block; width: 100%; }
-      table.pat-table tr { padding: var(--space-3) var(--space-4); }
+      table.pat-table tr { padding: var(--space-3) var(--space-4); border-bottom: 2px solid var(--color-border); }
+      table.pat-table tr:first-child { border-top: 2px solid var(--color-border); }
       table.pat-table td { padding: 4px 0; border: none; }
       table.pat-table td[data-label]::before {
         content: attr(data-label) ': ';
