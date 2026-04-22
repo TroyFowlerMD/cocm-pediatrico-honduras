@@ -43,7 +43,7 @@ function setLang(lang) {
   if (saved) document.documentElement.setAttribute('data-theme', saved);
   document.addEventListener('click', (e) => {
     if (e.target.closest('[data-theme-toggle]')) {
-      const cur = document.documentElement.getAttribute('data-theme') || 'light';
+      const cur = document.documentElement.getAttribute('data-theme') || 'dark';
       const next = cur === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       localStorage.setItem('coCMCamasca.theme', next);
