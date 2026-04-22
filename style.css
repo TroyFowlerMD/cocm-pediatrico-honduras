@@ -1200,3 +1200,5 @@ a, button, [role='button'], input, select {
 @media (max-width: 700px) {
   .app-layout.no-sidebar .page-content { padding: var(--space-4); }
 }
+/* Prevent horizontal overflow on mobile */
+html, body { overflow-x: hidden; max-width: 100%; }
