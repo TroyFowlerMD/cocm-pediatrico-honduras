@@ -628,7 +628,7 @@ function bigSparkline(values, cutoffs) {
   // Single-point or no data: show placeholder message instead of chart
   if (!values || values.length < 2) {
     const msg = en ? 'Add another score to see trend' : 'Agregue otro puntaje para ver la tendencia';
-    return `<div style="font-size:var(--text-xs);color:var(--color-text-muted);padding:8px 0;font-style:italic;">${msg}</div>`;
+    return `<div style="font-size:10px;color:var(--color-text-muted);padding:4px 0;font-style:italic;">${msg}</div>`;
   }
   // Fixed chart geometry with space for axis labels on left
   const w = 300, h = 90, padL = 34, padR = 6, padT = 6, padB = 16;
