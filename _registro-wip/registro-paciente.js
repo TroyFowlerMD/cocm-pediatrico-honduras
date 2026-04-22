@@ -40,10 +40,11 @@ function setLang(lang) {
 // ── Theme toggle ────────────────────────────────────────────────
 (function initTheme() {
   const saved = localStorage.getItem('coCMCamasca.theme');
-  if (saved) document.documentElement.setAttribute('data-theme', saved);
+  const system = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  document.documentElement.setAttribute('data-theme', saved || system);
   document.addEventListener('click', (e) => {
     if (e.target.closest('[data-theme-toggle]')) {
-      const cur = document.documentElement.getAttribute('data-theme') || 'dark';
+      const cur = document.documentElement.getAttribute('data-theme') || system;
       const next = cur === 'dark' ? 'light' : 'dark';
       document.documentElement.setAttribute('data-theme', next);
       localStorage.setItem('coCMCamasca.theme', next);
