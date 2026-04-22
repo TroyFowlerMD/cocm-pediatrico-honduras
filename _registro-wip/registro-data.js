@@ -13,25 +13,39 @@
 // ════════════════════════════════════════════════════════════════
 // CLIENT EMAIL HELPER
 // ════════════════════════════════════════════════════════════════
-// The Apps Script deployment runs with "Execute as: Me" + "Who has access: Anyone",
-// which means Session.getActiveUser() is blank on the backend. The frontend must
-// send the user's email with every request. We read it from localStorage, or
-// prompt once on first load and persist.
+// Priority order:
+//   1. Cloudflare Access JWT cookie (CF_Authorization) — set automatically
+//      after Google login via Cloudflare Zero Trust.
+//   2. localStorage cache (persisted from a prior CF JWT read).
+//   3. Empty string — no prompt fallback (prompt removed now that CF Access
+//      is enforcing authentication at the edge).
+function _emailFromCFJwt() {
+  try {
+    const match = document.cookie.match(/(?:^|;\s*)CF_Authorization=([^;]+)/);
+    if (!match) return '';
+    const payload = match[1].split('.')[1];
+    if (!payload) return '';
+    const decoded = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+    const email = (decoded.email || '').trim().toLowerCase();
+    if (email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return email;
+  } catch (_) {}
+  return '';
+}
+
 function getClientEmail(opts) {
-  const o = opts || {};
+  // 1. Try Cloudflare Access JWT
+  const cfEmail = _emailFromCFJwt();
+  if (cfEmail) {
+    try { localStorage.setItem('coCMCamasca.user', cfEmail); } catch (_) {}
+    return cfEmail;
+  }
+  // 2. Try localStorage cache
   try {
     const stored = (localStorage.getItem('coCMCamasca.user') || '').trim().toLowerCase();
     if (stored && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(stored)) return stored;
   } catch (_) {}
-  if (!o.promptIfMissing) return '';
-  var input = '';
-  try {
-    input = (window.prompt('Sign in — enter your authorized Google email (this is stored locally only):') || '').trim().toLowerCase();
-  } catch (_) { return ''; }
-  if (!input) return '';
-  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input)) return '';
-  try { localStorage.setItem('coCMCamasca.user', input); } catch (_) {}
-  return input;
+  // 3. No prompt — CF Access should have caught unauthenticated users at the edge
+  return '';
 }
 
 const REG_LS = {
@@ -110,7 +124,7 @@ function featAll() {
 //   Who has access: Anyone with Google account
 // Only emails listed in the AuthorizedUsers tab (with active=TRUE) can read/write.
 // Rotate this URL whenever you redeploy a new version of the relay.
-const REG_DEFAULT_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxeYSvVau-oXTM0itCnKMjmGS8nk6dBbGs4fB71tHlVQEBZFtX9FVPGR5rRHjnIM_Qe/exec';
+const REG_DEFAULT_APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxeYSvVau-oXTM0itCnKMjmGS8nk6dBbGs4fB71tHlVQEBZFtX9FVPGR5rRHjnIM_Qe/exec'; // v2.1 — Version 6 — active deployment
 
 // ── Spreadsheet layout (must match the deployed Sheet) ─────────
 const REG_GIDS = {

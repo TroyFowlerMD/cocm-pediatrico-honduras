@@ -309,7 +309,7 @@ async function submitSuggestion() {
       headers: { 'Content-Type':'text/plain;charset=utf-8' },
       body: JSON.stringify({
         op: 'suggest',
-        email: getClientEmail({ promptIfMissing: true }),
+        email: getClientEmail(),
         submitter,
         category,
         priority,
@@ -322,7 +322,7 @@ async function submitSuggestion() {
     if (json && json.url) row.Attachment_URL = json.url;
   } else if (url) {
     // No attachment — still route through Apps Script so email fires
-    const emailToSend = getClientEmail({ promptIfMissing: true });
+    const emailToSend = getClientEmail();
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type':'text/plain;charset=utf-8' },
@@ -361,7 +361,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const savedLang = localStorage.getItem('coCMCamasca.lang') || 'es';
   setLang(savedLang);
   // Ensure email is stored before any Apps Script calls fire
-  getClientEmail({ promptIfMissing: true });
+  getClientEmail();
   load();
 });
 </script>
