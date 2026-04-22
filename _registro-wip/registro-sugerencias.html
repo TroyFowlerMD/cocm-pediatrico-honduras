@@ -359,6 +359,8 @@ function escapeHtml(s) { return String(s||'').replace(/[&<>"']/g, c => ({'&':'&a
 document.addEventListener('DOMContentLoaded', () => {
   const savedLang = localStorage.getItem('coCMCamasca.lang') || 'es';
   setLang(savedLang);
+  // Ensure email is stored before any Apps Script calls fire
+  getClientEmail({ promptIfMissing: true });
   load();
 });
 </script>
