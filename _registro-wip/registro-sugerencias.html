@@ -329,7 +329,6 @@ async function submitSuggestion() {
       body: JSON.stringify({ op:'suggest', email: emailToSend, submitter, category, priority, description: desc }),
     });
     const json = await res.json();
-    if (!json.ok) { alert('Error: ' + JSON.stringify(json)); return; }
     if (json && json.id) row.Suggestion_ID = json.id;
   } else {
     await writeRow('Sugerencias', row);
