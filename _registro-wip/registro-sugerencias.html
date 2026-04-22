@@ -225,6 +225,8 @@ function setLang(lang) {
 let SUG_STATE = { team: [], suggestions: [] };
 
 async function load() {
+  // Ensure we have an email before hitting Apps Script
+  getClientEmail({ promptIfMissing: true });
   const [config, suggestions] = await Promise.all([
     fetchTab('Config'),
     fetchTab('Sugerencias').catch(()=>[])
@@ -309,7 +311,7 @@ async function submitSuggestion() {
       headers: { 'Content-Type':'text/plain;charset=utf-8' },
       body: JSON.stringify({
         op: 'suggest',
-        email: getClientEmail(),
+        email: getClientEmail({ promptIfMissing: true }),
         submitter,
         category,
         priority,
@@ -325,7 +327,7 @@ async function submitSuggestion() {
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type':'text/plain;charset=utf-8' },
-      body: JSON.stringify({ op:'suggest', email: getClientEmail(), submitter, category, priority, description: desc }),
+      body: JSON.stringify({ op:'suggest', email: getClientEmail({ promptIfMissing: true }), submitter, category, priority, description: desc }),
     });
     const json = await res.json();
     if (json && json.id) row.Suggestion_ID = json.id;
