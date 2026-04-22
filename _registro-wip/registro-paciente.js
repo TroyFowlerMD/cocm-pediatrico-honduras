@@ -208,6 +208,7 @@ function render() {
         <button class="primary" onclick="openScoreModal()" title="${getLang()==='en' ? 'Log a score without a visit' : 'Registrar puntaje sin visita'}">📊 ${getLang()==='en'?'Log score only':'Solo puntaje'}</button>
         <button class="ghost" onclick="openMedModal()">${t('action_add_med2')}</button>
         ${!safetyActive ? `<button class="danger" onclick="raiseSafety()">${t('action_raise_safety')}</button>` : ''}
+        <button class="${isTruthyFlag(p.Brigade_Flag) ? 'brigade-active' : 'ghost'}" onclick="openBrigadeModal()" title="${getLang()==='en' ? 'Flag for next brigade visit' : 'Marcar para próxima brigada'}">${isTruthyFlag(p.Brigade_Flag) ? '🚩' : '🏳'} ${getLang()==='en' ? 'Brigade' : 'Brigada'}</button>
         <button class="ghost" onclick="toggleStatus()">${t('action_change_status')}</button>
         <button class="ghost" onclick="openEditPatientModal()" title="${getLang()==='en' ? 'Edit demographics, conditions, or monitored tools' : 'Editar datos demográficos, condiciones o herramientas monitoreadas'}">✏️ ${getLang()==='en' ? 'Edit patient' : 'Editar paciente'}</button>
         <!-- brigade indicator shown in the banner above; row flag shown on registry -->
@@ -1346,6 +1347,55 @@ async function _pacAuthGate() {
   return { status: 'blocked' };
 }
 
+// ── Brigade Flag modal ────────────────────────────────────────────
+function openBrigadeModal() {
+  const host = document.getElementById('brigadeModal');
+  if (!host) return;
+  const p = PSTATE.patient || {};
+  const en = getLang() === 'en';
+  const inputStyle = 'width:100%;padding:8px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);';
+  document.getElementById('brigadeForm').innerHTML = `
+    <label style="display:flex;gap:10px;align-items:center;font-size:var(--text-sm);cursor:pointer;font-weight:600;">
+      <input type="checkbox" id="brigadeCheckbox" ${isTruthyFlag(p.Brigade_Flag)?'checked':''} style="width:18px;height:18px;cursor:pointer;"/>
+      <span>🚩 ${en?'Flag for next brigade':'Marcar para próxima brigada'}</span>
+    </label>
+    <input type="text" id="brigadeReason" placeholder="${en?'Reason / details — supports **bold** / *italic*':'Razón / detalles — admite **negrita** / *cursiva*'}" value="${escapeHtml(p.Brigade_Reason||'')}" style="${inputStyle}margin-top:10px;"/>
+    <div style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:4px;">${en?'Flags this patient to be seen by the next brigade. Appears on the registry Brigade filter chip.':'Marca a este paciente para ser visto en la próxima brigada. Aparece en el filtro de Brigada del registro.'}</div>
+  `;
+  host.style.display = 'flex';
+}
+function closeBrigadeModal() {
+  const host = document.getElementById('brigadeModal');
+  if (host) host.style.display = 'none';
+}
+async function submitBrigade() {
+  const btn = document.getElementById('brigadeSaveBtn');
+  if (btn) { btn.disabled = true; btn.textContent = '...'; }
+  const brigadeFlag = document.getElementById('brigadeCheckbox')?.checked ? 'TRUE' : '';
+  const brigadeReason = (document.getElementById('brigadeReason')?.value || '').trim();
+  const p = PSTATE.patient || {};
+  const payload = { ...p, Brigade_Flag: brigadeFlag, Brigade_Reason: brigadeReason };
+  try {
+    const result = await savePatient(payload);
+    if (result && result.status === 'ok') {
+      PSTATE.patient = { ...p, Brigade_Flag: brigadeFlag, Brigade_Reason: brigadeReason };
+      closeBrigadeModal();
+      renderPatientPage();
+    } else {
+      alert((getLang()==='en'?'Save failed: ':'Error al guardar: ') + (result?.message || 'unknown error'));
+    }
+  } catch(e) {
+    alert((getLang()==='en'?'Save failed: ':'Error al guardar: ') + e.message);
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = getLang()==='en'?'Save':'Guardar'; }
+  }
+}
+if (typeof window !== 'undefined') {
+  window.openBrigadeModal = openBrigadeModal;
+  window.closeBrigadeModal = closeBrigadeModal;
+  window.submitBrigade = submitBrigade;
+}
+
 // ── Edit Patient modal (demographics + conditions + monitored tools) ──
 // Live DOB → Age helper for edit modal
 function updateEpAge(dobVal) {
@@ -1461,14 +1511,6 @@ function openEditPatientModal() {
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;">${toolRows || `<span style="font-size:var(--text-xs);color:var(--color-text-muted);">${en?'No tools configured':'No hay herramientas configuradas'}</span>`}</div>
     </div>
     <div style="margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--color-border);">
-      <label style="display:flex;gap:10px;align-items:center;font-size:var(--text-sm);cursor:pointer;font-weight:600;" title="${en?'Flag this patient to be seen by the next brigade visit.':'Marcar este paciente para ser visto en la próxima visita de brigada.'}">
-        <input type="checkbox" id="epBrigadeFlag" ${isTruthyFlag(p.Brigade_Flag)?'checked':''} style="width:18px;height:18px;cursor:pointer;"/>
-        <span>🚩 ${en?'Flag for next brigade':'Marcar para próxima brigada'}</span>
-      </label>
-      <input type="text" id="epBrigadeReason" placeholder="${en?'Reason / details — supports **bold** / *italic*':'Razón / detalles — admite **negrita** / *cursiva*'}" value="${escapeHtml(p.Brigade_Reason||'')}" style="${inputStyle}margin-top:6px;"/>
-      <div style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:4px;">${en?'Flags this patient to be seen by the next brigade. Appears on the registry Brigade filter chip.':'Marca a este paciente para ser visto en la próxima brigada. Aparece en el filtro de Brigada del registro.'}</div>
-    </div>
-    <div style="margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--color-border);">
       <label class="np-label">${en?'Notes':'Notas'}</label>
       <textarea id="epNotes" rows="2" placeholder="${en?'Notes (supports **bold** / *italic*)':'Notas (admite **negrita** / *cursiva*)'}" style="${inputStyle}">${escapeHtml(p.Notes||'')}</textarea>
     </div>
@@ -1508,8 +1550,9 @@ async function submitEditPatient() {
   const tools    = [...document.querySelectorAll('input[name="epTool"]:checked')].map(c=>c.value).join(',');
   const primaryCondition = (document.getElementById('epPrimaryCondition')?.value || '').trim();
 
-  const brigadeFlag = document.getElementById('epBrigadeFlag')?.checked ? 'TRUE' : '';
-  const brigadeReason = (document.getElementById('epBrigadeReason')?.value || '').trim();
+  // Brigade flag is managed via the dedicated Brigade modal, not Edit Patient
+  const brigadeFlag = p.Brigade_Flag || '';
+  const brigadeReason = p.Brigade_Reason || '';
 
   // Capture previous values for undo
   const prev = {
@@ -2197,7 +2240,7 @@ if (typeof window !== 'undefined') {
   document.addEventListener('keydown', (e) => {
     // Esc — close topmost visible modal
     if (e.key === 'Escape') {
-      const openModals = ['visitModal','scoreModal','visitOnlyModal','editVisitModal','editPatientModal','todoModal']
+      const openModals = ['visitModal','scoreModal','visitOnlyModal','editVisitModal','editPatientModal','brigadeModal','todoModal']
         .map(id => document.getElementById(id))
         .filter(m => m && m.style.display !== 'none' && getComputedStyle(m).display !== 'none');
       if (openModals.length) {

@@ -244,6 +244,7 @@
     .entry-type-chip.type-visit { background: var(--color-primary-bg); color: var(--color-primary); }
     .entry-type-chip.type-score { background: var(--color-surface-offset); color: var(--color-text-muted); border: 1px dashed var(--color-border); }
     .brigade-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 10px; border-radius: var(--radius-full); font-size: var(--text-xs); font-weight: 700; background: oklch(from var(--color-warning) l c h / 0.12); color: var(--color-warning); border: 1px solid oklch(from var(--color-warning) l c h / 0.35); }
+    button.brigade-active { background: var(--color-warning); color: #fff; border: none; padding: var(--space-2) var(--space-4); border-radius: var(--radius-md); font-weight: 600; cursor: pointer; }
     .todo-row { display: flex; align-items: center; gap: 10px; padding: 6px 8px; background: var(--color-surface-2); border-radius: var(--radius-sm); }
     .todo-row .todo-text { font-size: var(--text-sm); color: var(--color-text); }
     .tier-severe   { background: var(--color-error);  color: white; }
@@ -472,6 +473,21 @@
     <div class="modal-footer">
       <button class="ghost" onclick="closeEditPatientModal()" data-es="Cancelar" data-en="Cancel">Cancelar</button>
       <button class="primary" id="editPatientSaveBtn" onclick="submitEditPatient()" data-es="Guardar" data-en="Save">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- Brigade Flag Modal -->
+<div class="modal-backdrop" id="brigadeModal" style="display:none;">
+  <div class="modal" style="max-width:440px;">
+    <div class="modal-header">
+      <h3 data-es="🚩 Marcar para brigada" data-en="🚩 Brigade flag">🚩 Marcar para brigada</h3>
+      <button class="modal-close" onclick="closeBrigadeModal()">×</button>
+    </div>
+    <div class="modal-body" id="brigadeForm"></div>
+    <div class="modal-footer">
+      <button class="ghost" onclick="closeBrigadeModal()" data-es="Cancelar" data-en="Cancel">Cancelar</button>
+      <button class="primary" id="brigadeSaveBtn" onclick="submitBrigade()" data-es="Guardar" data-en="Save">Guardar</button>
     </div>
   </div>
 </div>
