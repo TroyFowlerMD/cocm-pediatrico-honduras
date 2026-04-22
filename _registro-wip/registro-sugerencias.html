@@ -322,12 +322,14 @@ async function submitSuggestion() {
     if (json && json.url) row.Attachment_URL = json.url;
   } else if (url) {
     // No attachment — still route through Apps Script so email fires
+    const emailToSend = getClientEmail({ promptIfMissing: true });
     const res = await fetch(url, {
       method: 'POST',
       headers: { 'Content-Type':'text/plain;charset=utf-8' },
-      body: JSON.stringify({ op:'suggest', email: getClientEmail({ promptIfMissing: true }), submitter, category, priority, description: desc }),
+      body: JSON.stringify({ op:'suggest', email: emailToSend, submitter, category, priority, description: desc }),
     });
     const json = await res.json();
+    if (!json.ok) { alert('Error: ' + JSON.stringify(json)); return; }
     if (json && json.id) row.Suggestion_ID = json.id;
   } else {
     await writeRow('Sugerencias', row);
