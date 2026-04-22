@@ -49,12 +49,13 @@ function getClientEmail(opts) {
 }
 
 const REG_LS = {
-  APPS_SCRIPT_URL: 'coCMCamasca.appsScriptUrl',
-  CSV_BASE_URL:    'coCMCamasca.csvBaseUrl',
-  USER:            'coCMCamasca.user',
-  PENDING_WRITES:  'coCMCamasca.pendingWrites',
-  CACHE:           'coCMCamasca.cache',
-  FEATURES:        'coCMCamasca.features',
+  APPS_SCRIPT_URL:   'coCMCamasca.appsScriptUrl',
+  CSV_BASE_URL:      'coCMCamasca.csvBaseUrl',
+  USER:              'coCMCamasca.user',
+  PENDING_WRITES:    'coCMCamasca.pendingWrites',
+  CACHE:             'coCMCamasca.cache',
+  FEATURES:          'coCMCamasca.features',
+  FILTER_THERAPIST:  'coCMCamasca.filterTherapist',
 };
 
 // ════════════════════════════════════════════════════════════════

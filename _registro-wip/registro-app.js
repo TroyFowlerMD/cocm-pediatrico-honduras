@@ -598,6 +598,27 @@ function populateTherapistFilter() {
   if (!sel) return;
   sel.innerHTML = `<option value="">${t('filter_all_therapists')}</option>` +
     STATE.team.filter(tm => tm.role==='therapist').map(tm => `<option value="${tm.name}">${tm.name}</option>`).join('');
+  // Restore persisted filter selection
+  try {
+    const saved = localStorage.getItem(REG_LS.FILTER_THERAPIST);
+    if (saved && sel.querySelector(`option[value="${saved}"]`)) {
+      sel.value = saved;
+    }
+  } catch(_) {}
+}
+
+// v2.5.12 — persist therapist filter selection across page loads
+function onTherapistFilterChange() {
+  const sel = document.getElementById('filterTherapist');
+  if (!sel) return;
+  try {
+    if (sel.value) {
+      localStorage.setItem(REG_LS.FILTER_THERAPIST, sel.value);
+    } else {
+      localStorage.removeItem(REG_LS.FILTER_THERAPIST);
+    }
+  } catch(_) {}
+  renderAll();
 }
 
 // ── v2.5.11: Auto-filter to therapist's own patients on login ──
@@ -662,6 +683,7 @@ function showTherapistFilterNotice(name) {
 function clearTherapistAutoFilter() {
   const sel = document.getElementById('filterTherapist');
   if (sel) sel.value = '';
+  try { localStorage.removeItem(REG_LS.FILTER_THERAPIST); } catch(_) {}
   const notice = document.getElementById('therapistFilterNotice');
   if (notice) notice.remove();
   renderAll();
