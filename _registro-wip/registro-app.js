@@ -600,6 +600,73 @@ function populateTherapistFilter() {
     STATE.team.filter(tm => tm.role==='therapist').map(tm => `<option value="${tm.name}">${tm.name}</option>`).join('');
 }
 
+// ── v2.5.11: Auto-filter to therapist's own patients on login ──
+function applyTherapistAutoFilter(user) {
+  if (!user || user.role !== 'therapist') return;
+  // Match by email → find therapist's display name in STATE.team
+  const email = (user.email || '').toLowerCase();
+  const me = (STATE.authorizedUsers || []).find(u => (u.email||'').toLowerCase() === email);
+  if (!me) return;
+  const myName = (me.name || '').trim();
+  if (!myName) return;
+  // Find matching therapist in team list
+  const match = (STATE.team || []).find(tm =>
+    tm.role === 'therapist' && tm.name.trim().toLowerCase() === myName.toLowerCase()
+  );
+  if (!match) return;
+  // Set filter dropdown
+  const sel = document.getElementById('filterTherapist');
+  if (!sel) return;
+  sel.value = match.name;
+  // Show the auto-filter notice banner
+  showTherapistFilterNotice(match.name);
+  // Re-render with filter applied
+  renderAll();
+}
+
+// ── Banner shown when therapist auto-filter is active ──
+function showTherapistFilterNotice(name) {
+  // Remove any existing notice
+  const existing = document.getElementById('therapistFilterNotice');
+  if (existing) existing.remove();
+  const sel = document.getElementById('filterTherapist');
+  if (!sel) return;
+  const notice = document.createElement('div');
+  notice.id = 'therapistFilterNotice';
+  notice.style.cssText = `
+    display: flex; align-items: center; gap: 8px; padding: 6px 12px;
+    background: var(--color-surface-2, #f0f7f7); border: 1px solid var(--color-primary, #01696f);
+    border-radius: 6px; font-size: 12px; color: var(--color-text); margin-bottom: 8px;
+  `;
+  const lang = document.documentElement.getAttribute('data-lang') || 'es';
+  const msgES = `Mostrando pacientes de <strong>${name}</strong>`;
+  const msgEN = `Showing <strong>${name}</strong>'s patients`;
+  const clearES = 'Ver todos';
+  const clearEN = 'View all';
+  notice.innerHTML = `
+    <span>👤 ${lang === 'es' ? msgES : msgEN}</span>
+    <button onclick="clearTherapistAutoFilter()" style="
+      margin-left:auto; font-size:11px; padding:2px 8px;
+      border:1px solid var(--color-border); border-radius:4px;
+      background:var(--color-surface); cursor:pointer; color:var(--color-text);
+    ">${lang === 'es' ? clearES : clearEN}</button>
+  `;
+  // Insert before the patient table or filter row
+  const toolbar = document.querySelector('.filter-row') || document.querySelector('.toolbar') || document.querySelector('.page-content');
+  if (toolbar && toolbar.parentNode) {
+    toolbar.parentNode.insertBefore(notice, toolbar);
+  }
+}
+
+// ── Clear therapist auto-filter ──
+function clearTherapistAutoFilter() {
+  const sel = document.getElementById('filterTherapist');
+  if (sel) sel.value = '';
+  const notice = document.getElementById('therapistFilterNotice');
+  if (notice) notice.remove();
+  renderAll();
+}
+
 function populateConditionFilter() {
   const sel = document.getElementById('filterCondition');
   if (!sel) return;
@@ -1256,7 +1323,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     // v2.5.8 — stamp "Name (email)" into new topbar tag
     stampSignedInTag(gate.user);
   }
-  loadAndRender();
+  loadAndRender().then(() => {
+    // v2.5.11 — auto-filter to therapist's own patients on login
+    if (gate.user && gate.user.role === 'therapist') {
+      applyTherapistAutoFilter(gate.user);
+    }
+  });
 });
 
 
