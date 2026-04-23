@@ -768,11 +768,11 @@ function renderVisits(lang) {
     const noteInner = longNote
       ? `<span class="vnote-preview" id="${noteId}-preview" style="display:block;">`
         + `<span style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">${noteHtml}</span>`
-        + `<button class="vnote-expand-btn" onclick="toggleNoteExpand('${noteId}')" style="background:none;border:none;padding:0;color:var(--color-primary);font-size:var(--text-xs);cursor:pointer;margin-top:2px;">${en?'▼ Show full note':'▼ Ver nota completa'}</button>`
+        + `<button class="vnote-expand-btn" onclick="toggleNoteExpand('${noteId}')" style="background:none;border:none;padding:0;color:var(--color-primary);font-size:inherit;cursor:pointer;margin-top:2px;">${en?'▼ Show full note':'▼ Ver nota completa'}</button>`
         + `</span>`
         + `<span class="vnote-full" id="${noteId}-full" style="display:none;">`
         + noteHtml
-        + `<button class="vnote-expand-btn" onclick="toggleNoteExpand('${noteId}')" style="background:none;border:none;padding:0;color:var(--color-primary);font-size:var(--text-xs);cursor:pointer;margin-top:2px;display:block;">${en?'▲ Collapse':'▲ Colapsar'}</button>`
+        + `<button class="vnote-expand-btn" onclick="toggleNoteExpand('${noteId}')" style="background:none;border:none;padding:0;color:var(--color-primary);font-size:inherit;cursor:pointer;margin-top:2px;display:block;">${en?'▲ Collapse':'▲ Colapsar'}</button>`
         + `</span>`
       : noteHtml;
     return `
