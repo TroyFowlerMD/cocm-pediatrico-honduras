@@ -793,14 +793,13 @@ function renderMeds(lang) {
   if (!PSTATE.meds.length) return `<p style="color:var(--color-text-muted);">${t('no_meds')}</p>`;
   return PSTATE.meds.map(m => {
     const freqPart = m.Frequency ? ` <span style="color:var(--color-text-muted);font-weight:400;">· ${escapeHtml(m.Frequency)}</span>` : '';
-    const notesLine = m.Notes ? `<div style="grid-column:1 / -1;color:var(--color-text-muted);font-size:var(--text-xs);font-style:italic;margin-top:2px;">${renderMarkdownInline(m.Notes)}</div>` : '';
+    const notesLine = m.Notes ? `<div class="mnotes" style="grid-column:1 / -1;">${renderMarkdownInline(m.Notes)}</div>` : '';
     return `
     <div class="med-row">
       <div class="mdate">${m.Date}</div>
       <div class="mmed">${escapeHtml(m.Medication)} ${m.Dose?`<span style="color:var(--color-text-muted);font-weight:400;">· ${m.Dose}</span>`:''}${freqPart}</div>
       <div class="maction">${escapeHtml(translateMedAction(m.Action)||'')}</div>
-      <div>${escapeHtml(m.Reason||'')}</div>
-      <div style="color:var(--color-text-muted);font-size:var(--text-xs);">${escapeHtml(m.Prescriber||'')}</div>
+      <div class="mpresc" style="grid-column:span 2;">${escapeHtml(m.Reason||'')}${m.Reason && m.Prescriber ? ' · ' : ''}${escapeHtml(m.Prescriber||'')}</div>
       ${notesLine}
     </div>
     `;
