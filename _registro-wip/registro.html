@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CoCM Camasca — Registro de Pacientes</title>
-  <link rel="stylesheet" href="style.css?v=c17bec8" />
+  <link rel="stylesheet" href="style.css?v=865e862" />
   <style>
     /* ================================================================
        REGISTRO DASHBOARD — inherits portal design tokens from style.css
@@ -701,23 +701,12 @@
 <div class="modal-backdrop" id="configModal" style="display:none;">
   <div class="modal" style="max-width:640px;">
     <div class="modal-header">
-      <h3 data-es="Configurar fuente de datos" data-en="Configure data source">Configurar fuente de datos</h3>
+      <h3 data-es="Preferencias de visualización" data-en="Display preferences">Preferencias de visualización</h3>
       <button class="modal-close" onclick="closeConfigModal()">×</button>
     </div>
     <div class="modal-body">
-      <p data-es="El panel necesita leer del Google Sheet. Elija uno de los dos métodos:" data-en="The dashboard needs to read from the Google Sheet. Choose one of two methods:">El panel necesita leer del Google Sheet. Elija uno de los dos métodos:</p>
-      <h4 style="margin-top: var(--space-4);" data-es="Opción 1 — Apps Script (recomendado)" data-en="Option 1 — Apps Script (recommended)">Opción 1 — Apps Script (recomendado)</h4>
-      <p data-es="Permite lecturas y escrituras. Pegue la URL del Web App desplegado:" data-en="Enables reads and writes. Paste the deployed Web App URL:">Permite lecturas y escrituras. Pegue la URL del Web App desplegado:</p>
-      <input type="text" id="cfgAppsScriptUrl" style="width:100%;padding:8px;font-family:ui-monospace,monospace;font-size:var(--text-xs);background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);" placeholder="https://script.google.com/macros/s/.../exec" />
-
-      <h4 style="margin-top: var(--space-4);" data-es="Opción 2 — CSV publicado (solo lectura)" data-en="Option 2 — Published CSV (read-only)">Opción 2 — CSV publicado (solo lectura)</h4>
-      <p style="font-size: var(--text-xs); color: var(--color-text-muted);" data-es="En el Sheet, use Archivo › Compartir › Publicar en la web › CSV. Pegue la URL base (sin &gid):" data-en="In the Sheet, use File › Share › Publish to web › CSV. Paste the base URL (without &gid):">En el Sheet, use Archivo › Compartir › Publicar en la web › CSV. Pegue la URL base (sin &gid):</p>
-      <input type="text" id="cfgCsvBaseUrl" style="width:100%;padding:8px;font-family:ui-monospace,monospace;font-size:var(--text-xs);background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);" placeholder="https://docs.google.com/spreadsheets/d/e/XXX/pub?output=csv" />
-
-      <p style="margin-top: var(--space-4); font-size: var(--text-xs); color: var(--color-text-muted);" data-es="Sin configurar, el panel usa datos de ejemplo (demo)." data-en="Without configuration, the dashboard uses demo data.">Sin configurar, el panel usa datos de ejemplo (demo).</p>
-
       <!-- ── Display preferences ── -->
-      <div style="margin-top: var(--space-6); padding-top: var(--space-5); border-top: 1px solid var(--color-border);">
+      <div>
         <h4 style="margin: 0 0 var(--space-2);" data-es="Preferencias de visualización" data-en="Display preferences">Preferencias de visualización</h4>
         <p style="font-size: var(--text-xs); color: var(--color-text-muted); margin: 0 0 var(--space-3);" data-es="Active o desactive campos para simplificar el panel. Los datos siguen guardándose en el Sheet aunque estén ocultos aquí." data-en="Toggle fields to simplify the dashboard. Data still saves to the Sheet even if hidden here.">Active o desactive campos para simplificar el panel.</p>
 
@@ -840,9 +829,9 @@
 <!-- Toast host (populated by registro-i18n.js showToast) -->
 <div id="regToastHost"></div>
 
-<script src="registro-i18n.js?v=c17bec8"></script>
-<script src="registro-data.js?v=c17bec8"></script>
-<script src="registro-app.js?v=c17bec8"></script>
+<script src="registro-i18n.js?v=865e862"></script>
+<script src="registro-data.js?v=865e862"></script>
+<script src="registro-app.js?v=865e862"></script>
 
 </body>
 </html>
