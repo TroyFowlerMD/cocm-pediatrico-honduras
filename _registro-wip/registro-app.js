@@ -235,6 +235,10 @@ function renderNewPatientForm(showAll) {
           therapists.map(t => [t.name, t.name])
         )}
       </div>
+      <div>
+        <label class="np-label">${lang==='en'?'Caregiver phone':'Tel\u00e9fono del cuidador'}</label>
+        <input type="tel" id="npPhone" style="width:100%;padding:8px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);" placeholder="+504..."/>
+      </div>
       <p style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:8px;">${t('modal_newpat_min_hint')}</p>
     </div>
     <button type="button" class="np-toggle-details" id="npToggleDetails" onclick="togglePatientDetails()" style="margin-top:var(--space-3);background:transparent;border:1px dashed var(--color-border);color:var(--color-primary);padding:8px 14px;border-radius:var(--radius-md);font-size:var(--text-xs);cursor:pointer;width:100%;font-weight:600;">
@@ -291,12 +295,13 @@ function togglePatientDetails() {
     npTherapist: document.getElementById('npTherapist')?.value || '',
     npEnrolled: document.getElementById('npEnrolled')?.value || '',
     npNotes: document.getElementById('npNotes')?.value || '',
+    npPhone: document.getElementById('npPhone')?.value || '',
     npConds: [...document.querySelectorAll('#npConds input:checked')].map(c => c.value),
     npTools: [...document.querySelectorAll('#npTools input:checked')].map(c => c.value),
   };
   renderNewPatientForm(!current);
   // Restore
-  for (const id of ['npName','npDOB','npSex','npPrimaryCond','npTherapist','npEnrolled','npNotes']) {
+  for (const id of ['npName','npDOB','npSex','npPrimaryCond','npTherapist','npEnrolled','npNotes','npPhone']) {
     const el = document.getElementById(id);
     if (el && saved[id]) el.value = saved[id];
   }
@@ -534,6 +539,7 @@ async function submitNewPatient(skipDupCheck=false) {
     Created_At: now,
     Updated_By: '',
     Updated_At: '',
+    Caregiver_Phone: document.getElementById('npPhone')?.value.trim() || '',
     Schema_Version: '1.0',
   };
   let saveOk = false;
@@ -551,7 +557,7 @@ async function submitNewPatient(skipDupCheck=false) {
     return;
   }
   STATE.pacientes.push(row);
-  STATE.enrichedPatients = computePatientTiers(STATE.pacientes, STATE.visitas, STATE.tools);
+  STATE.enrichedPatients = computePatientTiers(STATE.pacientes, STATE.visitas, STATE.tools, STATE.authorizedUsers);
   // Submit baseline scores if entered
   const scoreRows = document.querySelectorAll('#npScoreRows .np-score-row');
   const baselineDate = row.Enrollment_Date || new Date().toISOString().slice(0,10);
@@ -678,7 +684,7 @@ async function loadAndRender() {
       );
       STATE.team = STATE.config.filter(r => r.Category==='team' && isActiveRow(r))
                                .map(r => ({ name: r.Key, role: r.Value }));
-      STATE.enrichedPatients = computePatientTiers(STATE.pacientes, STATE.visitas, STATE.tools);
+      STATE.enrichedPatients = computePatientTiers(STATE.pacientes, STATE.visitas, STATE.tools, STATE.authorizedUsers);
       populateUserDropdown();
       populateTherapistFilter();
       populateConditionFilter();
@@ -707,7 +713,7 @@ async function loadAndRender() {
         STATE.tools   = parseToolCutoffs(STATE.config);
         STATE.conditions = STATE.conditions || {};
         STATE.team   = STATE.team || [];
-        STATE.enrichedPatients = computePatientTiers(STATE.pacientes, STATE.visitas, STATE.tools);
+        STATE.enrichedPatients = computePatientTiers(STATE.pacientes, STATE.visitas, STATE.tools, STATE.authorizedUsers);
         populateUserDropdown();
         populateTherapistFilter();
         populateConditionFilter();
@@ -752,7 +758,7 @@ async function loadAndRender() {
   );
   STATE.team = STATE.config.filter(r => r.Category==='team' && isActiveRow(r))
                            .map(r => ({ name: r.Key, role: r.Value }));
-  STATE.enrichedPatients = computePatientTiers(STATE.pacientes, STATE.visitas, STATE.tools);
+  STATE.enrichedPatients = computePatientTiers(STATE.pacientes, STATE.visitas, STATE.tools, STATE.authorizedUsers);
 
   populateUserDropdown();
   populateTherapistFilter();
@@ -1391,7 +1397,11 @@ function renderPatientRow(p, lang, opts={}) {
   if (cols.trend) tds.push(`<td data-label="${t('th_trend')}">${sparkline(visitsOfTool.map(v => Number(v.Score)))}</td>`);
   if (cols.last_visit) tds.push(`<td data-label="${t('th_last_visit')}">${p._lastVisitDate ? escapeHtml(p._lastVisitDate) : '<span class="cell-empty">—</span>'}<div class="pat-meta">${daysLabel}</div></td>`);
   if (cols.last_contact) tds.push(`<td data-label="${t('th_last_contact')}">${fmtDateWithAgo(p.Last_BHCM_Contact_Date)}</td>`);
-  if (cols.last_psych) tds.push(`<td data-label="${t('th_last_psych')}">${fmtDateWithAgo(p._lastPsychDate || p.Last_Psych_Consult_Date)}</td>`);
+  if (cols.last_psych) {
+    const _psychDateStr = fmtDateWithAgo(p._lastPsychDate || p.Last_Psych_Consult_Date);
+    const _brigadeBadge = p._lastPsychIsBrigade ? ` <span style="font-size:0.85em;color:var(--color-text-muted);font-weight:400;">(brigade)</span>` : '';
+    tds.push(`<td data-label="${t('th_last_psych')}">${_psychDateStr}${_brigadeBadge}</td>`);
+  }
   if (cols.flags) tds.push(`<td data-label="${t('th_flags')}">${flags.join(' ') || '<span class="cell-empty">—</span>'}</td>`);
 
   return `<tr class="${rowClass}" onclick="goPatient('${p.Patient_ID}')">${tds.join('')}</tr>`;

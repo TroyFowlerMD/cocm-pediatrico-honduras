@@ -739,7 +739,7 @@ function tierRank(tier) {
  * For each patient, find their latest visit per tool and determine
  * highest-severity tier across tools as "primary tier".
  */
-function computePatientTiers(pacientes, visitas, tools) {
+function computePatientTiers(pacientes, visitas, tools, authorizedUsers) {
   const byPt = {};
   for (const v of visitas) {
     if (!v.Patient_ID) continue;
@@ -823,23 +823,47 @@ function computePatientTiers(pacientes, visitas, tools) {
     }
 
     // ── Last psych review date ─────────────────────────────────
-    // = max of: stored Last_Psych_Consult_Date, any visit logged by a psychiatrist
-    // Brigade visits (any therapist entry during a brigade) are also counted
-    // if the visit was logged by a team member with role=psychiatrist.
+    // = max of: stored Last_Psych_Consult_Date, any visit logged by a psychiatrist.
+    // Match visit Therapist field against psychiatrist display names (team list)
+    // AND against psychiatrist emails (authorizedUsers list) — covers both storage formats.
+    const _teamList = (typeof STATE !== 'undefined' && STATE.team ? STATE.team : []);
+    const _authUsers = authorizedUsers || (typeof STATE !== 'undefined' && STATE.authorizedUsers ? STATE.authorizedUsers : []);
     const psychNames = new Set(
-      (typeof STATE !== 'undefined' && STATE.team ? STATE.team : [])
-        .filter(tm => tm.role === 'psychiatrist')
-        .map(tm => tm.name.trim().toLowerCase())
+      _teamList.filter(tm => tm.role === 'psychiatrist').map(tm => tm.name.trim().toLowerCase())
     );
+    const psychEmails = new Set(
+      _authUsers.filter(u => u.role === 'psychiatrist').map(u => (u.email || '').trim().toLowerCase())
+    );
+    function _isPsychVisit(v) {
+      const who = String(v.Therapist || v.Created_By || '').trim().toLowerCase();
+      if (!who) return false;
+      return psychNames.has(who) || psychEmails.has(who);
+    }
     const psychVisitDates = visits
-      .filter(v => v.Therapist && psychNames.has(String(v.Therapist).trim().toLowerCase()))
+      .filter(v => _isPsychVisit(v))
       .map(v => v.Visit_Date)
-      .filter(Boolean);
-    const allPsychDates = [
-      p.Last_Psych_Consult_Date,
-      ...psychVisitDates,
-    ].filter(Boolean).sort();
-    const _lastPsychDate = allPsychDates.length ? allPsychDates[allPsychDates.length - 1] : '';
+      .filter(Boolean)
+      .sort();
+    const latestPsychVisitDate = psychVisitDates.length ? psychVisitDates[psychVisitDates.length - 1] : '';
+    const storedPsychDate = p.Last_Psych_Consult_Date || '';
+    // Determine which date wins, and whether it came from a visit (brigade) vs stored field
+    let _lastPsychDate = '';
+    let _lastPsychIsBrigade = false;
+    if (storedPsychDate && latestPsychVisitDate) {
+      if (latestPsychVisitDate >= storedPsychDate) {
+        _lastPsychDate = latestPsychVisitDate;
+        _lastPsychIsBrigade = true;
+      } else {
+        _lastPsychDate = storedPsychDate;
+        _lastPsychIsBrigade = false;
+      }
+    } else if (latestPsychVisitDate) {
+      _lastPsychDate = latestPsychVisitDate;
+      _lastPsychIsBrigade = true;
+    } else if (storedPsychDate) {
+      _lastPsychDate = storedPsychDate;
+      _lastPsychIsBrigade = false;
+    }
 
     return {
       ...p,
@@ -851,6 +875,7 @@ function computePatientTiers(pacientes, visitas, tools) {
       _toolScores: toolScores,
       _lastVisitDate: lastVisitDate,
       _lastPsychDate,
+      _lastPsychIsBrigade,
       _daysSinceLastVisit: lastVisitDate ? daysBetween(lastVisitDate, todayISO()) : 9999,
       _safetyActive: isTruthyFlag(p.Safety_Flag) && !p.Safety_Flag_Ack_At,
       _primaryCondition: primaryCondition,
