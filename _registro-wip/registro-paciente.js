@@ -1392,13 +1392,13 @@ async function submitBrigade() {
         if (idx >= 0) STATE.pacientes[idx] = { ...STATE.pacientes[idx], Brigade_Flag: brigadeFlag, Brigade_Reason: brigadeReason };
       }
       closeBrigadeModal();
-      renderPatientPage();
+      render();
     } else {
-      alert((en ? 'Save failed: ' : 'Error al guardar: ') + (result?.message || 'unknown error'));
+      showToast((en ? 'Save failed: ' : 'Error al guardar: ') + (result?.message || 'unknown error'), { variant: 'error' });
       if (btn) { btn.disabled = false; btn.textContent = en ? 'Save' : 'Guardar'; }
     }
   } catch(e) {
-    alert((en ? 'Save failed: ' : 'Error al guardar: ') + e.message);
+    showToast((en ? 'Save failed: ' : 'Error al guardar: ') + e.message, { variant: 'error' });
     if (btn) { btn.disabled = false; btn.textContent = en ? 'Save' : 'Guardar'; }
   }
 }
@@ -2278,7 +2278,7 @@ async function confirmDeleteVisit(visitId) {
         STATE.visitas = STATE.visitas.filter(v => v.Visit_ID !== visitId);
       }
       showToast(en ? 'Entry deleted.' : 'Entrada eliminada.', { variant: 'success' });
-      renderPatientPage();
+      render();
     } else {
       showToast((en ? 'Delete failed: ' : 'Error al eliminar: ') + (result?.message || 'unknown'), { variant: 'error' });
     }
