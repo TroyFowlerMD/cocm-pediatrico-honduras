@@ -1055,8 +1055,10 @@ function renderTierBlock(label, tierClass, patients, lang, opts={}) {
   function th(label, colKey) {
     if (!colKey) return `<th>${label}</th>`;
     const active = TABLE_SORT.col === colKey;
-    const arrow = active ? (TABLE_SORT.dir === 'asc' ? ' ▲' : ' ▼') : '';
-    return `<th class="th-sortable${active?' th-sorted':''}" onclick="thSortClick('${colKey}')" title="${lang==='en'?'Click to sort':'Clic para ordenar'}">${label}${arrow}</th>`;
+    const indicator = active
+      ? `<span class="th-sort-arrow">${TABLE_SORT.dir === 'asc' ? '▲' : '▼'}</span>`
+      : `<span class="th-sort-arrow th-sort-idle">↕</span>`;
+    return `<th class="th-sortable${active?' th-sorted':''}" onclick="thSortClick('${colKey}')" title="${lang==='en'?'Click to sort':'Clic para ordenar'}">${label} ${indicator}</th>`;
   }
   const ths = [];
   if (cols.therapist)    ths.push(th(t('th_therapist'),    'therapist'));
@@ -1245,7 +1247,9 @@ function renderPatientRow(p, lang, opts={}) {
   const tds = [];
   if (cols.therapist) tds.push(`<td data-label="${t('th_therapist')}">${escapeHtml(p.Therapist||'—')}</td>`);
   if (cols.patient) {
-    const verifyBadge = (p._primaryNeedsVerify && p._primaryGroup !== 'mixed_other')
+    // Only show verify badge if condition was auto-inferred (no explicit Primary_Condition set)
+    // Never show if user explicitly selected a primary condition (Primary_Condition is set)
+    const verifyBadge = (p._primaryNeedsVerify && p._primaryGroup !== 'mixed_other' && !p.Primary_Condition)
       ? ` <span class="verify-primary-badge" title="${lang==='en'?'Auto-inferred primary condition — please verify':'Condición primaria auto-inferida — verificar'}">⚠ ${lang==='en'?'verify primary':'verificar primaria'}</span>`
       : '';
     tds.push(`
