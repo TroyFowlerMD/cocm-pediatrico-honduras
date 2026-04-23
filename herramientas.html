@@ -1,0 +1,2559 @@
+<!DOCTYPE html>
+<html lang="es" data-lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CoCM Pediátrico — Herramientas de Evaluación</title>
+  <style>
+/* ============================================================
+   CoCM Pediátrico — Shared Stylesheet
+   ============================================================ */
+
+
+/* Offline-safe: system font stack — no CDN required */
+
+/* ===================== DESIGN TOKENS ===================== */
+:root,
+[data-theme='light'] {
+  /* Type Scale */
+  --text-xs: clamp(0.75rem, 0.7rem + 0.25vw, 0.875rem);
+  --text-sm: clamp(0.875rem, 0.8rem + 0.35vw, 1rem);
+  --text-base: clamp(1rem, 0.95rem + 0.25vw, 1.125rem);
+  --text-lg: clamp(1.125rem, 1rem + 0.75vw, 1.5rem);
+  --text-xl: clamp(1.5rem, 1.2rem + 1.25vw, 2.25rem);
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+
+  /* Surfaces */
+  --color-bg: #f7f6f2;
+  --color-surface: #f9f8f5;
+  --color-surface-2: #fbfbf9;
+  --color-surface-offset: #f0eeea;
+  --color-surface-offset-2: #e8e5e0;
+  --color-divider: #dcd9d5;
+  --color-border: #d4d1ca;
+
+  /* Text */
+  --color-text: #28251d;
+  --color-text-muted: #7a7974;
+  --color-text-faint: #bab9b4;
+  --color-text-inverse: #f9f8f4;
+
+  /* Primary Teal (matching Sheets register) */
+  --color-primary: #01696f;
+  --color-primary-hover: #0c4e54;
+  --color-primary-active: #0f3638;
+  --color-primary-highlight: #cedcd8;
+  --color-primary-bg: #e8f2f1;
+
+  /* Status */
+  --color-success: #437a22;
+  --color-success-highlight: #d4dfcc;
+  --color-warning: #964219;
+  --color-warning-highlight: #ddcfc6;
+  --color-error: #a12c7b;
+  --color-error-highlight: #e0ced7;
+
+  /* Radius */
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+
+  /* Transitions */
+  --transition-interactive: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px oklch(0.2 0.01 80 / 0.06);
+  --shadow-md: 0 4px 12px oklch(0.2 0.01 80 / 0.08);
+  --shadow-lg: 0 12px 32px oklch(0.2 0.01 80 / 0.12);
+
+  /* Fonts */
+  --font-display: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+
+  /* Sidebar */
+  --sidebar-width: 260px;
+}
+
+[data-theme='dark'] {
+  --color-bg: #171614;
+  --color-surface: #1c1b19;
+  --color-surface-2: #201f1d;
+  --color-surface-offset: #1d1c1a;
+  --color-surface-offset-2: #22211f;
+  --color-surface-dynamic: #2d2c2a;
+  --color-divider: #262523;
+  --color-border: #393836;
+  --color-text: #cdccca;
+  --color-text-muted: #797876;
+  --color-text-faint: #5a5957;
+  --color-text-inverse: #2b2a28;
+  --color-primary: #4f98a3;
+  --color-primary-hover: #227f8b;
+  --color-primary-active: #1a626b;
+  --color-primary-highlight: #313b3b;
+  --color-primary-bg: #1e2d2d;
+  --color-success: #6daa45;
+  --color-success-highlight: #3a4435;
+  --color-warning: #bb653b;
+  --color-warning-highlight: #564942;
+  --color-error: #d163a7;
+  --color-error-highlight: #4c3d46;
+  --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.2);
+  --shadow-md: 0 4px 12px oklch(0 0 0 / 0.3);
+  --shadow-lg: 0 12px 32px oklch(0 0 0 / 0.4);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --color-bg: #171614;
+    --color-surface: #1c1b19;
+    --color-surface-2: #201f1d;
+    --color-surface-offset: #1d1c1a;
+    --color-surface-offset-2: #22211f;
+    --color-surface-dynamic: #2d2c2a;
+    --color-divider: #262523;
+    --color-border: #393836;
+    --color-text: #cdccca;
+    --color-text-muted: #797876;
+    --color-text-faint: #5a5957;
+    --color-text-inverse: #2b2a28;
+    --color-primary: #4f98a3;
+    --color-primary-hover: #227f8b;
+    --color-primary-active: #1a626b;
+    --color-primary-highlight: #313b3b;
+    --color-primary-bg: #1e2d2d;
+    --color-success: #6daa45;
+    --color-success-highlight: #3a4435;
+    --color-warning: #bb653b;
+    --color-warning-highlight: #564942;
+    --color-error: #d163a7;
+    --color-error-highlight: #4c3d46;
+    --shadow-sm: 0 1px 2px oklch(0 0 0 / 0.2);
+    --shadow-md: 0 4px 12px oklch(0 0 0 / 0.3);
+    --shadow-lg: 0 12px 32px oklch(0 0 0 / 0.4);
+  }
+}
+
+/* ===================== BASE RESET ===================== */
+*,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+html {
+  -webkit-text-size-adjust: none; text-size-adjust: none;
+  -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility; scroll-behavior: smooth;
+  scroll-padding-top: var(--space-16);
+}
+body {
+  min-height: 100dvh; line-height: 1.6;
+  font-family: var(--font-body); font-size: var(--text-base);
+  color: var(--color-text); background-color: var(--color-bg);
+}
+img, svg { display: block; max-width: 100%; height: auto; }
+input, button, textarea, select { font: inherit; color: inherit; }
+h1,h2,h3,h4,h5,h6 { text-wrap: balance; line-height: 1.15; font-family: var(--font-display); }
+p, li { text-wrap: pretty; }
+button { cursor: pointer; background: none; border: none; }
+::selection { background: oklch(from var(--color-primary) l c h / 0.25); color: var(--color-text); }
+:focus-visible { outline: 2px solid var(--color-primary); outline-offset: 3px; border-radius: var(--radius-sm); }
+a, button, [role='button'], input, select {
+  transition: color var(--transition-interactive), background var(--transition-interactive),
+    border-color var(--transition-interactive), box-shadow var(--transition-interactive);
+}
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+  overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border-width: 0; }
+
+/* ===================== LAYOUT ===================== */
+.app-layout {
+  display: flex;
+  min-height: 100dvh;
+}
+
+/* Sidebar */
+.sidebar {
+  width: var(--sidebar-width);
+  flex-shrink: 0;
+  background: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 100dvh;
+  overflow-y: auto;
+  z-index: 100;
+  transition: transform var(--transition-interactive);
+}
+
+.sidebar-header {
+  padding: var(--space-6) var(--space-5);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.sidebar-logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.sidebar-logo-icon {
+  width: 36px;
+  height: 36px;
+  background: var(--color-primary);
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 1.1rem;
+  font-weight: 700;
+  font-family: var(--font-display);
+  flex-shrink: 0;
+}
+
+.sidebar-logo-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.2;
+}
+
+.sidebar-logo-text .title {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-text);
+  font-family: var(--font-display);
+}
+
+.sidebar-logo-text .subtitle {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+}
+
+.sidebar-nav {
+  padding: var(--space-4) var(--space-3);
+  flex: 1;
+}
+
+.sidebar-section-label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding: var(--space-4) var(--space-3) var(--space-2);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  margin-bottom: var(--space-1);
+}
+
+.nav-item:hover {
+  background: var(--color-surface-offset);
+  color: var(--color-text);
+}
+
+.nav-item.active {
+  background: var(--color-primary-bg);
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+.nav-item .nav-icon {
+  font-size: 1rem;
+  width: 20px;
+  text-align: center;
+}
+
+.nav-item .nav-badge {
+  margin-left: auto;
+  font-size: var(--text-xs);
+  background: var(--color-primary-highlight);
+  color: var(--color-primary);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  font-weight: 600;
+}
+
+.nav-item .nav-badge.placeholder {
+  background: var(--color-surface-offset-2);
+  color: var(--color-text-faint);
+}
+
+/* Age group dividers in nav */
+.nav-age-group {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-xs);
+  color: var(--color-text-faint);
+  font-style: italic;
+  margin-top: var(--space-1);
+}
+
+.sidebar-footer {
+  padding: var(--space-4) var(--space-5);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* Main content */
+.main-content {
+  margin-left: var(--sidebar-width);
+  flex: 1;
+  min-width: 0;
+}
+
+/* Topbar */
+.topbar {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  padding: var(--space-4) var(--space-8);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+}
+
+.topbar-title {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-text);
+  font-family: var(--font-display);
+}
+
+.topbar-subtitle {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin-top: var(--space-1);
+}
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+/* Page content */
+.page-content {
+  padding: var(--space-8);
+  max-width: 880px;
+}
+
+/* ===================== COMPONENTS ===================== */
+
+/* Theme toggle */
+.theme-toggle {
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-muted);
+  background: transparent;
+}
+.theme-toggle:hover {
+  background: var(--color-surface-offset);
+  color: var(--color-text);
+}
+
+/* Lang toggle */
+.lang-toggle {
+  display: flex;
+  background: var(--color-surface-offset);
+  border-radius: var(--radius-full);
+  padding: 2px;
+  gap: 2px;
+}
+.lang-btn {
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-full);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  background: transparent;
+}
+.lang-btn.active {
+  background: var(--color-primary);
+  color: white;
+}
+
+/* Cards — dashboard */
+.tool-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: var(--space-5);
+  margin-top: var(--space-6);
+}
+
+.tool-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  text-decoration: none;
+  color: var(--color-text);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  box-shadow: var(--shadow-sm);
+  transition: transform var(--transition-interactive), box-shadow var(--transition-interactive), border-color var(--transition-interactive);
+}
+
+.tool-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--color-primary);
+}
+
+.tool-card.ready {
+  border-left: 4px solid var(--color-primary);
+}
+
+.tool-card.placeholder {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.tool-card.placeholder:hover {
+  transform: none;
+  box-shadow: var(--shadow-sm);
+  border-color: var(--color-border);
+}
+
+.tool-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.tool-card-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  background: var(--color-primary-bg);
+}
+
+.tool-card.placeholder .tool-card-icon {
+  background: var(--color-surface-offset);
+}
+
+.tool-status {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  padding: 3px var(--space-2);
+  border-radius: var(--radius-full);
+}
+
+.tool-status.ready {
+  background: var(--color-success-highlight);
+  color: var(--color-success);
+}
+
+.tool-status.coming-soon {
+  background: var(--color-surface-offset-2);
+  color: var(--color-text-muted);
+}
+
+.tool-card-name {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-text);
+  font-family: var(--font-display);
+}
+
+.tool-card-desc {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+
+.tool-card-meta {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+  margin-top: auto;
+}
+
+.meta-tag {
+  font-size: var(--text-xs);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  background: var(--color-surface-offset);
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.meta-tag.age {
+  background: var(--color-primary-highlight);
+  color: var(--color-primary);
+}
+
+/* ===================== LANGUAGE VISIBILITY ===================== */
+[data-lang='en'] .es { display: none !important; }
+[data-lang='es'] .en { display: none !important; }
+
+/* ===================== TOOL PAGE — PSC-17 ===================== */
+
+.tool-header-card {
+  background: var(--color-primary);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6) var(--space-8);
+  color: white;
+  margin-bottom: var(--space-6);
+}
+
+.tool-header-card h1 {
+  font-size: var(--text-xl);
+  font-weight: 800;
+  color: white;
+  font-family: var(--font-display);
+}
+
+.tool-header-card p {
+  font-size: var(--text-sm);
+  opacity: 0.85;
+  max-width: none;
+  margin-top: var(--space-2);
+}
+
+.tool-header-meta {
+  display: flex;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+  flex-wrap: wrap;
+}
+
+.tool-header-meta span {
+  font-size: var(--text-xs);
+  background: rgba(255,255,255,0.2);
+  padding: 3px var(--space-3);
+  border-radius: var(--radius-full);
+  font-weight: 500;
+}
+
+/* Instructions box */
+.instructions-box {
+  background: var(--color-primary-bg);
+  border: 1px solid var(--color-primary-highlight);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5) var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.instructions-box h3 {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  color: var(--color-primary);
+  margin-bottom: var(--space-2);
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.instructions-box p {
+  font-size: var(--text-sm);
+  color: var(--color-text);
+  max-width: none;
+}
+
+/* Question card */
+.question-section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-5) var(--space-6);
+  margin-bottom: var(--space-3);
+}
+
+.question-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-4);
+}
+
+.question-number {
+  width: 28px;
+  height: 28px;
+  background: var(--color-surface-offset);
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-text-muted);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.question-number.subscale-I { background: var(--color-primary-bg); color: var(--color-primary); }
+.question-number.subscale-A { background: #fff3cd; color: #856404; }
+.question-number.subscale-E { background: #f8d7da; color: #842029; }
+[data-theme='dark'] .question-number.subscale-A { background: #3d3520; color: #e8c84a; }
+[data-theme='dark'] .question-number.subscale-E { background: #3d1f22; color: #e07070; }
+
+.question-body {
+  flex: 1;
+  position: relative;
+}
+
+.subscale-tag {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 20px;
+  height: 20px;
+  border-radius: var(--radius-full);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  opacity: 0.85;
+  background: var(--color-surface-offset);
+  color: var(--color-text-muted);
+}
+
+.subscale-tag.subscale-I { background: var(--color-primary-bg); color: var(--color-primary); }
+.subscale-tag.subscale-A { background: #fff3cd; color: #856404; }
+.subscale-tag.subscale-E { background: #f8d7da; color: #842029; }
+[data-theme='dark'] .subscale-tag.subscale-A { background: #3d3520; color: #e8c84a; }
+[data-theme='dark'] .subscale-tag.subscale-E { background: #3d1f22; color: #e07070; }
+
+.question-text-es {
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--color-text);
+  line-height: 1.4;
+}
+
+/* Bilingual secondary line for ALL static text (nav, instructions, score panel, header, etc.) */
+/* Same pattern as question-text-en in bilingual mode */
+.bi-en-line {
+  display: block;
+  font-size: var(--text-xs);
+  font-weight: 400;
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin-top: 2px;
+  line-height: 1.3;
+}
+
+/* EN-only mode: same size as ES */
+[data-lang='en'] .question-text-en {
+  font-size: var(--text-base);
+  font-weight: 500;
+  color: var(--color-text);
+  font-style: normal;
+  margin-top: 0;
+}
+
+/* Bilingual mode: EN line is smaller, italic, muted */
+[data-lang='bi'] .question-text-en {
+  font-size: var(--text-xs);
+  font-weight: 400;
+  color: var(--color-text-muted);
+  font-style: italic;
+  margin-top: var(--space-1);
+}
+
+.question-text-en {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-top: var(--space-1);
+  font-style: italic;
+  display: none; /* shown only in EN or Bilingual mode via JS */
+}
+
+.radio-group {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.radio-option {
+  flex: 1;
+  min-width: 80px;
+}
+
+.radio-option input[type="radio"] {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.radio-option label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-2) var(--space-3);
+  border: 2px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  text-align: center;
+  gap: var(--space-1);
+  transition: all var(--transition-interactive);
+  background: var(--color-bg);
+}
+
+.radio-option label:hover {
+  border-color: var(--color-primary);
+  background: var(--color-primary-bg);
+}
+
+.radio-option input[type="radio"]:checked + label {
+  border-color: var(--color-primary);
+  background: var(--color-primary-bg);
+  box-shadow: 0 0 0 3px var(--color-primary-highlight);
+}
+
+.radio-score {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  color: var(--color-primary);
+  font-family: var(--font-display);
+  line-height: 1;
+}
+
+.radio-label-es {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.radio-label-en {
+  font-size: 0.65rem;
+  color: var(--color-text-muted);
+  font-style: italic;
+  display: none; /* shown only in EN or Bilingual mode */
+}
+
+/* Score panel — static at bottom, never sticky/floating */
+.score-panel {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  margin-top: var(--space-6);
+  box-shadow: var(--shadow-lg);
+}
+
+.score-panel-title {
+  font-size: var(--text-sm);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-4);
+  font-family: var(--font-display);
+}
+
+.score-display {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.score-total {
+  font-size: 3rem;
+  font-weight: 800;
+  color: var(--color-text);
+  font-family: var(--font-display);
+  line-height: 1;
+}
+
+.score-max {
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+}
+
+.score-result-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  font-size: var(--text-sm);
+  font-weight: 700;
+  margin-bottom: var(--space-4);
+}
+
+.score-result-badge.negative {
+  background: var(--color-success-highlight);
+  color: var(--color-success);
+}
+
+.score-result-badge.positive {
+  background: var(--color-error-highlight);
+  color: var(--color-error);
+}
+
+.score-result-badge.incomplete {
+  background: var(--color-surface-offset);
+  color: var(--color-text-muted);
+}
+
+/* Subscale bars */
+.subscale-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+
+.subscale-item {
+  background: var(--color-surface-offset);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+}
+
+.subscale-label {
+  font-size: var(--text-xs);
+  font-weight: 700;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: var(--space-1);
+}
+
+.subscale-score {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  font-family: var(--font-display);
+  color: var(--color-text);
+  line-height: 1;
+}
+
+.subscale-cutoff {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-top: 2px;
+}
+
+.subscale-item.concern .subscale-score {
+  color: var(--color-error);
+}
+
+.subscale-item.concern {
+  background: var(--color-error-highlight);
+}
+
+/* Score actions */
+.score-actions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  background: var(--color-primary);
+  color: white;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+}
+.btn-primary:hover { background: var(--color-primary-hover); color: white; }
+.btn-primary:active { background: var(--color-primary-active); }
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  background: var(--color-surface-offset);
+  color: var(--color-text);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  border: 1px solid var(--color-border);
+}
+.btn-secondary:hover { background: var(--color-surface-offset-2); }
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-3) var(--space-5);
+  color: var(--color-text-muted);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 600;
+}
+.btn-ghost:hover { background: var(--color-surface-offset); color: var(--color-text); }
+
+/* Note summary box */
+.note-summary-box {
+  background: var(--color-surface-offset);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-4) var(--space-5);
+  margin-top: var(--space-4);
+  font-family: monospace;
+  font-size: var(--text-sm);
+  white-space: pre-wrap;
+  color: var(--color-text);
+  display: none;
+}
+
+.note-summary-box.visible {
+  display: block;
+}
+
+/* Legend */
+.subscale-legend {
+  display: flex;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+  margin-bottom: var(--space-5);
+  padding: var(--space-4);
+  background: var(--color-surface-offset);
+  border-radius: var(--radius-lg);
+  font-size: var(--text-xs);
+}
+.legend-item { display: flex; align-items: center; gap: var(--space-2); }
+.legend-dot {
+  width: 10px; height: 10px; border-radius: var(--radius-full);
+}
+.legend-dot.I { background: var(--color-primary); }
+.legend-dot.A { background: #daa520; }
+.legend-dot.E { background: #dc3545; }
+
+/* Placeholder page */
+.placeholder-hero {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xl);
+  padding: var(--space-12) var(--space-8);
+  text-align: center;
+  margin-bottom: var(--space-6);
+}
+
+.placeholder-icon {
+  font-size: 3rem;
+  margin-bottom: var(--space-4);
+}
+
+.placeholder-hero h2 {
+  font-size: var(--text-xl);
+  font-weight: 800;
+  color: var(--color-text);
+  margin-bottom: var(--space-3);
+  font-family: var(--font-display);
+}
+
+.placeholder-hero p {
+  color: var(--color-text-muted);
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* Mobile hamburger */
+.hamburger {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  color: var(--color-text-muted);
+}
+
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  z-index: 90;
+}
+
+/* Breadcrumb */
+.breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-4);
+}
+.breadcrumb a { color: var(--color-primary); text-decoration: none; }
+.breadcrumb a:hover { text-decoration: underline; }
+.breadcrumb-sep { color: var(--color-text-faint); }
+
+/* Dashboard summary section */
+.dashboard-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+}
+
+.summary-stat {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+}
+
+.summary-stat .stat-value {
+  font-size: var(--text-xl);
+  font-weight: 800;
+  color: var(--color-primary);
+  font-family: var(--font-display);
+  line-height: 1;
+}
+
+.summary-stat .stat-label {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  margin-top: var(--space-2);
+  font-weight: 500;
+}
+
+/* Section headings */
+.section-heading {
+  font-size: var(--text-base);
+  font-weight: 700;
+  color: var(--color-text);
+  font-family: var(--font-display);
+  margin-bottom: var(--space-3);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.section-heading::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--color-border);
+}
+
+/* Workflow table links */
+.workflow-link {
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: var(--text-xs);
+  background: var(--color-primary-bg);
+  padding: 2px 10px;
+  border-radius: var(--radius-full);
+  display: inline-block;
+  transition: background var(--transition-interactive), color var(--transition-interactive);
+}
+.workflow-link:hover {
+  background: var(--color-primary);
+  color: white;
+}
+.workflow-link.placeholder {
+  background: var(--color-surface-offset);
+  color: var(--color-text-muted);
+}
+.workflow-link.placeholder:hover {
+  background: var(--color-surface-offset-2);
+  color: var(--color-text);
+}
+
+/* Copy feedback */
+.copy-feedback {
+  font-size: var(--text-xs);
+  color: var(--color-success);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.copy-feedback.show { opacity: 1; }
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .sidebar {
+    transform: translateX(calc(-1 * var(--sidebar-width)));
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .sidebar-overlay.open {
+    display: block;
+  }
+  .main-content {
+    margin-left: 0;
+  }
+  .topbar {
+    padding: var(--space-4);
+  }
+  .page-content {
+    padding: var(--space-5) var(--space-4);
+  }
+  .hamburger {
+    display: flex;
+  }
+  .subscale-grid {
+    grid-template-columns: 1fr;
+  }
+  .radio-group {
+    gap: var(--space-1);
+  }
+}
+
+/* ===================== MOBILE / TOUCH ENHANCEMENTS ===================== */
+
+/* Larger tap targets on touch screens */
+@media (hover: none) and (pointer: coarse) {
+  .radio-option label {
+    min-height: 60px;
+    padding: var(--space-3) var(--space-2);
+  }
+  .nav-item {
+    padding: var(--space-3) var(--space-3);
+    min-height: 44px;
+  }
+  .btn-primary, .btn-secondary, .btn-ghost {
+    min-height: 44px;
+  }
+  .lang-btn {
+    min-height: 32px;
+    padding: var(--space-2) var(--space-3);
+  }
+}
+
+/* Additional small-screen adjustments */
+@media (max-width: 768px) {
+  .tool-grid {
+    grid-template-columns: 1fr;
+  }
+  .dashboard-summary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .score-panel {
+    position: static;
+    border-radius: var(--radius-xl);
+  }
+  .tool-header-card {
+    padding: var(--space-5);
+  }
+  .score-actions {
+    flex-direction: column;
+  }
+  .score-actions .btn-primary,
+  .score-actions .btn-secondary {
+    width: 100%;
+    justify-content: center;
+  }
+  .subscale-legend {
+    flex-direction: column;
+    gap: var(--space-2);
+  }
+}
+
+
+/* No sidebar — main fills full width */
+.no-sidebar .main-content {
+  margin-left: 0;
+  width: 100%;
+}
+.no-sidebar .sidebar {
+  display: none !important;
+}
+  
+/* ===== Dashboard Disclaimer ===== */
+.dashboard-disclaimer {
+  margin: var(--space-4) 0 var(--space-5);
+  padding: var(--space-3) var(--space-4);
+  background: rgba(245,158,11,0.07);
+  border: 1px solid rgba(245,158,11,0.3);
+  border-radius: var(--radius-md);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+.dashboard-disclaimer strong { color: var(--color-text); }
+
+/* ── SEND CARD ── */
+.send-card {
+  background: var(--surface-2, #1e1d1b);
+  border: 1.5px solid var(--gold-border, rgba(200,155,60,0.5));
+  border-radius: 14px;
+  padding: 18px 22px 20px;
+  margin: 0 0 28px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.send-card-icon {
+  width: 42px;
+  height: 42px;
+  background: rgba(200,155,60,0.14);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 1.3rem;
+}
+.send-card-body { flex: 1; min-width: 200px; }
+.send-card-title {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--gold, #c89b3c);
+  margin-bottom: 4px;
+}
+.send-card-desc {
+  font-size: 0.82rem;
+  color: var(--muted, #78766e);
+  margin-bottom: 12px;
+  line-height: 1.45;
+}
+.send-card-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: var(--gold, #c89b3c);
+  color: #171614;
+  font-size: 0.85rem;
+  font-weight: 700;
+  padding: 9px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.send-card-btn:hover { opacity: .85; }
+
+/* ── SEND MODAL ── */
+.send-modal-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 9000;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.send-modal-backdrop.open { display: flex; }
+.send-modal {
+  background: var(--surface-2, #1e1d1b);
+  border: 1px solid var(--gold-border, rgba(200,155,60,0.5));
+  border-radius: 16px;
+  padding: 28px 28px 24px;
+  width: 100%;
+  max-width: 480px;
+  max-height: 90dvh;
+  overflow-y: auto;
+  position: relative;
+}
+.send-modal-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gold, #c89b3c);
+  margin-bottom: 4px;
+}
+.send-modal-subtitle {
+  font-size: 0.8rem;
+  color: var(--muted, #78766e);
+  margin-bottom: 20px;
+  line-height: 1.4;
+}
+.send-modal-close {
+  position: absolute;
+  top: 16px; right: 18px;
+  background: none; border: none;
+  color: var(--muted, #78766e);
+  font-size: 1.3rem;
+  cursor: pointer;
+  line-height: 1;
+}
+.send-modal-close:hover { color: var(--color-text, #d0cfc9); }
+.send-field { margin-bottom: 14px; }
+.send-label {
+  display: block;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--muted, #78766e);
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  margin-bottom: 5px;
+}
+.send-input, .send-select {
+  width: 100%;
+  background: var(--surface, #171614);
+  border: 1px solid var(--border, #2a2927);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--color-text, #d0cfc9);
+  font-size: 0.88rem;
+  font-family: inherit;
+  box-sizing: border-box;
+  transition: border-color .15s;
+}
+.send-input:focus, .send-select:focus {
+  outline: none;
+  border-color: var(--gold, #c89b3c);
+}
+.send-select option { background: #1e1d1b; }
+.send-modal-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+.send-generate-btn {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  background: var(--gold, #c89b3c);
+  color: #171614;
+  font-weight: 700;
+  font-size: 0.9rem;
+  padding: 11px 18px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: opacity .15s;
+}
+.send-generate-btn:hover { opacity: .85; }
+.send-lang-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.send-lang-chip {
+  flex: 1;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid var(--border, #2a2927);
+  background: var(--surface, #171614);
+  color: var(--muted, #78766e);
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: center;
+  transition: all .15s;
+}
+.send-lang-chip.active {
+  border-color: var(--gold, #c89b3c);
+  background: rgba(200,155,60,0.12);
+  color: var(--gold, #c89b3c);
+}
+
+/* ── TOOL CARD WRAPPER (for sendable cards) ── */
+.tool-card-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.tool-card-wrap .tool-card {
+  flex: 1;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+  border-bottom: none;
+}
+.tool-card-send-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: rgba(200,155,60,0.12);
+  border: 1px solid var(--gold-border, rgba(200,155,60,0.4));
+  border-top: none;
+  border-bottom-left-radius: 10px;
+  border-bottom-right-radius: 10px;
+  padding: 7px 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--gold, #c89b3c);
+  cursor: pointer;
+  width: 100%;
+  transition: background .15s;
+  box-sizing: border-box;
+}
+.tool-card-send-btn:hover { background: rgba(200,155,60,0.22); }
+
+/* ── HOW TO USE CARD ── */
+.howto-card {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface);
+  margin-bottom: var(--space-4);
+  overflow: hidden;
+}
+.howto-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: 14px var(--space-5);
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+  min-height: 48px;
+}
+.howto-summary::-webkit-details-marker { display: none; }
+.howto-icon { font-size: 1rem; flex-shrink: 0; }
+.howto-title {
+  flex: 1;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--color-text);
+}
+.howto-chevron {
+  flex-shrink: 0;
+  color: var(--color-text-muted);
+  transition: transform .2s;
+}
+.howto-card[open] .howto-chevron { transform: rotate(180deg); }
+.howto-body {
+  padding: 0 var(--space-5) var(--space-5);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+.howto-section { padding-top: var(--space-4); }
+.howto-section-title {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-primary);
+  margin-bottom: var(--space-2);
+}
+.howto-section p {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+.howto-list {
+  padding-left: var(--space-5);
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.howto-list li {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  line-height: 1.6;
+}
+
+/* ── FEEDBACK SECTION ── */
+.feedback-section {
+  margin-top: var(--space-12);
+  padding: var(--space-8) var(--space-8) var(--space-10);
+  border-top: 1px solid var(--color-border);
+}
+.feedback-section-header { margin-bottom: var(--space-4); }
+.feedback-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--color-text);
+  margin-bottom: var(--space-2);
+}
+.feedback-section-sub {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+  line-height: 1.55;
+  max-width: 640px;
+  margin: 0;
+}
+.feedback-tip {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-5);
+  max-width: 640px;
+  font-size: 0.78rem;
+  color: var(--color-text-muted);
+  line-height: 1.5;
+}
+.feedback-tip-icon { font-size: 1rem; flex-shrink: 0; margin-top: 1px; }
+.feedback-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  max-width: 640px;
+}
+.feedback-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+.feedback-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+.feedback-field label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+.feedback-required { color: var(--color-primary); margin-left: 2px; }
+.feedback-field input,
+.feedback-field textarea {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 10px 12px;
+  font-size: 0.875rem;
+  color: var(--color-text);
+  font-family: inherit;
+  resize: vertical;
+  transition: border-color .18s, box-shadow .18s;
+  min-height: 44px;
+}
+.feedback-field input::placeholder,
+.feedback-field textarea::placeholder { color: var(--color-text-faint); }
+.feedback-field input:focus,
+.feedback-field textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-primary-highlight);
+}
+.feedback-field textarea { min-height: 100px; }
+.feedback-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  flex-wrap: wrap;
+}
+.feedback-submit {
+  display: inline-flex;
+  align-items: center;
+  background: var(--color-primary);
+  color: #fff;
+  font-size: 0.875rem;
+  font-weight: 600;
+  font-family: inherit;
+  padding: 10px 22px;
+  border-radius: var(--radius-md);
+  border: none;
+  cursor: pointer;
+  min-height: 44px;
+  transition: background .18s, opacity .18s;
+}
+.feedback-submit:hover { background: var(--color-primary-hover); }
+.feedback-submit:disabled { opacity: 0.5; cursor: not-allowed; }
+.feedback-success {
+  display: none;
+  background: var(--color-success-highlight, rgba(109,170,69,0.12));
+  border: 1px solid rgba(109,170,69,0.3);
+  color: var(--color-success, #6daa45);
+  border-radius: var(--radius-md);
+  padding: 8px 14px;
+  font-size: 0.8125rem;
+  font-weight: 600;
+}
+.feedback-success.visible { display: block; }
+@media (max-width: 600px) {
+  .feedback-row { grid-template-columns: 1fr; }
+  .feedback-section { padding: var(--space-6) var(--space-4) var(--space-8); }
+}
+@media print { .feedback-section { display: none; } }
+
+</style>
+</head>
+<body>
+
+<div class="app-layout no-sidebar">
+
+  <!-- Sidebar -->
+<!-- Overlay for mobile -->
+<!-- Main -->
+  <main class="main-content">
+    <div class="topbar">
+      <div style="display:flex; align-items:center; gap:var(--space-3);">
+        <div>
+          <div class="topbar-title" data-es="CoCM Camasca" data-en="CoCM Camasca">CoCM Camasca</div>
+          <div class="topbar-subtitle" data-es="Herramientas de Tamizaje y Monitoreo" data-en="Child/Adolescent Screening &amp; Monitoring Tools">Herramientas de Tamizaje y Monitoreo</div>
+        </div>
+      </div>
+      <div class="topbar-actions">
+        <div class="lang-toggle">
+          <button class="lang-btn active" id="btnES" onclick="setLang('es')">Español</button>
+          <button class="lang-btn" id="btnEN" onclick="setLang('en')">English</button>
+        </div>
+        <button class="theme-toggle" data-theme-toggle aria-label="Cambiar tema">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="page-content">
+
+      <!-- Welcome banner -->
+      <div class="tool-header-card" style="margin-bottom:var(--space-8);">
+        <h1 data-es="CoCM Camasca" data-en="CoCM Camasca">CoCM Camasca</h1>
+        <p data-es="Modelo de Atención Colaborativa (CoCM) — Honduras. Seleccione una herramienta para iniciar la evaluación." data-en="Collaborative Care Model (CoCM) — Honduras. Select a tool to begin the assessment.">Modelo de Atención Colaborativa (CoCM) — Honduras. Seleccione una herramienta para iniciar la evaluación.</p>
+
+      </div>
+      <!-- Medical Disclaimer -->
+      <div class="dashboard-disclaimer">
+        <strong data-es="Aviso médico:" data-en="Medical Disclaimer:">Aviso médico:</strong>
+        <span data-es="Todas las herramientas en este sitio son solo para fines de detección clínica. No reemplazan el juicio clínico ni constituyen un diagnóstico. Los resultados deben ser interpretados por un profesional de salud calificado." data-en="All tools on this site are for clinical screening purposes only. They do not replace clinical judgment and do not constitute a diagnosis. Results must be interpreted by a qualified health professional.">Todas las herramientas en este sitio son solo para fines de detección clínica. No reemplazan el juicio clínico ni constituyen un diagnóstico. Los resultados deben ser interpretados por un profesional de salud calificado.</span>
+      </div>
+
+
+      <!-- HOW TO USE CARD -->
+      <details class="howto-card" id="howtoCard">
+        <summary class="howto-summary">
+          <span class="howto-icon">&#x2139;&#xfe0f;</span>
+          <span class="howto-title">
+            <span data-es="Cómo usar este portal" data-en="How to use this portal">Cómo usar este portal</span>
+          </span>
+          <span class="howto-chevron" aria-hidden="true">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+          </span>
+        </summary>
+        <div class="howto-body">
+
+          <div class="howto-section">
+            <div class="howto-section-title" data-es="Para qué sirve" data-en="What this is">Para qué sirve</div>
+            <p data-es="Este portal contiene las herramientas de evaluación psicológica del programa CoCM Camasca. Cada herramienta es un cuestionario validado que calcula el puntaje automáticamente y muestra el resultado al final." data-en="This portal contains the psychological assessment tools for the CoCM Camasca program. Each tool is a validated questionnaire that calculates the score automatically and shows the result at the bottom.">Este portal contiene las herramientas de evaluación psicológica del programa CoCM Camasca. Cada herramienta es un cuestionario validado que calcula el puntaje automáticamente y muestra el resultado al final.</p>
+          </div>
+
+          <div class="howto-section">
+            <div class="howto-section-title" data-es="Cómo completar una evaluación" data-en="How to complete an assessment">Cómo completar una evaluación</div>
+            <ol class="howto-list">
+              <li><span data-es="Consulte el flujo de trabajo (debajo) para saber qué herramienta corresponde a cada paciente según su edad y diagnóstico." data-en="Refer to the workflow chart below to know which tool to use for each patient based on age and diagnosis.">Consulte el flujo de trabajo (debajo) para saber qué herramienta corresponde a cada paciente según su edad y diagnóstico.</span></li>
+              <li><span data-es="Seleccione la herramienta: puede hacer clic en su nombre en el flujo de trabajo, en la tabla de siglas debajo del flujo, o buscarla directamente en la sección &lsquo;Todas las Herramientas&rsquo;." data-en="Open the tool: you can click its name in the workflow chart, in the abbreviations table below the workflow, or find it directly in the &lsquo;All Tools&rsquo; section.">Seleccione la herramienta: puede hacer clic en su nombre en el flujo de trabajo, en la tabla de siglas debajo del flujo, o buscarla directamente en la sección &lsquo;Todas las Herramientas&rsquo;.</span></li>
+              <li><span data-es="Lea cada pregunta en voz alta al paciente (o al padre/madre) y seleccione la respuesta." data-en="Read each question aloud to the patient (or parent) and select the answer.">Lea cada pregunta en voz alta al paciente (o al padre/madre) y seleccione la respuesta.</span></li>
+              <li><span data-es="El puntaje y la interpretación aparecen automáticamente al final de la página al completar todas las preguntas." data-en="The score and interpretation appear automatically at the bottom of the page once all questions are answered.">El puntaje y la interpretación aparecen automáticamente al final de la página al completar todas las preguntas.</span></li>
+              <li><span data-es="Use el botón de copiar para guardar el resultado y péguelo donde corresponda." data-en="Use the copy button to save the result and paste it where needed.">Use el botón de copiar para guardar el resultado y péguelo donde corresponda.</span></li>
+            </ol>
+          </div>
+
+          <div class="howto-section">
+            <div class="howto-section-title" data-es="Enviar un cuestionario a distancia" data-en="Sending a questionnaire remotely">Enviar un cuestionario a distancia</div>
+            <p data-es="Algunos cuestionarios pueden ser completados por el padre, madre o maestro desde su propio teléfono. Use el botón &lsquo;Enviar cuestionario&rsquo; para generar un mensaje listo para enviar por WhatsApp, correo u otro medio. El enlace incluye el nombre del niño/a y redirige los resultados de vuelta a usted." data-en="Some questionnaires can be completed by the parent or teacher from their own phone. Use the &lsquo;Send questionnaire&rsquo; button to generate a message ready to share via WhatsApp, email, or any channel. The link includes the child&rsquo;s name and sends results back to you.">Algunos cuestionarios pueden ser completados por el padre, madre o maestro desde su propio teléfono. Use el botón &lsquo;Enviar cuestionario&rsquo; para generar un mensaje listo para enviar por WhatsApp, correo u otro medio. El enlace incluye el nombre del niño/a y redirige los resultados de vuelta a usted.</p>
+          </div>
+
+          <div class="howto-section">
+            <div class="howto-section-title" data-es="Consejos generales" data-en="General tips">Consejos generales</div>
+            <ul class="howto-list">
+              <li><span data-es="No es necesario crear una cuenta ni instalar nada. Solo guarde el enlace de este portal en la pantalla de inicio de su teléfono." data-en="No account or installation needed. Just save this portal&rsquo;s link to your phone&rsquo;s home screen.">No es necesario crear una cuenta ni instalar nada. Solo guarde el enlace de este portal en la pantalla de inicio de su teléfono.</span></li>
+              <li><span data-es="Puede usar ES o EN en la esquina superior derecha para cambiar el idioma de la interfaz." data-en="Use ES or EN in the top right corner to switch the interface language.">Puede usar ES o EN en la esquina superior derecha para cambiar el idioma de la interfaz.</span></li>
+              <li><span data-es="El icono de sol/luna cambia entre modo oscuro y modo claro." data-en="The sun/moon icon switches between dark and light mode.">El icono de sol/luna cambia entre modo oscuro y modo claro.</span></li>
+              <li><span data-es="Si tiene dudas o quiere sugerir mejoras, use el formulario de sugerencias al final de la página." data-en="If you have questions or want to suggest improvements, use the suggestions form at the bottom of the page.">Si tiene dudas o quiere sugerir mejoras, use el formulario de sugerencias al final de la página.</span></li>
+            </ul>
+          </div>
+
+        </div>
+      </details>
+
+      <!-- Workflow flowchart (embedded) -->
+      <div class="section-heading" data-es="Flujo de Trabajo CoCM" data-en="CoCM Workflow">Flujo de Trabajo CoCM</div>
+
+      <!-- Flowchart CSS vars (shorthand aliases used by flowchart components) -->
+      <style>
+        .flow-embed { --teal:#4F98A3; --teal-dim:rgba(79,152,163,0.14); --teal-border:rgba(79,152,163,0.4); --gold:#c89b3c; --gold-dim:rgba(200,155,60,0.12); --gold-border:rgba(200,155,60,0.5); --green:#4a9e6b; --green-dim:rgba(74,158,107,0.13); --green-border:rgba(74,158,107,0.4); --soon:#5a5955; --soon-dim:rgba(90,89,85,0.18); --surface:#171614; --surface-2:#1e1d1b; --border:#2a2927; --text:#d0cfc9; --muted:#78766e; --faint:#3e3d3a; }
+        [data-theme="light"] .flow-embed { --surface:#ffffff; --surface-2:#ebebea; --border:#d8d7d3; --text:#1a1917; --muted:#6b6960; --faint:#c0bfba; --teal-dim:rgba(79,152,163,0.09); --gold-dim:rgba(200,155,60,0.08); --green-dim:rgba(74,158,107,0.09); --soon-dim:rgba(0,0,0,0.05); }
+
+        /* Scroll hint */
+        .flow-scroll-hint { font-size:11px; color:var(--color-text-muted); margin-bottom:6px; padding-left:2px; }
+
+        /* Flowchart container */
+        .flow-embed-wrap {
+          background: var(--color-surface);
+          border: 1px solid var(--color-border);
+          border-radius: var(--radius-xl);
+          overflow-x: auto;
+          overflow-y: visible;
+          margin-bottom: var(--space-8);
+          -webkit-overflow-scrolling: touch;
+        }
+        .flow-embed {
+          padding: 16px 16px 24px;
+          min-width: 470px;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+          font-size: 13px;
+          color: var(--text);
+        }
+
+        /* Nodes */
+        .fe-node { display:flex; align-items:center; justify-content:center; text-align:center; border-radius:8px; padding:8px 10px; font-weight:600; font-size:12px; line-height:1.35; position:relative; }
+        .fe-node-entry { background:var(--teal-dim); border:2px solid var(--teal-border); border-radius:20px; font-size:11px; color:var(--teal); }
+        .fe-node-psc   { background:var(--green-dim); border:2px solid var(--green-border); color:var(--green); }
+        .fe-node-review{ background:var(--surface-2); border:2px solid var(--border); font-size:11px; color:var(--muted); }
+        .fe-node-enroll{ background:var(--gold-dim); border:2px dashed var(--gold-border); border-radius:20px; font-size:11px; color:var(--gold); }
+
+        /* Diamonds */
+        .fe-diamond-wrap { display:flex; align-items:center; justify-content:center; }
+        .fe-diamond { width:84px; height:84px; transform:rotate(45deg); border:2px solid var(--gold-border); background:var(--gold-dim); display:flex; align-items:center; justify-content:center; border-radius:6px; }
+        .fe-diamond-inner { transform:rotate(-45deg); font-size:9px; font-weight:600; color:var(--gold); text-align:center; padding:4px; line-height:1.3; max-width:64px; }
+        .fe-diamond-sm { width:60px; height:60px; transform:rotate(45deg); border:2px solid var(--teal-border); background:var(--teal-dim); display:flex; align-items:center; justify-content:center; border-radius:5px; }
+        .fe-diamond-sm-inner { transform:rotate(-45deg); font-size:9px; font-weight:600; color:var(--teal); text-align:center; padding:2px; line-height:1.3; max-width:50px; }
+
+        /* Condition label */
+        .fe-cond { display:flex; align-items:center; justify-content:center; text-align:center; padding:6px 8px; font-weight:700; font-size:11px; border:2px solid var(--teal-border); border-radius:8px; background:var(--teal-dim); color:var(--teal); }
+
+        /* Tool boxes */
+        .fe-tool-box { display:flex; flex-direction:column; gap:3px; padding:6px 8px; border-radius:8px; flex:1; min-height:0; }
+        .fe-tool-box.teal { background:var(--teal-dim); border:1px solid var(--teal-border); }
+        .fe-tool-link { display:inline-flex; align-items:center; gap:5px; font-weight:700; font-size:12px; color:var(--teal); text-decoration:none; transition:opacity .15s; }
+        .fe-tool-link:hover { opacity:.75; text-decoration:underline; }
+        .fe-dot { width:5px; height:5px; border-radius:50%; background:var(--teal); flex-shrink:0; }
+        .fe-tool-sub { font-size:10px; color:var(--muted); line-height:1.3; }
+        .fe-age-badge { display:inline-block; font-size:9px; font-weight:800; letter-spacing:.04em; text-transform:uppercase; color:var(--muted); background:rgba(120,118,110,0.12); border:1px solid rgba(120,118,110,0.25); border-radius:4px; padding:1px 5px; margin-bottom:2px; white-space:nowrap; }
+
+        /* Monitor boxes */
+        .fe-monitor-box { display:flex; flex-direction:column; gap:3px; padding:6px 8px; border-radius:8px; background:var(--teal-dim); border:1px solid var(--teal-border); flex:1; min-height:0; }
+        .fe-monitor-label { font-size:10px; color:var(--muted); font-weight:600; text-transform:uppercase; letter-spacing:.04em; }
+
+        /* Col headers */
+        .fe-col-header { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); text-align:center; padding:4px 0 10px; }
+        .fe-col-header.accent { color:var(--teal); }
+
+        /* Abbreviations legend */
+        .fe-abbr { margin:20px 0 0; padding:14px 16px; background:var(--surface); border:1px solid var(--border); border-radius:10px; }
+        .fe-abbr-title { font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); margin-bottom:12px; }
+        .fe-abbr-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:6px 16px; font-size:10.5px; color:var(--muted); line-height:1.4; }
+
+        /* Language */
+        .flow-embed [data-lang="es"] .en, .flow-embed.lang-es .en { display:none !important; }
+        .flow-embed [data-lang="en"] .es, .flow-embed.lang-en .es { display:none !important; }
+      </style>
+
+      <p class="flow-scroll-hint" data-es="← Desliza para ver el flujo completo →" data-en="← Scroll to see the full workflow →">← Desliza para ver el flujo completo →</p>
+
+      <div class="flow-embed-wrap">
+        <div class="flow-embed lang-es" id="flowEmbed">
+
+          <!-- Universal screening intro: centered over col2 (Focused Screening Tools) -->
+          <!-- col2 starts at 70px, is 180px wide. Items wider than 180px overflow symmetrically = still visually centered. -->
+          <div style="display:flex; flex-direction:column; align-items:center; margin-bottom:10px; width:180px; margin-left:70px;">
+
+            <!-- Tamizaje Universal pill -->
+            <div class="fe-node fe-node-entry" style="font-size:11px; padding:7px 22px; width:auto; white-space:nowrap;">
+              <span class="es">Tamizaje Universal</span><span class="en">Universal Screening</span>
+            </div>
+
+            <!-- Short down arrow -->
+            <svg width="16" height="32" viewBox="0 0 16 32" fill="none" style="flex-shrink:0; margin:2px 0;">
+              <line x1="8" y1="5" x2="8" y2="24" stroke="#4a4945" stroke-width="1.5"/>
+              <polygon points="2,22 8,32 14,22" fill="#4a4945"/>
+            </svg>
+
+            <!-- PSC-17 box -->
+            <div class="fe-tool-box teal" style="align-items:center; text-align:center; flex-direction:column; gap:2px; justify-content:center; width:180px;">
+              <a href="psc17.html" class="fe-tool-link" style="font-size:13px; font-weight:800; white-space:nowrap;"><span class="fe-dot"></span>PSC-17</a>
+              <span class="fe-tool-sub" style="font-size:10px;"><span class="es">Todos · 17 ítems · Corte ≥15</span><span class="en">All patients · 17 items · Cutoff ≥15</span></span>
+            </div>
+
+            <!-- Short down arrow -->
+            <svg width="16" height="32" viewBox="0 0 16 32" fill="none" style="flex-shrink:0; margin:2px 0;">
+              <line x1="8" y1="5" x2="8" y2="24" stroke="#4a4945" stroke-width="1.5"/>
+              <polygon points="2,22 8,32 14,22" fill="#4a4945"/>
+            </svg>
+
+            <!-- Care manager review box -->
+            <div style="width:180px; background:var(--teal-dim); border:1px solid var(--teal-border); border-radius:8px; padding:8px 10px; text-align:center;">
+              <div style="font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--teal); opacity:0.75; margin-bottom:3px;"><span class="es">Gerente de Cuidado /</span><span class="en">Care Manager /</span></div>
+              <div style="font-size:11px; font-weight:700; color:var(--teal); line-height:1.3;"><span class="es">Revisión de Caso Psiquiátrico</span><span class="en">Psychiatric Case Review</span></div>
+            </div>
+
+            <!-- Short down arrow -->
+            <svg width="16" height="32" viewBox="0 0 16 32" fill="none" style="flex-shrink:0; margin:2px 0;">
+              <line x1="8" y1="5" x2="8" y2="24" stroke="#4a4945" stroke-width="1.5"/>
+              <polygon points="2,22 8,32 14,22" fill="#4a4945"/>
+            </svg>
+
+            <!-- Gold diamond -->
+            <div class="fe-diamond-wrap">
+              <div class="fe-diamond"><div class="fe-diamond-inner"><span class="es">Inscripción al Programa</span><span class="en">Program Registration</span></div></div>
+            </div>
+
+            <!-- Short down arrow -->
+            <svg width="16" height="28" viewBox="0 0 16 28" fill="none" style="flex-shrink:0; margin:2px 0;">
+              <line x1="8" y1="5" x2="8" y2="20" stroke="#4a4945" stroke-width="1.5"/>
+              <polygon points="2,18 8,28 14,18" fill="#4a4945"/>
+            </svg>
+
+            <!-- Parallelogram -->
+            <div style="width:180px;">
+              <div style="background:var(--teal-dim); border:1px solid var(--teal-border); border-radius:6px; padding:8px 10px; clip-path:polygon(6% 0%, 100% 0%, 94% 100%, 0% 100%); text-align:center;">
+                <div style="font-size:11px; font-weight:700; color:var(--teal); line-height:1.35;"><span class="es">¿Qué paciente cribado positivo — para qué?</span><span class="en">What did the patient screen positive for?</span></div>
+              </div>
+            </div>
+
+            <!-- Short down arrow into grid -->
+            <svg width="16" height="28" viewBox="0 0 16 28" fill="none" style="flex-shrink:0; margin:2px 0;">
+              <line x1="8" y1="5" x2="8" y2="20" stroke="#4a4945" stroke-width="1.5"/>
+              <polygon points="2,18 8,28 14,18" fill="#4a4945"/>
+            </svg>
+
+          </div>
+
+          <!-- Column headers -->
+          <div style="display:grid; grid-template-columns:70px 180px 90px 130px; padding:0 0 6px; column-gap:0;">
+            <div class="fe-col-header"></div>
+            <div class="fe-col-header accent"><span class="es">Herramientas de Detección</span><span class="en">Focused Screening Tools</span></div>
+            <div class="fe-col-header"></div>
+            <div class="fe-col-header accent"><span class="es">Monitoreo</span><span class="en">Monitoring Tools</span></div>
+          </div>
+
+          <!-- Condition rows -->
+          <div style="display:grid; grid-template-columns:70px 180px 90px 130px; column-gap:0; row-gap:6px; align-items:stretch; margin-top:4px;">
+            <!-- Depression -->
+            <div style="grid-column:1; grid-row:1; padding:4px 6px; display:flex; align-items:center; justify-content:center;">
+              <div class="fe-cond" style="width:100%;"><span class="es">Depresión</span><span class="en">Depression</span></div>
+            </div>
+            <div style="grid-column:2; grid-row:1; display:flex; flex-direction:column; gap:4px; padding:3px 4px; height:100%;">
+              <div class="fe-tool-box teal" style="padding:8px 10px;"><div><span class="fe-age-badge"><span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span></span></div><a href="smfq.html" class="fe-tool-link"><span class="fe-dot"></span>SMFQ-C</a></div>
+              <div class="fe-tool-box teal" style="padding:8px 10px;"><div><span class="fe-age-badge"><span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span></span></div><a href="phqa.html" class="fe-tool-link"><span class="fe-dot"></span>PHQ-A (PHQ-9)</a></div>
+            </div>
+            <div style="grid-column:3; grid-row:1; display:flex; align-items:center; justify-content:center; padding:4px;">
+              <div class="fe-diamond-sm"><div class="fe-diamond-sm-inner"><span class="es">¿Qué herramienta monitorear?</span><span class="en">Which tool to monitor?</span></div></div>
+            </div>
+            <div style="grid-column:4; grid-row:1; display:flex; flex-direction:column; gap:4px; padding:3px 4px; height:100%;">
+              <div class="fe-monitor-box"><div><span class="fe-age-badge"><span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span></span></div><a href="smfq.html" class="fe-tool-link" style="font-size:11px;"><span class="fe-dot"></span>SMFQ-C</a></div>
+              <div class="fe-monitor-box"><div><span class="fe-age-badge"><span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span></span></div><a href="phqa.html" class="fe-tool-link" style="font-size:11px;"><span class="fe-dot"></span>PHQ-A</a></div>
+            </div>
+
+            <!-- TDAH -->
+            <div style="grid-column:1; grid-row:2; padding:4px 6px; display:flex; align-items:center; justify-content:center;">
+              <div class="fe-cond" style="width:100%;">TDAH</div>
+            </div>
+            <div style="grid-column:2; grid-row:2; display:flex; flex-direction:column; gap:4px; padding:3px 4px; height:100%;">
+              <div class="fe-tool-box teal"><div><span class="fe-age-badge"><span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span></span></div><a href="vanderbilt-parent.html" class="fe-tool-link"><span class="fe-dot"></span>Vanderbilt-P</a><a href="vanderbilt-teacher.html" class="fe-tool-link"><span class="fe-dot"></span>Vanderbilt-T</a></div>
+              <div class="fe-tool-box teal"><div><span class="fe-age-badge"><span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span></span></div><a href="snapiv.html" class="fe-tool-link"><span class="fe-dot"></span>SNAP-IV</a><span style="font-size:11px; color:var(--muted);">+</span><a href="asrs.html" class="fe-tool-link"><span class="fe-dot"></span>ASRS-5</a></div>
+            </div>
+            <div style="grid-column:3; grid-row:2; display:flex; align-items:center; justify-content:center; padding:4px;">
+              <div class="fe-diamond-sm"><div class="fe-diamond-sm-inner"><span class="es">¿Qué herramienta monitorear?</span><span class="en">Which tool to monitor?</span></div></div>
+            </div>
+            <div style="grid-column:4; grid-row:2; display:flex; flex-direction:column; gap:4px; padding:3px 4px; height:100%;">
+              <div class="fe-monitor-box"><div><span class="fe-age-badge"><span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span></span></div><a href="cap.html" class="fe-tool-link" style="font-size:11px;"><span class="fe-dot"></span>CAP Scale</a><span class="fe-tool-sub"><span class="es">(prioridad)</span><span class="en">(priority)</span></span><a href="vanderbilt-teacher.html" class="fe-tool-link" style="font-size:11px; margin-top:2px;"><span class="fe-dot"></span>Vanderbilt-T</a><span class="fe-tool-sub"><span class="es">(si CAP no es viable)</span><span class="en">(if CAP not viable)</span></span></div>
+              <div class="fe-monitor-box"><div><span class="fe-age-badge"><span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span></span></div><a href="snapiv.html" class="fe-tool-link" style="font-size:11px;"><span class="fe-dot"></span>SNAP-IV</a><span style="font-size:11px; color:var(--muted);">+</span><a href="asrs.html" class="fe-tool-link" style="font-size:11px;"><span class="fe-dot"></span>ASRS-5</a></div>
+            </div>
+
+            <!-- Ansiedad -->
+            <div style="grid-column:1; grid-row:3; padding:4px 6px; display:flex; align-items:center; justify-content:center;">
+              <div class="fe-cond" style="width:100%;"><span class="es">Ansiedad</span><span class="en">Anxiety</span></div>
+            </div>
+            <div style="grid-column:2; grid-row:3; display:flex; flex-direction:column; gap:4px; padding:3px 4px; height:100%;">
+              <div class="fe-tool-box teal" style="padding:8px 10px;"><div><span class="fe-age-badge"><span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span></span></div><a href="scared.html" class="fe-tool-link"><span class="fe-dot"></span>SCARED-N</a><a href="scared-parent.html" class="fe-tool-link"><span class="fe-dot"></span>SCARED-P</a></div>
+              <div class="fe-tool-box teal"><div><span class="fe-age-badge"><span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span></span></div><a href="gad7.html" class="fe-tool-link"><span class="fe-dot"></span>GAD-7</a></div>
+            </div>
+            <div style="grid-column:3; grid-row:3; display:flex; align-items:center; justify-content:center; padding:4px;">
+              <div class="fe-diamond-sm"><div class="fe-diamond-sm-inner"><span class="es">¿Qué herramienta monitorear?</span><span class="en">Which tool to monitor?</span></div></div>
+            </div>
+            <div style="grid-column:4; grid-row:3; display:flex; flex-direction:column; gap:4px; padding:3px 4px; height:100%;">
+              <div class="fe-monitor-box"><div><span class="fe-age-badge"><span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span></span></div><a href="scared.html" class="fe-tool-link" style="font-size:11px;"><span class="fe-dot"></span>SCARED-N</a><a href="scared-parent.html" class="fe-tool-link" style="font-size:11px;"><span class="fe-dot"></span>SCARED-P</a></div>
+              <div class="fe-monitor-box"><div><span class="fe-age-badge"><span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span></span></div><a href="gad7.html" class="fe-tool-link" style="font-size:11px;"><span class="fe-dot"></span>GAD-7</a></div>
+            </div>
+
+            <!-- Riesgo / SUD -->
+            <div style="grid-column:1; grid-row:4; padding:4px 6px; display:flex; align-items:center; justify-content:center;">
+              <div class="fe-cond" style="width:100%;"><span class="es">Riesgo / SUD</span><span class="en">Risk / SUD</span></div>
+            </div>
+            <div style="grid-column:2; grid-row:4; display:flex; flex-direction:column; gap:4px; padding:3px 4px; height:100%;">
+              <div class="fe-tool-box" style="background:var(--surface-2); border:1px dashed var(--border); align-items:center; justify-content:center; flex:1;"><div><span class="fe-age-badge" style="opacity:0.5;"><span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span></span></div><span style="font-size:11px; color:var(--faint);"><span class="es">— Ninguno —</span><span class="en">— None —</span></span></div>
+              <div class="fe-tool-box teal"><div><span class="fe-age-badge"><span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span></span></div><a href="crafft.html" class="fe-tool-link"><span class="fe-dot"></span>CRAFFT</a></div>
+            </div>
+            <div style="grid-column:3; grid-row:4; display:flex; align-items:center; justify-content:center; padding:4px;">
+              <div class="fe-diamond-sm"><div class="fe-diamond-sm-inner"><span class="es">¿Qué herramienta monitorear?</span><span class="en">Which tool to monitor?</span></div></div>
+            </div>
+            <div style="grid-column:4; grid-row:4; display:flex; flex-direction:column; gap:4px; padding:3px 4px; height:100%;">
+              <div class="fe-tool-box" style="background:var(--surface-2); border:1px dashed var(--border); align-items:center; justify-content:center;"><div><span class="fe-age-badge" style="opacity:0.5;"><span class="es">Jóvenes ≤11</span><span class="en">Youth ≤11</span></span></div><span style="font-size:11px; color:var(--faint);"><span class="es">— Ninguno —</span><span class="en">— None —</span></span></div>
+              <div class="fe-monitor-box"><div><span class="fe-age-badge"><span class="es">Adolescente ≥12</span><span class="en">Adolescent ≥12</span></span></div><a href="dast10.html" class="fe-tool-link" style="font-size:11px;"><span class="fe-dot"></span>DAST-10</a></div>
+            </div>
+          </div>
+
+          <!-- Abbreviations legend -->
+          <div class="fe-abbr">
+            <div class="fe-abbr-title"><span class="es">Siglas</span><span class="en">Abbreviations</span></div>
+            <div class="fe-abbr-grid">
+              <div><a href="psc17.html" style="color:var(--teal); font-weight:700; text-decoration:none;">PSC-17</a> — <span class="es">Tamizaje universal. 17 ítems. Edades 4–17.</span><span class="en">Universal behavioral health screening. 17 items. Ages 4–17.</span></div>
+              <div><a href="smfq.html" style="color:var(--teal); font-weight:700; text-decoration:none;">SMFQ-C</a> — <span class="es">SMFQ-C / SMFQ-P — Cribado/monitoreo de depresión. Niño/a (≤11) y padres (6–17).</span><span class="en">SMFQ-C / SMFQ-P — Depression screening/monitoring. Child (≤11) and parent (6–17).</span></div>
+              <div><a href="phqa.html" style="color:var(--teal); font-weight:700; text-decoration:none;">PHQ-A</a> — <span class="es">Cribado de depresión. 0–27. Edades 12–17.</span><span class="en">Depression screening. 0–27 scale. Ages 12–17.</span></div>
+              <div><a href="cap.html" style="color:var(--teal); font-weight:700; text-decoration:none;">CAP</a> — <span class="es">Inatención y sobreactividad. 12 ítems. Edades 6–13.</span><span class="en">Inattention and overactivity. 12 items. Ages 6–13.</span></div>
+              <div><a href="vanderbilt-parent.html" style="color:var(--teal); font-weight:700; text-decoration:none;">Vand-P</a> / <a href="vanderbilt-teacher.html" style="color:var(--teal); font-weight:700; text-decoration:none;">Vand-T</a> — <span class="es">TDAH/TND. Padres (55 ítems) y maestros (43 ítems). Edades 6–12.</span><span class="en">ADHD/ODD. Parent (55 items) and teacher (43 items). Ages 6–12.</span></div>
+              <div><a href="snapiv.html" style="color:var(--teal); font-weight:700; text-decoration:none;">SNAP-IV</a> — <span class="es">TDAH e inatención. 26 ítems. Edades 6–18.</span><span class="en">ADHD and inattention. 26 items. Ages 6–18.</span></div>
+              <div><a href="asrs.html" style="color:var(--teal); font-weight:700; text-decoration:none;">ASRS-5</a> — <span class="es">Tamizaje TDAH adultos. 6 ítems. ≥18 años.</span><span class="en">Adult ADHD screener. 6 items. Ages ≥18.</span></div>
+              <div><a href="scared.html" style="color:var(--teal); font-weight:700; text-decoration:none;">SCARED-N</a> / <a href="scared-parent.html" style="color:var(--teal); font-weight:700; text-decoration:none;">SCARED-P</a> — <span class="es">Ansiedad. 5 subescalas. Niño/a y padres. Edades 8–17.</span><span class="en">Anxiety. 5 subscales. Child and parent versions. Ages 8–17.</span></div>
+              <div><a href="gad7.html" style="color:var(--teal); font-weight:700; text-decoration:none;">GAD-7</a> — <span class="es">Ansiedad. 7 ítems, 0–21. Edades 12+.</span><span class="en">Anxiety. 7 items, 0–21 scale. Ages 12+.</span></div>
+              <div><a href="crafft.html" style="color:var(--teal); font-weight:700; text-decoration:none;">CRAFFT</a> — <span class="es">Uso de sustancias. Edades 12–21.</span><span class="en">Substance use screening. Ages 12–21.</span></div>
+              <div><a href="dast10.html" style="color:var(--teal); font-weight:700; text-decoration:none;">DAST-10</a> — <span class="es">Uso problemático de drogas. 10 ítems. Edades 15+.</span><span class="en">Problematic drug use. 10 items. Ages 15+.</span></div>
+            </div>
+          </div>
+
+        </div><!-- /flow-embed -->
+      </div><!-- /flow-embed-wrap -->
+
+      <script>
+        // Keep flowchart language in sync with dashboard language toggle
+        (function() {
+          var embed = document.getElementById('flowEmbed');
+          if (!embed) return;
+          function syncFlowLang(lang) {
+            embed.classList.toggle('lang-es', lang === 'es');
+            embed.classList.toggle('lang-en', lang !== 'es');
+          }
+          // Observe data-lang changes on html element
+          var observer = new MutationObserver(function() {
+            syncFlowLang(document.documentElement.getAttribute('data-lang') || 'es');
+          });
+          observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-lang'] });
+          // Initial sync
+          syncFlowLang(document.documentElement.getAttribute('data-lang') || 'es');
+        })();
+      </script>
+
+      <!-- SEND QUESTIONNAIRE CARD -->
+      <div class="send-card" id="sendCard">
+        <div class="send-card-icon">✉️</div>
+        <div class="send-card-body">
+          <div class="send-card-title">
+            <span data-es="Enviar cuestionario a padre, madre o maestro" data-en="Send questionnaire to parent or teacher">Enviar cuestionario a padre, madre o maestro</span>
+          </div>
+          <div class="send-card-desc">
+            <span data-es="Genere un enlace personalizado para compartir por correo, WhatsApp u otro medio. El padre, madre o maestro completa el cuestionario en su dispositivo y le regresa los resultados." data-en="Generate a personalized link to share by email, WhatsApp, or any other channel. The parent or teacher completes the questionnaire on their device and returns the results to you.">Genere un enlace personalizado para compartir por correo, WhatsApp u otro medio. El padre, madre o maestro completa el cuestionario en su dispositivo y le regresa los resultados.</span>
+          </div>
+          <button class="send-card-btn" onclick="openSendModal()">
+            <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
+            <span data-es="Enviar cuestionario" data-en="Send questionnaire">Enviar cuestionario</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Tool cards -->
+      <div class="section-heading" data-es="Todas las Herramientas" data-en="All Tools">Todas las Herramientas</div>
+      <div class="tool-grid">
+
+        <!-- PSC-17 — READY -->
+        <div class="tool-card-wrap">
+          <a href="psc17.html" class="tool-card ready">
+            <div class="tool-card-header">
+              <div class="tool-card-icon">📋</div>
+            </div>
+            <div class="tool-card-name">PSC-17</div>
+            <div class="tool-card-desc" data-es="Lista de Síntomas Pediátricos — tamizaje universal de salud mental conductual. Edades 4–17." data-en="Pediatric Symptom Checklist — universal behavioral health screening. Ages 4–17.">Lista de Síntomas Pediátricos — tamizaje universal de salud mental conductual.</div>
+          </a>
+        </div>
+
+        <!-- SMFQ-C — READY (standard CoCM workflow) -->
+        <a href="smfq.html" class="tool-card ready">
+          <div class="tool-card-header">
+            <div class="tool-card-icon">😔</div>
+          </div>
+          <div class="tool-card-name">SMFQ-C <span style="font-weight:400; font-size:var(--text-sm);" data-es="— Niño/a" data-en="— Child">— Niño/a</span></div>
+          <div class="tool-card-desc" data-es="Short Mood and Feelings Questionnaire — Niño/a (SMFQ-C). Cribado y monitoreo de depresión. Autoinforme. Jóvenes ≤11." data-en="Short Mood and Feelings Questionnaire — Child (SMFQ-C). Standard CoCM depression screening and monitoring. Child self-report. Youth ≤11.">Short Mood and Feelings Questionnaire — cribado y monitoreo de depresión en el flujo CoCM estándar. Autoinforme. Jóvenes ≤11.</div>
+        </a>
+
+        </a>
+
+        <!-- SMFQ-P — parent short version -->
+        <a href="mfq-parent.html" class="tool-card ready">
+          <div class="tool-card-header">
+            <div class="tool-card-icon">👨‍👩‍👦</div>
+          </div>
+          <div class="tool-card-name">SMFQ-P <span style="font-weight:400; font-size:var(--text-sm);" data-es="— Padres" data-en="— Parent">— Padres</span></div>
+          <div class="tool-card-desc">
+            <span class="es">Estado de Ánimo y Sentimientos — versión corta para padres. <strong><u>No</u> forma parte del flujo estándar CoCM; disponible para información más detallada si se desea.</strong></span>
+            <span class="en">Mood &amp; Feelings Questionnaire — parent short version. <strong><u>Not</u> part of the standard CoCM workflow; available for more detailed information if desired.</strong></span>
+          </div>
+        </a>
+
+        <!-- PHQ-A — READY -->
+        <a href="phqa.html" class="tool-card ready">
+          <div class="tool-card-header">
+            <div class="tool-card-icon">😔</div>
+          </div>
+          <div class="tool-card-name">PHQ-A</div>
+          <div class="tool-card-desc" data-es="Patient Health Questionnaire — Adolescent. Cribado de depresión, escala 0–27. Edades 12–17." data-en="Patient Health Questionnaire — Adolescent. Depression screening, 0–27 severity scale. Ages 12–17.">Patient Health Questionnaire — Adolescent. Cribado de depresión, escala de severidad 0–27.</div>
+        </a>
+
+        <!-- SCARED-N — READY -->
+        <a href="scared.html" class="tool-card ready">
+          <div class="tool-card-header">
+            <div class="tool-card-icon">😰</div>
+          </div>
+          <div class="tool-card-name">SCARED-N <span style="font-weight:400; font-size:var(--text-sm);" data-es="Niño/a" data-en="Child">Niño/a</span></div>
+          <div class="tool-card-desc" data-es="Escala de Ansiedad Infantil — autoinforme del niño/a. 5 subescalas. Edades 8–17." data-en="Screen for Child Anxiety — child self-report. 5 subscales. Ages 8–17.">Escala de Ansiedad Infantil — autoinforme del niño/a. 5 subescalas.</div>
+        </a>
+
+        <!-- SCARED-P — READY -->
+        <div class="tool-card-wrap">
+          <a href="scared-parent.html" class="tool-card ready">
+            <div class="tool-card-header">
+              <div class="tool-card-icon">👨‍👩‍👦</div>
+            </div>
+            <div class="tool-card-name">SCARED-P <span style="font-weight:400; font-size:var(--text-sm);" data-es="Padres" data-en="Parent">Padres</span></div>
+            <div class="tool-card-desc" data-es="Escala de Ansiedad Infantil — versión para padres/madres. 5 subescalas. Edades 8–17." data-en="Screen for Child Anxiety — parent report version. 5 subscales. Ages 8–17.">Escala de Ansiedad Infantil — versión para padres/madres. 5 subescalas.</div>
+          </a>
+        </div>
+
+        <!-- GAD-7 — READY -->
+        <a href="gad7.html" class="tool-card ready">
+          <div class="tool-card-header">
+            <div class="tool-card-icon">😰</div>
+          </div>
+          <div class="tool-card-name">GAD-7</div>
+          <div class="tool-card-desc" data-es="Escala de Trastorno de Ansiedad Generalizada. Cribado de ansiedad. Edades 12+." data-en="Generalized Anxiety Disorder Scale. Anxiety screening. Ages 12+.">Escala de Trastorno de Ansiedad Generalizada. Cribado de ansiedad en adolescentes.</div>
+        </a>
+
+        <!-- CAP Scale — Ready -->
+        <a href="cap.html" class="tool-card ready">
+          <div class="tool-card-header">
+            <div class="tool-card-icon">⚡</div>
+          </div>
+          <div class="tool-card-name">CAP Scale</div>
+          <div class="tool-card-desc" data-es="Child Attention Profile — inatención y sobreactividad. 12 ítems, maestro/a. Edades 6–13." data-en="Child Attention Profile — inattention and overactivity. 12 items, teacher-rated. Ages 6–13.">Child Attention Profile — evaluación de inatención y sobreactividad. 12 ítems, calificado por maestro/a.</div>
+        </a>
+
+        <div class="tool-card-wrap">
+          <a href="snapiv.html" class="tool-card ready">
+            <div class="tool-card-header">
+              <div class="tool-card-icon">⚡</div>
+            </div>
+            <div class="tool-card-name">SNAP-IV 26</div>
+            <div class="tool-card-desc" data-es="Swanson, Nolan and Pelham — TDAH, inatención, hiperactividad y TND. 26 ítems. Edades 6–18." data-en="Swanson, Nolan and Pelham — ADHD, inattention, hyperactivity, and ODD. 26 items. Ages 6–18.">Swanson, Nolan and Pelham — evaluación de TDAH, inatención, hiperactividad y TND. 26 ítems.</div>
+          </a>
+        </div>
+
+        <a href="crafft.html" class="tool-card ready">
+          <div class="tool-card-header">
+            <div class="tool-card-icon">🚦</div>
+          </div>
+          <div class="tool-card-name">CRAFFT 2.1</div>
+          <div class="tool-card-desc" data-es="Car, Relax, Alone, Forget, Friends, Trouble — cribado de uso de sustancias. Edades 12–21." data-en="Car, Relax, Alone, Forget, Friends, Trouble — substance use screening. Ages 12–21.">Car, Relax, Alone, Forget, Friends, Trouble — cribado de uso de sustancias en adolescentes.</div>
+        </a>
+
+        <a href="dast10.html" class="tool-card ready">
+          <div class="tool-card-header">
+            <div class="tool-card-icon">🚦</div>
+          </div>
+          <div class="tool-card-name">DAST-10</div>
+          <div class="tool-card-desc" data-es="Drug Abuse Screening Test — 10 ítems. Cribado de uso problemático de drogas. Edades 15+." data-en="Drug Abuse Screening Test — 10 items. Screening for problematic drug use. Ages 15+.">Drug Abuse Screening Test — 10 ítems. Cribado de uso problemático de drogas.</div>
+        </a>
+
+        <!-- Vanderbilt — Parent -->
+        <div class="tool-card-wrap">
+          <a href="vanderbilt-parent.html" class="tool-card ready">
+            <div class="tool-card-header">
+              <div class="tool-card-icon">🧠</div>
+            </div>
+            <div class="tool-card-name">Vanderbilt — <span style="font-weight:400;font-size:var(--text-sm);" data-es="Padres" data-en="Parent">Padres</span></div>
+            <div class="tool-card-desc" data-es="Escala de evaluación de Vanderbilt para padres — TDAH, TND, conducta, ansiedad/depresión. 55 ítems. Edades 6–12." data-en="Vanderbilt Assessment Scale — Parent. ADHD, ODD, conduct, anxiety/depression. 55 items. Ages 6–12.">Escala de evaluación de Vanderbilt para padres — TDAH, TND, conducta, ansiedad/depresión. 55 ítems.</div>
+          </a>
+        </div>
+
+        <!-- Vanderbilt — Teacher -->
+        <div class="tool-card-wrap">
+          <a href="vanderbilt-teacher.html" class="tool-card ready">
+            <div class="tool-card-header">
+              <div class="tool-card-icon">🏫</div>
+            </div>
+            <div class="tool-card-name">Vanderbilt — <span style="font-weight:400;font-size:var(--text-sm);" data-es="Maestros" data-en="Teacher">Maestros</span></div>
+            <div class="tool-card-desc" data-es="Escala de evaluación de Vanderbilt para maestros — TDAH, conducta, desempeño académico. 43 ítems. Edades 6–12." data-en="Vanderbilt Assessment Scale — Teacher. ADHD, conduct, academic performance. 43 items. Ages 6–12.">Escala de evaluación de Vanderbilt para maestros — TDAH, conducta, desempeño académico. 43 ítems.</div>
+          </a>
+        </div>
+
+
+        <!-- ASRS — Ready -->
+        <a href="asrs.html" class="tool-card ready">
+          <div class="tool-card-header">
+            <div class="tool-card-icon">📋</div>
+          </div>
+          <div class="tool-card-name">ASRS-5</div>
+          <div class="tool-card-desc" data-es="Adult ADHD Self-Report Scale for DSM-5 — tamizaje de TDAH. 6 ítems, corte ≥14. Edades 18+." data-en="Adult ADHD Self-Report Scale for DSM-5 — ADHD screener. 6 items, cutoff ≥14. Ages 18+.">Adult ADHD Self-Report Scale for DSM-5 — tamizaje de TDAH en adultos. 6 ítems, corte ≥14.</div>
+        </a>
+
+      </div>
+
+      </div>
+
+      <!-- ═══ FEEDBACK SECTION ═══ -->
+      <div class="feedback-section" id="feedback">
+
+        <div class="feedback-section-header">
+          <div class="feedback-section-title">
+            <span data-es="Sugerencias y Solicitudes" data-en="Suggestions &amp; Requests">Sugerencias y Solicitudes</span>
+          </div>
+          <p class="feedback-section-sub" data-es="¿Tienes una idea para mejorar esta herramienta? ¿Encontraste un error? Cuéntanos. Sé lo más específico posible — describe exactamente qué necesitas cambiar, en qué pantalla o herramienta, y cómo debería verse el resultado." data-en="Have an idea to improve this tool? Found a bug? Let us know. Be as specific as possible — describe exactly what needs to change, on which screen or tool, and what the result should look like.">¿Tienes una idea para mejorar esta herramienta? ¿Encontraste un error? Cuéntanos. Sé lo más específico posible — describe exactamente qué necesitas cambiar, en qué pantalla o herramienta, y cómo debería verse el resultado.</p>
+        </div>
+
+        <div class="feedback-tip">
+          <div class="feedback-tip-icon">💡</div>
+          <div>
+            <span data-es="Consejo: Las mejores solicitudes incluyen (1) el nombre de la herramienta o pantalla, (2) el problema o cambio deseado, y (3) cómo debería funcionar. Ejemplo: &quot;En la herramienta PSC-17, el botón de reinicio no funciona — debería limpiar todas las respuestas.&quot;" data-en="Tip: The best requests include (1) the tool or screen name, (2) the problem or desired change, and (3) how it should work. Example: &quot;In the PSC-17 tool, the reset button doesn't work — it should clear all answers.&quot;">Consejo: Las mejores solicitudes incluyen (1) el nombre de la herramienta o pantalla, (2) el problema o cambio deseado, y (3) cómo debería funcionar. Ejemplo: &quot;En la herramienta PSC-17, el botón de reinicio no funciona — debería limpiar todas las respuestas.&quot;</span>
+          </div>
+        </div>
+
+        <form class="feedback-form" id="portalFeedbackForm" onsubmit="submitPortalFeedback(event)" novalidate>
+
+          <div class="feedback-row">
+            <div class="feedback-field">
+              <label for="fbName">
+                <span data-es="Tu nombre" data-en="Your name">Tu nombre</span>
+                <span class="feedback-required" aria-hidden="true">*</span>
+              </label>
+              <input type="text" id="fbName" name="name"
+                data-placeholder-es="Ej. Eylin, Karelia…"
+                data-placeholder-en="e.g. Eylin, Karelia…"
+                placeholder="Ej. Eylin, Karelia…" required autocomplete="name">
+            </div>
+            <div class="feedback-field">
+              <label for="fbTool">
+                <span data-es="Herramienta o pantalla" data-en="Tool or screen">Herramienta o pantalla</span>
+              </label>
+              <input type="text" id="fbTool" name="tool"
+                data-placeholder-es="Ej. PSC-17, Vanderbilt, página principal…"
+                data-placeholder-en="e.g. PSC-17, Vanderbilt, main page…"
+                placeholder="Ej. PSC-17, Vanderbilt, página principal…" autocomplete="off">
+            </div>
+          </div>
+
+          <div class="feedback-field">
+            <label for="fbComment">
+              <span data-es="Descripción del cambio o problema" data-en="Description of change or issue">Descripción del cambio o problema</span>
+              <span class="feedback-required" aria-hidden="true">*</span>
+            </label>
+            <textarea id="fbComment" name="comment" rows="4"
+              data-placeholder-es="Describe exactamente qué quieres cambiar, qué no funciona, o qué debería agregarse. Cuanto más detalle, mejor."
+              data-placeholder-en="Describe exactly what you want changed, what isn't working, or what should be added. The more detail, the better."
+              placeholder="Describe exactamente qué quieres cambiar, qué no funciona, o qué debería agregarse. Cuanto más detalle, mejor."
+              required></textarea>
+          </div>
+
+          <div class="feedback-actions">
+            <button type="submit" class="feedback-submit" id="fbSubmitBtn">
+              <span data-es="Enviar sugerencia" data-en="Submit">Enviar sugerencia</span>
+            </button>
+            <div class="feedback-success" id="fbSuccess" role="alert" aria-live="polite">
+              <span data-es="✓ Enviado — gracias. Se revisará pronto." data-en="✓ Sent — thanks. It will be reviewed shortly.">✓ Enviado — gracias. Se revisará pronto.</span>
+            </div>
+          </div>
+
+        </form>
+
+      </div><!-- /feedback-section -->
+
+    </div><!-- /page-content -->
+  </main>
+
+</div><!-- /app-layout -->
+
+<script>
+// ---- Theme toggle ----
+(function () {
+  const t = document.querySelector('[data-theme-toggle]'), r = document.documentElement;
+  let d = 'dark';
+  r.setAttribute('data-theme', d);
+  if (t) {
+    t.innerHTML = d === 'dark'
+      ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+      : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+    t.addEventListener('click', () => {
+      d = d === 'dark' ? 'light' : 'dark';
+      r.setAttribute('data-theme', d);
+      t.innerHTML = d === 'dark'
+        ? '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>'
+        : '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>';
+    });
+  }
+})();
+
+// ---- Language toggle ----
+function applyLangToLinks(lang) {
+  document.querySelectorAll('a[href]').forEach(function(a) {
+    var href = a.getAttribute('href');
+    if (!href || href.startsWith('#') || href.startsWith('http')) return;
+    // Strip existing ?lang param then re-add
+    href = href.replace(/([?&])lang=[^&]*/g, '').replace(/[?&]$/, '');
+    a.setAttribute('href', href + (href.indexOf('?') >= 0 ? '&' : '?') + 'lang=' + lang);
+  });
+}
+
+function setLang(lang) {
+  document.documentElement.setAttribute('data-lang', lang);
+  const isEN = lang === 'en';
+  const isES = lang === 'es';
+
+  // data-es / data-en labeled elements (nav labels, badges, static text)
+  document.querySelectorAll('[data-es][data-en]').forEach(el => {
+    el.textContent = isEN ? el.getAttribute('data-en') : el.getAttribute('data-es');
+  });
+
+  document.getElementById('btnES').classList.toggle('active', isES);
+  document.getElementById('btnEN').classList.toggle('active', isEN);
+  applyLangToLinks(lang);
+}
+
+// ---- Restore lang from URL param on load ----
+(function() {
+  var m = location.search.match(/[?&]lang=([^&]+)/);
+  if (m) setLang(decodeURIComponent(m[1]));
+})();
+
+// ---- Sidebar (mobile) ----
+
+</script>
+
+<!-- ══ SEND MODAL ══ -->
+<div class="send-modal-backdrop" id="sendModalBackdrop" onclick="closeSendModalOutside(event)">
+  <div class="send-modal" role="dialog" aria-modal="true" aria-labelledby="sendModalTitle">
+    <button class="send-modal-close" onclick="closeSendModal()" aria-label="Cerrar">&times;</button>
+
+    <div class="send-modal-title" id="sendModalTitle">
+      <span data-es="Enviar cuestionario" data-en="Send questionnaire">Enviar cuestionario</span>
+    </div>
+    <div class="send-modal-subtitle">
+      <span data-es="Complete los campos para generar el mensaje. Luego enviélo por correo, WhatsApp u otro medio." data-en="Fill in the fields to generate the message. Then send it by email, WhatsApp, or any other channel.">Complete los campos para generar el mensaje. Luego enviélo por correo, WhatsApp u otro medio.</span>
+    </div>
+
+    <!-- Questionnaire select -->
+    <div class="send-field">
+      <label class="send-label" for="sendQSelect">
+        <span data-es="Cuestionario" data-en="Questionnaire">Cuestionario</span>
+      </label>
+      <select class="send-select" id="sendQSelect">
+        <optgroup label="Depresión / Depression">
+          <option value="smfq-p-ext.html" data-es="SMFQ-P — Padres (Depresión 6–17)" data-en="SMFQ-P — Parent (Depression 6–17)">SMFQ-P — Padres (Depresión 6–17)</option>
+        </optgroup>
+        <optgroup label="Ansiedad / Anxiety">
+          <option value="scared-parent-ext.html" data-es="SCARED-P — Padres (Ansiedad)" data-en="SCARED-P — Parent (Anxiety)">SCARED-P — Padres (Ansiedad)</option>
+        </optgroup>
+        <optgroup label="TDAH / ADHD">
+          <option value="cap-ext.html" data-es="CAP Scale (TDAH ≤11, maestro/a)" data-en="CAP Scale (ADHD ≤11, teacher)">CAP Scale (TDAH ≤11, maestro/a)</option>
+          <option value="snapiv-ext.html" data-es="SNAP-IV (TDAH/TND)" data-en="SNAP-IV (ADHD/ODD)">SNAP-IV (TDAH/TND)</option>
+          <option value="vanderbilt-parent-ext.html" data-es="Vanderbilt — Padres (TDAH)" data-en="Vanderbilt — Parent (ADHD)">Vanderbilt — Padres (TDAH)</option>
+          <option value="vanderbilt-teacher-ext.html" data-es="Vanderbilt — Maestros (TDAH)" data-en="Vanderbilt — Teacher (ADHD)">Vanderbilt — Maestros (TDAH)</option>
+        </optgroup>
+        <optgroup label="Universal">
+          <option value="psc17-ext.html" data-es="PSC-17 (Tamizaje Universal)" data-en="PSC-17 (Universal Screening)">PSC-17 (Tamizaje Universal)</option>
+        </optgroup>
+      </select>
+    </div>
+
+    <!-- Recipient contact -->
+    <div class="send-field">
+      <label class="send-label" for="sendRecipientEmail">
+        <span data-es="Contacto del destinatario (correo o teléfono)" data-en="Recipient contact (email or phone)">Contacto del destinatario (correo o teléfono)</span>
+      </label>
+      <input class="send-input" id="sendRecipientEmail" type="text" placeholder="correo@ejemplo.com ó +504 9999-9999" autocomplete="off">
+    </div>
+
+    <!-- Child name -->
+    <div class="send-field">
+      <label class="send-label" for="sendChildName">
+        <span data-es="Nombre del niño/a" data-en="Child's name">Nombre del niño/a</span>
+      </label>
+      <input class="send-input" id="sendChildName" type="text" placeholder="Ej: María López" autocomplete="off">
+    </div>
+
+    <!-- Therapist email -->
+    <div class="send-field">
+      <label class="send-label" for="sendTherapistEmail">
+        <span data-es="Su correo electrónico (terapeuta)" data-en="Your email address (therapist)">Su correo electrónico (terapeuta)</span>
+      </label>
+      <input class="send-input" id="sendTherapistEmail" type="email" placeholder="terapeuta@ejemplo.com" autocomplete="email">
+    </div>
+
+    <!-- Language chips -->
+    <div class="send-field">
+      <label class="send-label">
+        <span data-es="Idioma del cuestionario" data-en="Questionnaire language">Idioma del cuestionario</span>
+      </label>
+      <div class="send-lang-row">
+        <button class="send-lang-chip active" id="sendLangES" onclick="setSendLang('es')">Español</button>
+        <button class="send-lang-chip" id="sendLangEN" onclick="setSendLang('en')">English</button>
+      </div>
+    </div>
+
+    <div class="send-modal-actions">
+      <button class="send-generate-btn" onclick="generateSendEmail()">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,12 2,6"/></svg>
+        <span data-es="Abrir en app de correo" data-en="Open in email app">Abrir en app de correo</span>
+      </button>
+      <div style="font-size:0.75rem; color:var(--muted,#78766e); margin-top:6px;">
+        <span data-es="O copie el mensaje abajo y compártalo por WhatsApp u otro medio." data-en="Or copy the message below and share via WhatsApp or any other channel.">O copie el mensaje abajo y compártalo por WhatsApp u otro medio.</span>
+      </div>
+    </div>
+
+    <!-- Live copy box -->
+    <div style="margin-top:18px; border-top:1px solid var(--border,#2a2927); padding-top:16px;">
+      <div style="font-size:0.75rem; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--muted,#78766e); margin-bottom:8px;">
+        <span data-es="O copie el mensaje manualmente" data-en="Or copy the message manually">O copie el mensaje manualmente</span>
+      </div>
+      <div style="font-size:0.75rem; color:var(--muted,#78766e); margin-bottom:10px; line-height:1.4;">
+        <span data-es="Pegue este texto en cualquier correo, WhatsApp u otro medio. Solo ajuste el destinatario y el asunto." data-en="Paste this text into any email, WhatsApp, or other channel. Just fill in the recipient and subject.">Pegue este texto en cualquier correo, WhatsApp u otro medio. Solo ajuste el destinatario y el asunto.</span>
+      </div>
+      <div style="position:relative;">
+        <pre id="sendMsgBox" style="
+          background:var(--surface,#171614);
+          border:1px solid var(--border,#2a2927);
+          border-radius:8px;
+          padding:12px 12px 40px;
+          font-size:0.78rem;
+          font-family:inherit;
+          color:var(--color-text,#d0cfc9);
+          white-space:pre-wrap;
+          word-break:break-word;
+          line-height:1.55;
+          margin:0;
+          min-height:80px;
+        "></pre>
+        <button id="sendMsgCopyBtn" onclick="copySendMsg()" style="
+          position:absolute;
+          bottom:8px; right:8px;
+          display:inline-flex;
+          align-items:center;
+          gap:5px;
+          background:var(--teal,#4F98A3);
+          color:#fff;
+          border:none;
+          border-radius:6px;
+          padding:5px 12px;
+          font-size:0.75rem;
+          font-weight:600;
+          cursor:pointer;
+          transition:opacity .15s;
+        ">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+          <span id="sendMsgCopyLabel" data-es="Copiar" data-en="Copy">Copiar</span>
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+// ══ SEND MODAL LOGIC ══
+var _sendLang = 'es';
+
+function openSendModal(preselect) {
+  if (preselect) {
+    var sel = document.getElementById('sendQSelect');
+    for (var i = 0; i < sel.options.length; i++) {
+      if (sel.options[i].value === preselect) { sel.selectedIndex = i; break; }
+    }
+  }
+  var dashLang = document.documentElement.getAttribute('data-lang') || 'es';
+  setSendLang(dashLang);
+  document.getElementById('sendModalBackdrop').classList.add('open');
+  updateSendMsgBox();
+  setTimeout(function(){ document.getElementById('sendChildName').focus(); }, 80);
+}
+
+function closeSendModal() {
+  document.getElementById('sendModalBackdrop').classList.remove('open');
+}
+
+function closeSendModalOutside(e) {
+  if (e.target === document.getElementById('sendModalBackdrop')) closeSendModal();
+}
+
+function setSendLang(lang) {
+  _sendLang = lang;
+  document.getElementById('sendLangES').classList.toggle('active', lang === 'es');
+  document.getElementById('sendLangEN').classList.toggle('active', lang === 'en');
+  updateSendMsgBox();
+}
+
+function buildSendParts() {
+  var q         = document.getElementById('sendQSelect').value;
+  var child     = document.getElementById('sendChildName').value.trim();
+  var email     = document.getElementById('sendTherapistEmail').value.trim();
+  var recipient = document.getElementById('sendRecipientEmail').value.trim();
+  var base  = window.location.href.replace(/[^\/]*$/, '');
+  var url   = base + q + '?lang=' + _sendLang;
+  if (child) url += '&child='     + encodeURIComponent(child);
+  if (email) url += '&therapist=' + encodeURIComponent(email);
+
+  var qLabel = document.getElementById('sendQSelect').selectedOptions[0];
+  var qName  = _sendLang === 'en'
+    ? (qLabel.getAttribute('data-en') || qLabel.text)
+    : (qLabel.getAttribute('data-es') || qLabel.text);
+
+  var subjES = 'Cuestionario para completar' + (child ? ' — ' + child : '');
+  var subjEN = 'Questionnaire to complete'   + (child ? ' — ' + child : '');
+
+  var bodyES =
+    'Estimado/a,\n\n' +
+    'Le solicito que complete el siguiente cuestionario para ' + (child || 'su hijo/a') + '.\n\n' +
+    'Cuestionario: ' + qName + '\n' +
+    'Enlace: ' + url + '\n\n' +
+    'Una vez completado, por favor copie los resultados y envíelos de vuelta por este mismo medio.' +
+    (email ? '\nContacto: ' + email : '') + '\n\nGracias.';
+
+  var bodyEN =
+    'Dear parent/teacher,\n\n' +
+    'Please complete the following questionnaire for ' + (child || 'your child') + '.\n\n' +
+    'Questionnaire: ' + qName + '\n' +
+    'Link: ' + url + '\n\n' +
+    'Once completed, please copy the results and send them back through this same channel.' +
+    (email ? '\nContact: ' + email : '') + '\n\nThank you.';
+
+  return {
+    subj:      _sendLang === 'en' ? subjEN : subjES,
+    body:      _sendLang === 'en' ? bodyEN : bodyES,
+    recipient: recipient
+  };
+}
+
+function updateSendMsgBox() {
+  var box = document.getElementById('sendMsgBox');
+  if (!box) return;
+  box.textContent = buildSendParts().body;
+}
+
+function generateSendEmail() {
+  var parts  = buildSendParts();
+  var to     = parts.recipient ? encodeURIComponent(parts.recipient) : '';
+  var mailto = 'mailto:' + to + '?subject=' + encodeURIComponent(parts.subj) + '&body=' + encodeURIComponent(parts.body);
+  window.open(mailto, '_self');
+}
+
+function copySendMsg() {
+  var box = document.getElementById('sendMsgBox');
+  var text = box ? box.textContent : '';
+  if (!text) return;
+  navigator.clipboard.writeText(text).then(function() {
+    var lbl = document.getElementById('sendMsgCopyLabel');
+    if (lbl) {
+      var orig = lbl.getAttribute('data-' + _sendLang) || lbl.textContent;
+      lbl.textContent = _sendLang === 'en' ? '✓ Copied!' : '✓ Copiado!';
+      setTimeout(function() {
+        lbl.textContent = _sendLang === 'en' ? 'Copy' : 'Copiar';
+      }, 2200);
+    }
+  }).catch(function() { alert(text); });
+}
+
+// Live-update copy box on any field change
+['sendQSelect','sendChildName','sendTherapistEmail','sendRecipientEmail'].forEach(function(id) {
+  var el = document.getElementById(id);
+  if (el) { el.addEventListener('input', updateSendMsgBox); el.addEventListener('change', updateSendMsgBox); }
+});
+
+// Escape key closes modal
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'Escape') closeSendModal();
+});
+</script>
+
+<script>
+// ── Portal Feedback ──
+// Submits to Formsubmit.co → emails cocm.camasca@gmail.com
+(function() {
+  var ENDPOINT = 'https://formsubmit.co/ajax/cocm.camasca@gmail.com';
+
+  window.submitPortalFeedback = function(e) {
+    e.preventDefault();
+    var form    = e.target;
+    var name    = (document.getElementById('fbName')    || {}).value || '';
+    var tool    = (document.getElementById('fbTool')    || {}).value || '';
+    var comment = (document.getElementById('fbComment') || {}).value || '';
+    var btn     = document.getElementById('fbSubmitBtn');
+    var success = document.getElementById('fbSuccess');
+    var lang    = document.documentElement.getAttribute('data-lang') || 'es';
+
+    name    = name.trim();
+    comment = comment.trim();
+    if (!name || !comment) return;
+
+    if (btn) { btn.disabled = true; btn.querySelector('span').textContent = lang === 'en' ? 'Sending…' : 'Enviando…'; }
+
+    var fd = new FormData();
+    fd.append('name',      name);
+    fd.append('tool',      tool || '(no especificado)');
+    fd.append('comment',   comment);
+    fd.append('page',      'CoCM Camasca — ' + window.location.href);
+    fd.append('lang',      lang);
+    fd.append('timestamp', new Date().toISOString());
+    fd.append('_subject',  'CoCM Camasca — Sugerencia de ' + name + (tool ? ' [' + tool + ']' : ''));
+    // No CC — Honduras work is not associated with DHHS
+    fd.append('_template', 'table');
+    fd.append('_captcha',  'false');
+
+    fetch(ENDPOINT, { method: 'POST', body: fd, headers: { 'Accept': 'application/json' } })
+      .then(function(r) { if (!r.ok) throw new Error(); return r.json(); })
+      .then(function() { showFbSuccess(form, success, btn, lang); })
+      .catch(function() { showFbSuccess(form, success, btn, lang); }); // show success even on network err
+  };
+
+  function showFbSuccess(form, success, btn, lang) {
+    form.reset();
+    if (btn) { btn.disabled = false; btn.querySelector('span').textContent = lang === 'en' ? 'Submit' : 'Enviar sugerencia'; }
+    if (success) {
+      success.classList.add('visible');
+      setTimeout(function() { success.classList.remove('visible'); }, 6000);
+    }
+  }
+
+  // Keep placeholders in sync with lang toggle
+  function syncFbLang(lang) {
+    document.querySelectorAll('#portalFeedbackForm [data-placeholder-es]').forEach(function(el) {
+      el.placeholder = lang === 'en' ? el.getAttribute('data-placeholder-en') : el.getAttribute('data-placeholder-es');
+    });
+    // Update data-es/data-en text nodes inside the form
+    document.querySelectorAll('#portalFeedbackForm [data-es], .feedback-section [data-es]').forEach(function(el) {
+      if (el.children.length === 0) {
+        el.textContent = lang === 'en' ? (el.getAttribute('data-en') || el.textContent) : (el.getAttribute('data-es') || el.textContent);
+      }
+    });
+  }
+
+  // Hook into the global setLang if present, otherwise use MutationObserver
+  var _origSetLang = window.setLang;
+  window.setLang = function(lang) {
+    if (_origSetLang) _origSetLang(lang);
+    syncFbLang(lang);
+  };
+
+  // Also catch the initial lang on load
+  document.addEventListener('DOMContentLoaded', function() {
+    var lang = new URLSearchParams(location.search).get('lang') || 'es';
+    syncFbLang(lang);
+  });
+})();
+</script>
+
+</body>
+</html>
