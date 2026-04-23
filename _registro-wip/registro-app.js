@@ -14,6 +14,7 @@ let STATE = {
   enrichedPatients: [],
   user: '',
   dataset: 'real',   // 'real' | 'test'
+  groupByCondition: false, // when true, sections list by primary condition group
 };
 
 // ════════════════════════════════════════════════════════════════
@@ -926,6 +927,20 @@ function thSortClick(col) {
 }
 if (typeof window !== 'undefined') window.thSortClick = thSortClick;
 
+function toggleGroupBy() {
+  STATE.groupByCondition = !STATE.groupByCondition;
+  const btn = document.getElementById('groupByCondBtn');
+  if (btn) {
+    const en = getLang() === 'en';
+    btn.classList.toggle('active', STATE.groupByCondition);
+    btn.title = STATE.groupByCondition
+      ? (en ? 'Grouped by condition — click to show flat list' : 'Agrupado por condición — clic para lista plana')
+      : (en ? 'Click to group by condition' : 'Clic para agrupar por condición');
+  }
+  renderAll();
+}
+if (typeof window !== 'undefined') window.toggleGroupBy = toggleGroupBy;
+
 function renderAll() {
   const lang = getLang();
   const list = filterAndSortPatients(STATE.enrichedPatients);
@@ -971,27 +986,23 @@ function filterAndSortPatients(all) {
     return true;
   });
 
-  // Sort
-  // For primary_group, actual grouping is done in renderPatientSections;
-  // here we only sort within-group by primary score DESC (nulls last →
-  // most-overdue first as tiebreaker).
-  if (sortBy === 'primary_group') {
+  // Sort — when groupByCondition is active, pre-sort within group by score desc
+  if (STATE.groupByCondition) {
     list.sort((a, b) => {
       const groupOrder = PRIMARY_GROUPS.indexOf(a._primaryGroup) - PRIMARY_GROUPS.indexOf(b._primaryGroup);
       if (groupOrder !== 0) return groupOrder;
-      // Within group: primary_score DESC, nulls last
       const as = (a._primaryScore == null) ? -Infinity : a._primaryScore;
       const bs = (b._primaryScore == null) ? -Infinity : b._primaryScore;
       if (bs !== as) return bs - as;
-      // Both null → most overdue first
       return b._daysSinceLastVisit - a._daysSinceLastVisit;
     });
   } else {
     list.sort((a, b) => {
       if (sortBy === 'severity') return tierRank(a._tier) - tierRank(b._tier) || b._daysSinceLastVisit - a._daysSinceLastVisit;
-      if (sortBy === 'name') return String(a.Patient_Name||'').localeCompare(String(b.Patient_Name||''));
-      if (sortBy === 'recent') return a._daysSinceLastVisit - b._daysSinceLastVisit;
-      // default: most overdue first (longest since last visit)
+      if (sortBy === 'name_asc') return String(a.Patient_Name||'').localeCompare(String(b.Patient_Name||''));
+      if (sortBy === 'last_visit_asc') return a._daysSinceLastVisit - b._daysSinceLastVisit;
+      if (sortBy === 'due_followup') return b._daysSinceLastVisit - a._daysSinceLastVisit;
+      // last_visit_desc default
       return b._daysSinceLastVisit - a._daysSinceLastVisit;
     });
   }
@@ -1034,7 +1045,6 @@ function filterAndSortPatients(all) {
     });
   }
 
-  list._sortBy = sortBy;
   return list;
 }
 
@@ -1124,15 +1134,13 @@ function renderPatientSections(list, lang) {
   const safety = list.filter(p => p._safetyActive);
   const nonSafety = list.filter(p => !p._safetyActive);
 
-  const sortBy = list._sortBy || 'primary_group';
-
   let html = '';
   if (safety.length) {
     const pinLabel = t('safety_pinned');
     html += renderTierBlock(pinLabel, 'tier-severe', safety, lang, { pinned: true });
   }
 
-  if (sortBy === 'primary_group') {
+  if (STATE.groupByCondition) {
     // Group by _primaryGroup in PRIMARY_GROUPS order.
     const byGroup = {};
     PRIMARY_GROUPS.forEach(g => byGroup[g] = []);
@@ -1147,15 +1155,8 @@ function renderPatientSections(list, lang) {
       html += renderTierBlock(label, `primary-group primary-group-${g}`, byGroup[g], lang);
     }
   } else {
-    // Legacy severity-tier grouping
-    const groups = {};
-    TIER_ORDER.forEach(tier => groups[tier] = []);
-    nonSafety.forEach(p => groups[p._tier].push(p));
-    for (const tier of TIER_ORDER) {
-      if (!groups[tier].length) continue;
-      const label = translateTier(tier).toUpperCase();
-      html += renderTierBlock(label, TIER_CLASS[tier], groups[tier], lang);
-    }
+    // Flat list — all patients in one table, no section headers
+    html += renderTierBlock('', '', nonSafety, lang, { flat: true });
   }
   container.innerHTML = html;
 }
@@ -1229,7 +1230,7 @@ function renderTierBlock(label, tierClass, patients, lang, opts={}) {
   if (cols.flags)        ths.push(th(t('th_flags'),        null));
   return `
     <div class="tier-block">
-      <div class="tier-pill ${tierClass}">${label} · ${patients.length}</div>
+      ${opts.flat ? '' : `<div class="tier-pill ${tierClass}">${label} · ${patients.length}</div>`}
       <div class="pat-table-scroll-top" aria-hidden="true"><div class="pat-table-scroll-top-inner"></div></div>
       <div class="pat-table-wrap">
         <table class="pat-table">
