@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CoCM Camasca — Registro de Pacientes</title>
-  <link rel="stylesheet" href="style.css?v=09fb163" />
+  <link rel="stylesheet" href="style.css?v=d07c2b8" />
   <style>
     /* ================================================================
        REGISTRO DASHBOARD — inherits portal design tokens from style.css
@@ -582,6 +582,11 @@
         <select id="userSelect" onchange="setUser(this.value)" style="display:none;"><option value="">—</option></select>
         <span id="userLabel" style="display:none;">—</span>
 
+        <div class="filter-group" style="min-width:220px;flex:1.5;">
+          <label for="searchBox" data-es="Buscar" data-en="Search">Buscar</label>
+          <input type="search" id="searchBox" placeholder="Buscar paciente, terapeuta, condición…" data-es-placeholder="Buscar paciente, terapeuta, condición…" data-en-placeholder="Search patient, therapist, condition…" oninput="renderAll()" style="background:color-mix(in srgb,var(--color-primary) 8%,var(--color-surface));border-color:color-mix(in srgb,var(--color-primary) 40%,var(--color-border));" />
+        </div>
+
         <div class="filter-group">
           <label for="filterTherapist" data-es="Terapeuta" data-en="Therapist">Terapeuta</label>
           <select id="filterTherapist" onchange="try{this.value?localStorage.setItem('coCMCamasca.filterTherapist',this.value):localStorage.removeItem('coCMCamasca.filterTherapist')}catch(e){}renderAll()"><option value="">—</option></select>
@@ -606,11 +611,6 @@
             <option value="Transferido" data-es="Transferido" data-en="Transferred" title="Cuidado transferido a otro proveedor o clínica" data-tip-es="Cuidado transferido a otro proveedor o clínica." data-tip-en="Care transferred to another provider or clinic.">Transferido</option>
             <option value="Otro" data-es="Otro" data-en="Other" title="El estado no coincide con las categorías anteriores (referido, graduado, retiro familiar, etc.)" data-tip-es="El estado no coincide con las categorías anteriores (referido, graduado, retiro familiar, etc.)." data-tip-en="Status doesn't fit the above categories (referred out, graduated, family withdrew, etc.).">Otro</option>
           </select>
-        </div>
-
-        <div class="filter-group" style="min-width:220px;flex:1;">
-          <label for="searchBox" data-es="Buscar" data-en="Search">Buscar</label>
-          <input type="search" id="searchBox" placeholder="Buscar paciente, terapeuta, condición…" data-es-placeholder="Buscar paciente, terapeuta, condición…" data-en-placeholder="Search patient, therapist, condition…" oninput="renderAll()" />
         </div>
 
         <div class="filter-group">
@@ -830,9 +830,9 @@
 <!-- Toast host (populated by registro-i18n.js showToast) -->
 <div id="regToastHost"></div>
 
-<script src="registro-i18n.js?v=09fb163"></script>
-<script src="registro-data.js?v=09fb163"></script>
-<script src="registro-app.js?v=09fb163"></script>
+<script src="registro-i18n.js?v=d07c2b8"></script>
+<script src="registro-data.js?v=d07c2b8"></script>
+<script src="registro-app.js?v=d07c2b8"></script>
 
 </body>
 </html>
