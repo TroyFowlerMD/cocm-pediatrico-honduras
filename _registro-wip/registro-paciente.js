@@ -1634,12 +1634,13 @@ async function shareToolLink(toolKey) {
     const p = PSTATE.patient || {};
     const fullName = String(p.Patient_Name || '').trim();
     const firstName = fullName.split(/\s+/)[0] || (getLang()==='en' ? 'your child' : 'su hijo/a');
+    const therapist = String(p.Therapist || '').trim() || 'CoCM Pediátrico Camasca';
     const isEN = getLang() === 'en';
     let msg;
     if (isEN) {
-      msg = `Hello — please help us by completing this short questionnaire about ${firstName}. It takes only a few minutes and the results help guide ${firstName}'s care.\n\n${toolKey}:\n${url}\n\nThank you!\n— CoCM Pediátrico Camasca`;
+      msg = `Hello — please help us by completing this short questionnaire about ${firstName}. It takes only a few minutes and the results help guide ${firstName}'s care.\n\n${toolKey}:\n${url}\n\nThank you!\n— ${therapist}`;
     } else {
-      msg = `Hola — por favor ayúdenos completando este breve cuestionario sobre ${firstName}. Solo toma unos minutos y los resultados nos ayudan a guiar la atención de ${firstName}.\n\n${toolKey}:\n${url}\n\n¡Gracias!\n— CoCM Pediátrico Camasca`;
+      msg = `Hola — por favor ayúdenos completando este breve cuestionario sobre ${firstName}. Solo toma unos minutos y los resultados nos ayudan a guiar la atención de ${firstName}.\n\n${toolKey}:\n${url}\n\n¡Gracias!\n— ${therapist}`;
     }
     // Try clipboard API first, fall back to execCommand
     let copied = false;
