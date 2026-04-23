@@ -202,8 +202,10 @@ async function submitAddMe() {
 // ════════════════════════════════════════════════════════════════
 function newPatientModal() {
   renderNewPatientForm(false);
+  // Always reset save button — it lives outside the re-rendered form div
+  const btn = document.getElementById('npSaveBtn');
+  if (btn) { btn.disabled = false; btn.textContent = getLang()==='en' ? 'Save' : 'Guardar'; }
   document.getElementById('newPatientModal').style.display = 'flex';
-  // Focus the name field
   setTimeout(() => document.getElementById('npName')?.focus(), 50);
 }
 function closeNewPatientModal() {
@@ -599,6 +601,9 @@ async function submitNewPatient(skipDupCheck=false) {
     reenable();
     showToast(t('generic_error', { msg: err.message }), { variant: 'error', retry: () => submitNewPatient(true) });
     return;
+  } finally {
+    // Safety net: always re-enable button even if an unexpected error occurred
+    if (!saveOk) reenable();
   }
   STATE.pacientes.push(row);
   STATE.enrichedPatients = computePatientTiers(STATE.pacientes, STATE.visitas, STATE.tools, STATE.authorizedUsers);
