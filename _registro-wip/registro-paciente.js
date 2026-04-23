@@ -185,6 +185,7 @@ function render() {
         <span><strong>${t('label_therapist')}:</strong> ${escapeHtml(p.Therapist||'—')}</span>
         <span><strong>${t('pat_enrolled')}:</strong> ${p.Enrollment_Date||'—'}</span>
         <span><strong>${t('th_status')}:</strong> ${translateStatus(p.Status)||'—'}</span>
+        ${p.Caregiver_Phone ? `<span><strong>${getLang()==='en'?'Caregiver phone':'Tel. cuidador'}:</strong> <a href="tel:${escapeHtml(p.Caregiver_Phone)}" style="color:var(--color-primary);text-decoration:none;">${escapeHtml(p.Caregiver_Phone)}</a></span>` : ''}
       </div>
       <div style="margin-top: var(--space-3);">
         <strong class="cond-label" style="font-size:var(--text-xs);color:var(--color-text-muted);text-transform:uppercase;">${t('label_conditions')}:</strong>
@@ -1463,10 +1464,27 @@ function openEditPatientModal() {
     </label>`;
   }).join('');
 
+  const TOOL_META = {
+    'PHQ-A':             { es: 'Depresión · 12+',         en: 'Depression · 12+' },
+    'SMFQ-C':            { es: 'Depresión, auto · ≤11',   en: 'Depression, self · ≤11' },
+    'SMFQ-P':            { es: 'Depresión, padres · ≤11', en: 'Depression, parent · ≤11' },
+    'GAD-7':             { es: 'Ansiedad · 12+',          en: 'Anxiety · 12+' },
+    'SCARED':            { es: 'Ansiedad · ≤11',          en: 'Anxiety · ≤11' },
+    'CAP':               { es: 'TEPT · todos',            en: 'PTSD · all ages' },
+    'SNAP-IV':           { es: 'TDAH, padres/maestros · ≤11', en: 'ADHD, parent/teacher · ≤11' },
+    'Vanderbilt-Parent': { es: 'TDAH, padres · ≤11',     en: 'ADHD, parent · ≤11' },
+    'Vanderbilt-Teacher':{ es: 'TDAH, maestros · ≤11',   en: 'ADHD, teacher · ≤11' },
+    'ASRS-5':            { es: 'TDAH, auto · 12+',       en: 'ADHD, self · 12+' },
+    'DAST-10':           { es: 'Sustancias · 12+',        en: 'Substances · 12+' },
+    'CRAFFT':            { es: 'Sustancias · 12+',        en: 'Substances · 12+' },
+    'PSC-17':            { es: 'Cribado inicial · todos', en: 'Initial screen · all ages' },
+  };
   const toolRows = toolKeysAll.map(tk => {
-    return `<label style="display:flex;gap:8px;align-items:center;padding:6px 4px;cursor:pointer;font-size:var(--text-sm);">
-      <input type="checkbox" name="epTool" value="${escapeHtml(tk)}" ${curTools.has(tk)?'checked':''} style="width:16px;height:16px;cursor:pointer;"/>
-      <span>${escapeHtml(tk)}</span>
+    const meta = TOOL_META[tk];
+    const desc = meta ? (en ? meta.en : meta.es) : '';
+    return `<label style="display:flex;gap:8px;align-items:flex-start;padding:6px 4px;cursor:pointer;font-size:var(--text-sm);">
+      <input type="checkbox" name="epTool" value="${escapeHtml(tk)}" ${curTools.has(tk)?'checked':''} style="width:16px;height:16px;cursor:pointer;margin-top:2px;flex-shrink:0;"/>
+      <span><span>${escapeHtml(tk)}</span>${desc ? `<br><span style="font-size:var(--text-xs);color:var(--color-text-muted);font-weight:400;">${escapeHtml(desc)}</span>` : ''}</span>
     </label>`;
   }).join('');
 
@@ -1511,6 +1529,10 @@ function openEditPatientModal() {
           const opts = therapistList.map(u => { const n = escapeHtml(u.name||u.email||''); return `<option value="${n}" ${p.Therapist===n?'selected':''}>${n}</option>`; }).join('');
           return `<select id="epTherapist" style="${inputStyle}"><option value="">— ${en?'select':'seleccionar'} —</option>${opts}</select>`;
         })()} 
+      </div>
+      <div style="grid-column:1 / -1;">
+        <label class="np-label">${en?'Caregiver phone':'Tel\u00e9fono del cuidador'}</label>
+        <input type="tel" id="epPhone" value="${escapeHtml(p.Caregiver_Phone||'')}" placeholder="+504..." style="${inputStyle}"/>
       </div>
     </div>
     <div style="margin-top:var(--space-4);padding-top:var(--space-3);border-top:1px solid var(--color-border);">

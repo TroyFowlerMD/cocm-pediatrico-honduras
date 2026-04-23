@@ -259,7 +259,30 @@ function renderNewPatientForm(showAll) {
       <div style="margin-top: var(--space-3);">
         <label class="np-label">${t('label_tools')}</label>
         <div id="npTools" style="display:flex;flex-wrap:wrap;gap:6px;">
-          ${toolKeys.map(k => `<label style="display:inline-flex;gap:4px;align-items:center;padding:4px 10px;background:var(--color-surface-offset);border-radius:var(--radius-full);font-size:var(--text-xs);cursor:pointer;"><input type="checkbox" value="${k}"/>${k}</label>`).join('')}
+          ${(() => {
+            const NP_TOOL_META = {
+              'PHQ-A':             lang==='en'?'Depression ·12+':'Depresión ·12+',
+              'SMFQ-C':            lang==='en'?'Depression, self ·≤11':'Depresión auto ·≤11',
+              'SMFQ-P':            lang==='en'?'Depression, parent ·≤11':'Depresión padres ·≤11',
+              'GAD-7':             lang==='en'?'Anxiety ·12+':'Ansiedad ·12+',
+              'SCARED':            lang==='en'?'Anxiety ·≤11':'Ansiedad ·≤11',
+              'CAP':               lang==='en'?'PTSD · all ages':'TEPT · todos',
+              'SNAP-IV':           lang==='en'?'ADHD parent/teacher ·≤11':'TDAH padres/maestros ·≤11',
+              'Vanderbilt-Parent': lang==='en'?'ADHD, parent ·≤11':'TDAH padres ·≤11',
+              'Vanderbilt-Teacher':lang==='en'?'ADHD, teacher ·≤11':'TDAH maestros ·≤11',
+              'ASRS-5':            lang==='en'?'ADHD, self ·12+':'TDAH auto ·12+',
+              'DAST-10':           lang==='en'?'Substances ·12+':'Sustancias ·12+',
+              'CRAFFT':            lang==='en'?'Substances ·12+':'Sustancias ·12+',
+              'PSC-17':            lang==='en'?'Initial screen · all ages':'Cribado inicial · todos',
+            };
+            return toolKeys.map(k => {
+              const desc = NP_TOOL_META[k] || '';
+              return `<label title="${desc}" style="display:inline-flex;flex-direction:column;gap:1px;padding:4px 10px;background:var(--color-surface-offset);border-radius:var(--radius-full);font-size:var(--text-xs);cursor:pointer;">
+                <span style="display:flex;gap:4px;align-items:center;"><input type="checkbox" value="${k}" style="margin:0;"/>${k}</span>
+                ${desc ? `<span style="font-size:10px;color:var(--color-text-muted);padding-left:18px;line-height:1.1;">${desc}</span>` : ''}
+              </label>`;
+            }).join('');
+          })()}
         </div>
       </div>
       <div style="margin-top: var(--space-3);">
