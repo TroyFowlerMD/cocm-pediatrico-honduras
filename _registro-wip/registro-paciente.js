@@ -255,6 +255,12 @@ function render() {
           </div>`;
         }).join('')}
       </div>
+      ${(() => {
+        const shareableKeys = toolKeys.filter(tk => typeof TOOL_EXT_URL_MAP !== 'undefined' && TOOL_EXT_URL_MAP[tk]);
+        if (shareableKeys.length < 2) return '';
+        const en = getLang() === 'en';
+        return `<button class="tool-launch-btn" onclick="shareAllTools()" style="margin-top:var(--space-2);width:100%;padding:7px;font-weight:600;border-radius:var(--radius-md);" title="${en ? 'Copy one combined share message with all questionnaire links' : 'Copiar un mensaje combinado con todos los cuestionarios'}">📤 ${en ? 'Share all questionnaires' : 'Compartir todos los cuestionarios'}</button>`;
+      })()}
       ${!toolKeys.includes('PSC-17') ? `
         <div style="margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px dashed var(--color-border);">
           <div style="font-size:var(--text-xs);color:var(--color-text-muted);margin-bottom:6px;">${getLang()==='en' ? 'Screening tool (not part of monitoring panel)' : 'Herramienta de detección (no es parte del panel de monitoreo)'}</div>
@@ -1739,6 +1745,59 @@ async function shareToolLink(toolKey) {
 }
 // Expose globally for inline onclick handlers
 if (typeof window !== 'undefined') window.shareToolLink = shareToolLink;
+
+// Share combined message for all shareable tools assigned to this patient.
+async function shareAllTools() {
+  try {
+    const p = PSTATE.patient || {};
+    const toolKeys = (p.Tools||'').split(',').map(s=>s.trim()).filter(Boolean);
+    const shareableKeys = toolKeys.filter(tk => typeof TOOL_EXT_URL_MAP !== 'undefined' && TOOL_EXT_URL_MAP[tk]);
+    if (!shareableKeys.length) {
+      showToast(getLang()==='en' ? 'No shareable questionnaires for this patient' : 'No hay cuestionarios para compartir', { variant: 'warn' });
+      return;
+    }
+    const fullName = String(p.Patient_Name || '').trim();
+    const firstName = fullName.split(/\s+/)[0] || (getLang()==='en' ? 'your child' : 'su hijo/a');
+    const therapist = String(p.Therapist || '').trim() || 'CoCM Pediátrico Camasca';
+    const isEN = getLang() === 'en';
+    const toolLines = shareableKeys.map(tk => `${tk}:\n${TOOL_EXT_URL_MAP[tk]}`).join('\n\n');
+    let msg;
+    if (isEN) {
+      msg = `Hello — please help us by completing the following questionnaires about ${firstName}. Each takes only a few minutes and the results help guide ${firstName}'s care.\n\n${toolLines}\n\nThank you!\n— ${therapist}`;
+    } else {
+      msg = `Hola — por favor ayúdenos completando los siguientes cuestionarios sobre ${firstName}. Cada uno toma solo unos minutos y los resultados nos ayudan a guiar la atención de ${firstName}.\n\n${toolLines}\n\n¡Gracias!\n— ${therapist}`;
+    }
+    let copied = false;
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(msg);
+        copied = true;
+      }
+    } catch(_) {}
+    if (!copied) {
+      try {
+        const ta = document.createElement('textarea');
+        ta.value = msg;
+        ta.style.position = 'fixed'; ta.style.opacity = '0';
+        document.body.appendChild(ta); ta.select();
+        document.execCommand('copy');
+        document.body.removeChild(ta);
+        copied = true;
+      } catch(_) {}
+    }
+    if (copied) {
+      showToast(isEN
+        ? `All ${shareableKeys.length} questionnaires copied — paste into WhatsApp/email`
+        : `${shareableKeys.length} cuestionarios copiados — pega en WhatsApp/correo`,
+        { variant: 'success' });
+    } else {
+      window.prompt(isEN ? 'Copy this message:' : 'Copia este mensaje:', msg);
+    }
+  } catch(err) {
+    showToast((getLang()==='en' ? 'Share failed: ' : 'Error al compartir: ') + (err && err.message ? err.message : String(err)), { variant: 'error' });
+  }
+}
+if (typeof window !== 'undefined') window.shareAllTools = shareAllTools;
 
 // ── Visit note expand/collapse ────────────────────────────────
 function toggleNoteExpand(noteId) {
