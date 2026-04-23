@@ -779,31 +779,28 @@ function computePatientTiers(pacientes, visitas, tools, authorizedUsers) {
     let needsVerify = false;
     const storedPrimary = normalizeConditionKey(p.Primary_Condition);
     const verifiedFlag = isTruthyFlag(p.Primary_Condition_Verified);
-    if (storedPrimary) {
-      primaryCondition = storedPrimary;
-      primaryGroup = conditionKeyToGroup(storedPrimary);
-      needsVerify = !verifiedFlag; // explicit but not yet verified
+    // Infer from Conditions if Primary_Condition column is absent from sheet
+    const _condsRawAll = String(p.Conditions||'').split(',').map(s=>s.trim()).filter(Boolean);
+    const _inferredPrimary = normalizeConditionKey(_condsRawAll[0] || '');
+    // Effective primary: stored wins, else infer from first Condition
+    const _effectivePrimary = storedPrimary || _inferredPrimary;
+    // Treat as verified (suppress badge) when:
+    //   a) Primary_Condition_Verified is TRUE, OR
+    //   b) Primary_Condition is explicitly stored in the sheet (user confirmed it), OR
+    //   c) Sheet column missing AND only one condition listed (unambiguous — no badge needed)
+    const _isSingleCond = _condsRawAll.length === 1;
+    const _verifiedEffective = verifiedFlag || (!!storedPrimary) || (!storedPrimary && !!_inferredPrimary && _isSingleCond);
+    if (_effectivePrimary) {
+      primaryCondition = _effectivePrimary;
+      primaryGroup = conditionKeyToGroup(_effectivePrimary);
+      needsVerify = !_verifiedEffective;
     } else {
-      // Auto-infer from first Conditions entry
-      const condsRaw = String(p.Conditions || '').split(',').map(s => s.trim()).filter(Boolean);
-      if (condsRaw.length) {
-        const firstKey = normalizeConditionKey(condsRaw[0]);
-        if (firstKey) {
-          primaryCondition = firstKey;
-          primaryGroup = conditionKeyToGroup(firstKey);
-          needsVerify = true;
-        }
+      // No condition info at all — fallback to first tool, always needs verify
+      const toolsRaw = String(p.Tools || '').split(',').map(s => s.trim()).filter(Boolean);
+      if (toolsRaw.length && TOOL_TO_GROUP[toolsRaw[0]]) {
+        primaryGroup = TOOL_TO_GROUP[toolsRaw[0]];
       }
-      // Fallback: first tool
-      if (!primaryCondition) {
-        const toolsRaw = String(p.Tools || '').split(',').map(s => s.trim()).filter(Boolean);
-        if (toolsRaw.length && TOOL_TO_GROUP[toolsRaw[0]]) {
-          primaryGroup = TOOL_TO_GROUP[toolsRaw[0]];
-          needsVerify = true;
-        } else {
-          needsVerify = true;
-        }
-      }
+      needsVerify = true;
     }
 
     // Find latest score for the tool most relevant to primary group.

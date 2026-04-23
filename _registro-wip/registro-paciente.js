@@ -88,6 +88,13 @@ async function load() {
       const p = cached.pacientes.find(x => x.Patient_ID === id);
       if (p) {
         PSTATE.patient = p;
+        // Backfill Primary_Condition from Conditions if the sheet column is missing
+        if (!PSTATE.patient.Primary_Condition) {
+          const firstCond = String(PSTATE.patient.Conditions || '').split(',').map(s => s.trim()).filter(Boolean)[0] || '';
+          if (firstCond && typeof normalizeConditionKey === 'function') {
+            PSTATE.patient.Primary_Condition = normalizeConditionKey(firstCond);
+          }
+        }
         PSTATE.visits = (cached.visitas || []).filter(v => v.Patient_ID === id)
                                  .sort((a,b) => String(b.Visit_Date).localeCompare(String(a.Visit_Date)));
         PSTATE.meds = (cached.meds || []).filter(m => m.Patient_ID === id)
@@ -112,6 +119,13 @@ async function load() {
       fetchTab('AuthorizedUsers').catch(() => []),
     ]);
     PSTATE.patient = pacientes.find(p => p.Patient_ID === id);
+    // Backfill Primary_Condition from Conditions if the sheet column is missing
+    if (PSTATE.patient && !PSTATE.patient.Primary_Condition) {
+      const firstCond = String(PSTATE.patient.Conditions || '').split(',').map(s => s.trim()).filter(Boolean)[0] || '';
+      if (firstCond && typeof normalizeConditionKey === 'function') {
+        PSTATE.patient.Primary_Condition = normalizeConditionKey(firstCond);
+      }
+    }
     PSTATE.visits = visitas.filter(v => v.Patient_ID === id)
                            .sort((a,b) => String(b.Visit_Date).localeCompare(String(a.Visit_Date)));
     PSTATE.meds = meds.filter(m => m.Patient_ID === id)
