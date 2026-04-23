@@ -268,6 +268,12 @@ function renderNewPatientForm(showAll) {
         <div id="npScoreRows"></div>
         <button type="button" onclick="addNpScoreRow()" style="margin-top:var(--space-2);background:transparent;border:1px dashed var(--color-border);color:var(--color-primary);padding:6px 12px;border-radius:var(--radius-md);font-size:var(--text-xs);cursor:pointer;width:100%;">+ ${lang==='en'?'Add baseline score':'Agregar puntaje basal'}</button>
       </div>
+      <div style="margin-top: var(--space-3); border-top: 1px solid var(--color-border); padding-top: var(--space-3);">
+        <label class="np-label">${lang==='en'?'Medications (optional)':'Medicamentos (opcional)'}</label>
+        <p style="font-size:var(--text-xs);color:var(--color-text-muted);margin-bottom:var(--space-2);">${lang==='en'?'Log any medications being started at enrollment.':'Registra medicamentos que se inician al ingreso.'}</p>
+        <div id="npMedRows"></div>
+        <button type="button" onclick="addNpMedRow()" style="margin-top:var(--space-2);background:transparent;border:1px dashed var(--color-border);color:var(--color-primary);padding:6px 12px;border-radius:var(--radius-md);font-size:var(--text-xs);cursor:pointer;width:100%;">+ ${lang==='en'?'Add medication':'Agregar medicamento'}</button>
+      </div>
     </div>
   ` : '';
 
@@ -380,6 +386,85 @@ function addNpScoreRow() {
 }
 if (typeof window !== 'undefined') window.addNpScoreRow = addNpScoreRow;
 
+function addNpMedRow() {
+  const host = document.getElementById('npMedRows');
+  if (!host) return;
+  const en = getLang() === 'en';
+  const psychiatrists = (STATE.team || []).filter(tm => tm.role === 'psychiatrist');
+  const inputSt = 'width:100%;padding:7px 8px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);font-size:var(--text-sm);';
+  const div = document.createElement('div');
+  div.className = 'np-med-row';
+  div.style.cssText = 'border:1px solid var(--color-border);border-radius:var(--radius-md);padding:var(--space-3);margin-bottom:var(--space-2);position:relative;background:var(--color-surface-offset);';
+  div.innerHTML = `
+    <button type="button" onclick="this.closest('.np-med-row').remove()" title="${en?'Remove':'Quitar'}" style="position:absolute;top:8px;right:8px;background:transparent;border:none;color:var(--color-text-muted);font-size:16px;cursor:pointer;line-height:1;">×</button>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2);">
+      <div>
+        <label class="np-label">${en?'Date':'Fecha'}</label>
+        <input type="date" class="npMedDate" value="${new Date().toISOString().slice(0,10)}" style="${inputSt}"/>
+      </div>
+      <div>
+        <label class="np-label">${en?'Action':'Acción'}</label>
+        <select class="npMedAction" style="${inputSt}">
+          <option value="START">START</option>
+          <option value="INCREASE">INCREASE</option>
+          <option value="DECREASE">DECREASE</option>
+          <option value="CONTINUE">CONTINUE</option>
+          <option value="HOLD">HOLD</option>
+          <option value="STOP">STOP</option>
+        </select>
+      </div>
+      <div style="grid-column:1/-1;">
+        <label class="np-label">${en?'Medication':'Medicamento'} <span style="color:var(--color-error);">*</span></label>
+        <select class="npMedSel" style="${inputSt}">
+          <option value="">—</option>
+          ${MED_FORMULARY.map(m => `<option value="${m}">${m}</option>`).join('')}
+          <option value="__other__">${en?'Other (specify)':'Otro (especificar)'}</option>
+        </select>
+        <input type="text" class="npMedOther" placeholder="${en?'Specify medication':'Especificar medicamento'}" style="display:none;margin-top:6px;${inputSt}"/>
+      </div>
+      <div>
+        <label class="np-label">${en?'Dose':'Dosis'}</label>
+        <div style="position:relative;">
+          <input type="number" class="npMedDose" placeholder="20" step="0.5" min="0" style="width:100%;padding:7px 42px 7px 8px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);font-size:var(--text-sm);"/>
+          <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--color-text-muted);font-size:var(--text-sm);pointer-events:none;">mg</span>
+        </div>
+      </div>
+      <div>
+        <label class="np-label">${en?'Frequency':'Frecuencia'}</label>
+        <select class="npMedFreq" style="${inputSt}">
+          <option value="">—</option>
+          ${MED_FREQ_PRESETS.map(p => `<option value="${p.v}">${en?p.en:p.es}</option>`).join('')}
+        </select>
+        <label style="display:flex;gap:8px;align-items:center;margin-top:6px;font-size:var(--text-sm);cursor:pointer;">
+          <input type="checkbox" class="npMedPRN" style="width:15px;height:15px;"/>
+          <span>PRN (${en?'as needed':'según necesario'})</span>
+        </label>
+      </div>
+      <div style="grid-column:1/-1;">
+        <label class="np-label">${en?'Prescriber':'Prescriptor'}</label>
+        <select class="npMedPresc" style="${inputSt}">
+          <option value="">—</option>
+          ${psychiatrists.map(tm => `<option value="${tm.name}">${tm.name}</option>`).join('')}
+        </select>
+      </div>
+      <div style="grid-column:1/-1;">
+        <label class="np-label">${en?'Notes':'Notas'}</label>
+        <input type="text" class="npMedNotes" placeholder="${en?'Optional':'Opcional'}" style="${inputSt}"/>
+      </div>
+    </div>
+  `;
+  // Wire up "Other" toggle
+  const sel = div.querySelector('.npMedSel');
+  const other = div.querySelector('.npMedOther');
+  sel.addEventListener('change', () => {
+    const isOther = sel.value === '__other__';
+    other.style.display = isOther ? 'block' : 'none';
+    if (isOther) setTimeout(() => other.focus(), 50);
+  });
+  host.appendChild(div);
+}
+if (typeof window !== 'undefined') window.addNpMedRow = addNpMedRow;
+
 async function submitNewPatient(skipDupCheck=false) {
   const btn = document.getElementById('npSaveBtn');
   if (btn && btn.disabled) return; // double-submit guard
@@ -489,6 +574,42 @@ async function submitNewPatient(skipDupCheck=false) {
       };
       try { await writeRow('Visitas', visitRow); STATE.visitas.push(visitRow); } catch(_) {}
     }
+  }
+  // Submit medications if entered
+  const medRows = document.querySelectorAll('#npMedRows .np-med-row');
+  for (const mr of medRows) {
+    const medSelEl = mr.querySelector('.npMedSel');
+    const medOtherEl = mr.querySelector('.npMedOther');
+    let med = '';
+    if (medSelEl) {
+      med = medSelEl.value === '__other__' ? (medOtherEl?.value || '').trim() : medSelEl.value;
+    }
+    if (!med) continue; // skip rows with no medication selected
+    const doseRaw = (mr.querySelector('.npMedDose')?.value || '').trim();
+    const doseStr = doseRaw ? `${doseRaw} mg` : '';
+    const freqSelEl = mr.querySelector('.npMedFreq');
+    const isPRN = !!mr.querySelector('.npMedPRN')?.checked;
+    let freq = freqSelEl?.value || '';
+    if (freq === 'QD-AM') freq = getLang()==='en'?'Daily, every morning':'Diario, cada mañana';
+    else if (freq === 'QD-PM') freq = getLang()==='en'?'Daily, every evening':'Diario, cada noche';
+    else if (freq === 'QHS') freq = getLang()==='en'?'QHS, before bed':'QHS, al acostarse';
+    if (isPRN) freq = freq ? freq + ' + PRN' : 'PRN';
+    const medRow = {
+      Med_ID: `M-${Date.now()}-${Math.random().toString(36).slice(2,6)}`,
+      Patient_ID: nextId,
+      Date: mr.querySelector('.npMedDate')?.value || row.Enrollment_Date,
+      Medication: med,
+      Dose: doseStr,
+      Frequency: freq,
+      Action: mr.querySelector('.npMedAction')?.value || 'START',
+      Prescriber: mr.querySelector('.npMedPresc')?.value || '',
+      Reason: '',
+      Notes: mr.querySelector('.npMedNotes')?.value.trim() || '',
+      Created_By: STATE.user || 'unknown',
+      Created_At: now,
+      Schema_Version: '1.0',
+    };
+    try { await writeRow('Medicamentos', medRow); } catch(_) {}
   }
   closeNewPatientModal();
   renderAll();
