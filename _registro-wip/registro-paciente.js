@@ -1469,6 +1469,11 @@ function openEditPatientModal() {
     return `<option value="${escapeHtml(c)}" ${pcCurrent===c?'selected':''}>${escapeHtml(lbl)}</option>`;
   }).join('');
 
+  // Detect any freetext 'other' condition stored that isn't a known condKey
+  const _knownCondSet = new Set(condKeys);
+  const _otherCondVal = [...curConds].find(c => !_knownCondSet.has(c)) || '';
+  const _otherCondChecked = !!_otherCondVal;
+
   const condRows = condKeys.map(c => {
     const d = PSTATE.conditions[c] || {};
     const lbl = en ? (d.en || c) : (d.es || c);
@@ -1476,7 +1481,16 @@ function openEditPatientModal() {
       <input type="checkbox" name="epCond" value="${escapeHtml(c)}" ${curConds.has(c)?'checked':''} style="width:16px;height:16px;cursor:pointer;"/>
       <span>${escapeHtml(lbl)}</span>
     </label>`;
-  }).join('');
+  }).join('') + `
+    <div style="padding:6px 4px;">
+      <label style="display:flex;gap:8px;align-items:center;cursor:pointer;font-size:var(--text-sm);" onclick="(function(e){e.stopPropagation();var cb=document.getElementById('epCondOtherCb');var wrap=document.getElementById('epCondOtherWrap');if(e.target!==cb){cb.checked=!cb.checked;}wrap.style.display=cb.checked?'block':'none';if(cb.checked)setTimeout(()=>document.getElementById('epCondOtherText').focus(),50);}).call(this,event)">
+        <input type="checkbox" id="epCondOtherCb" ${_otherCondChecked?'checked':''} style="width:16px;height:16px;cursor:pointer;" onclick="event.stopPropagation();document.getElementById('epCondOtherWrap').style.display=this.checked?'block':'none';if(this.checked)setTimeout(()=>document.getElementById('epCondOtherText').focus(),50);"/>
+        <span>${en?'Other':'Otro'}</span>
+      </label>
+      <div id="epCondOtherWrap" style="display:${_otherCondChecked?'block':'none'};margin-top:6px;padding-left:24px;">
+        <input type="text" id="epCondOtherText" value="${escapeHtml(_otherCondVal)}" placeholder="${en?'Specify condition':'Especificar condición'}" style="width:100%;padding:7px 8px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);font-size:var(--text-sm);"/>
+      </div>
+    </div>`;
 
   const TOOL_META = {
     'PHQ-A':             { es: 'Depresión · 12+',         en: 'Depression · 12+' },
@@ -1605,7 +1619,10 @@ async function submitEditPatient() {
     ? (nameParts[0][0] + nameParts[nameParts.length-1][0]).toUpperCase()
     : (nameParts[0]?.[0] || '').toUpperCase();
   const notes    = (document.getElementById('epNotes')?.value || '').trim();
-  const conds    = [...document.querySelectorAll('input[name="epCond"]:checked')].map(c=>c.value).join(',');
+  const _epCondOtherCb = document.getElementById('epCondOtherCb');
+  const _epCondOtherText = (document.getElementById('epCondOtherText')?.value || '').trim();
+  const _otherEntry = (_epCondOtherCb?.checked && _epCondOtherText) ? [_epCondOtherText] : [];
+  const conds    = [...document.querySelectorAll('input[name="epCond"]:checked')].map(c=>c.value).concat(_otherEntry).join(',');
   const tools    = [...document.querySelectorAll('input[name="epTool"]:checked')].map(c=>c.value).join(',');
   const primaryCondition = (document.getElementById('epPrimaryCondition')?.value || '').trim();
 

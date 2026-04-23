@@ -253,8 +253,15 @@ function renderNewPatientForm(showAll) {
       ${npField('npEnrolled', 'label_enrollment', 'date', false, new Date().toISOString().slice(0,10))}
       <div style="margin-top: var(--space-3);">
         <label class="np-label">${t('label_conditions')}</label>
-        <div id="npConds" style="display:flex;flex-wrap:wrap;gap:6px;">
+        <div id="npConds" style="display:flex;flex-wrap:wrap;gap:6px;align-items:flex-start;">
           ${conds.map(([k,v]) => `<label style="display:inline-flex;gap:4px;align-items:center;padding:4px 10px;background:var(--color-surface-offset);border-radius:var(--radius-full);font-size:var(--text-xs);cursor:pointer;"><input type="checkbox" value="${k}"/>${lang==='en'?v.en:v.es}</label>`).join('')}
+          <label id="npCondOtherLabel" style="display:inline-flex;gap:4px;align-items:center;padding:4px 10px;background:var(--color-surface-offset);border-radius:var(--radius-full);font-size:var(--text-xs);cursor:pointer;">
+            <input type="checkbox" id="npCondOtherCb" onclick="(function(cb){var w=document.getElementById('npCondOtherWrap');w.style.display=cb.checked?'block':'none';if(cb.checked)setTimeout(()=>document.getElementById('npCondOtherText').focus(),50);})(this)"/>
+            ${lang==='en'?'Other':'Otro'}
+          </label>
+          <div id="npCondOtherWrap" style="display:none;width:100%;margin-top:2px;">
+            <input type="text" id="npCondOtherText" placeholder="${lang==='en'?'Specify condition':'Especificar condición'}" style="width:100%;padding:7px 8px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);font-size:var(--text-sm);"/>
+          </div>
         </div>
       </div>
       <div style="margin-top: var(--space-3);">
@@ -321,6 +328,8 @@ function togglePatientDetails() {
     npNotes: document.getElementById('npNotes')?.value || '',
     npPhone: document.getElementById('npPhone')?.value || '',
     npConds: [...document.querySelectorAll('#npConds input:checked')].map(c => c.value),
+    npCondOtherChecked: !!document.getElementById('npCondOtherCb')?.checked,
+    npCondOtherText: document.getElementById('npCondOtherText')?.value || '',
     npTools: [...document.querySelectorAll('#npTools input:checked')].map(c => c.value),
   };
   renderNewPatientForm(!current);
@@ -332,6 +341,14 @@ function togglePatientDetails() {
   for (const v of saved.npConds) {
     const cb = document.querySelector(`#npConds input[value="${v}"]`);
     if (cb) cb.checked = true;
+  }
+  if (saved.npCondOtherChecked) {
+    const otherCb = document.getElementById('npCondOtherCb');
+    const otherWrap = document.getElementById('npCondOtherWrap');
+    const otherText = document.getElementById('npCondOtherText');
+    if (otherCb) otherCb.checked = true;
+    if (otherWrap) otherWrap.style.display = 'block';
+    if (otherText) otherText.value = saved.npCondOtherText;
   }
   for (const v of saved.npTools) {
     const cb = document.querySelector(`#npTools input[value="${v}"]`);
@@ -523,6 +540,9 @@ async function submitNewPatient(skipDupCheck=false) {
   // Collect fields (detail section may or may not be rendered)
   const primaryCond = document.getElementById('npPrimaryCond')?.value || '';
   let conds = [...document.querySelectorAll('#npConds input:checked')].map(c => c.value);
+  const _npCondOtherCb = document.getElementById('npCondOtherCb');
+  const _npCondOtherText = (document.getElementById('npCondOtherText')?.value || '').trim();
+  if (_npCondOtherCb?.checked && _npCondOtherText) conds.push(_npCondOtherText);
   if (primaryCond && !conds.includes(primaryCond)) conds.unshift(primaryCond);
   const condsStr = conds.join(',');
 
