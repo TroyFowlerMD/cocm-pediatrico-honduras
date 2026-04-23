@@ -875,6 +875,10 @@ function filterAndSortPatients(all) {
           av = (a._lastPsychDate || a.Last_Psych_Consult_Date) || '0000';
           bv = (b._lastPsychDate || b.Last_Psych_Consult_Date) || '0000';
           return dir * av.localeCompare(bv);
+        case 'enrolled':
+          av = a.Enrollment_Date || '0000';
+          bv = b.Enrollment_Date || '0000';
+          return dir * av.localeCompare(bv);
         default: return 0;
       }
     });
@@ -1063,7 +1067,7 @@ function renderTierBlock(label, tierClass, patients, lang, opts={}) {
   const ths = [];
   if (cols.therapist)    ths.push(th(t('th_therapist'),    'therapist'));
   if (cols.patient)      ths.push(th(t('th_paciente'),     'patient'));
-  if (cols.enrolled)     ths.push(th(t('th_enrolled'),     null));
+  if (cols.enrolled)     ths.push(th(t('th_enrolled'),     'enrolled'));
   if (cols.conditions)   ths.push(th(t('th_conditions'),   null));
   if (cols.latest_score) ths.push(th(t('th_latest_score'), null));
   if (cols.baseline)     ths.push(th(t('th_baseline_on_main'), null));
