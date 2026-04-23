@@ -2241,10 +2241,35 @@ async function submitEditVisit() {
     showToast(t('generic_error', { msg: err.message }), { variant:'error', retry: () => submitEditVisit() });
   }
 }
+// ── Styled confirm dialog (replaces native confirm()) ──────────
+let _confirmDeleteResolve = null;
+function confirmDialog({ heading, message, okLabel, cancelLabel }) {
+  return new Promise(resolve => {
+    _confirmDeleteResolve = resolve;
+    document.getElementById('confirmDeleteHeading').textContent = heading;
+    document.getElementById('confirmDeleteMsg').textContent = message;
+    document.getElementById('confirmDeleteOkBtn').textContent = okLabel;
+    document.getElementById('confirmDeleteCancelBtn').textContent = cancelLabel;
+    document.getElementById('confirmDeleteModal').style.display = 'flex';
+  });
+}
+function _resolveConfirmDelete(result) {
+  document.getElementById('confirmDeleteModal').style.display = 'none';
+  if (_confirmDeleteResolve) { _confirmDeleteResolve(result); _confirmDeleteResolve = null; }
+}
+if (typeof window !== 'undefined') window._resolveConfirmDelete = _resolveConfirmDelete;
+
 async function confirmDeleteVisit(visitId) {
   const en = getLang() === 'en';
-  const msg = en ? 'Delete this entry? This cannot be undone.' : '¿Eliminar esta entrada? Esta acción no se puede deshacer.';
-  if (!confirm(msg)) return;
+  const confirmed = await confirmDialog({
+    heading: en ? 'Delete entry?' : '¿Eliminar entrada?',
+    message: en
+      ? 'Are you sure you want to delete this visit entry? This cannot be undone.'
+      : '¿Seguro que quieres eliminar esta entrada? Esta acción no se puede deshacer.',
+    okLabel:     en ? 'Yes, delete' : 'Sí, eliminar',
+    cancelLabel: en ? 'Cancel'      : 'Cancelar',
+  });
+  if (!confirmed) return;
   try {
     const result = await deleteRow('Visitas', visitId);
     if (result && (result.status === 'ok' || result.ok)) {
@@ -2267,10 +2292,15 @@ async function confirmDeletePatient() {
   const en = getLang() === 'en';
   const p = PSTATE.patient;
   if (!p) return;
-  const msg = en
-    ? `Permanently delete ${p.Patient_Name} (${p.Patient_ID})? This will NOT delete their visits or medication records. This cannot be undone.`
-    : `¿Eliminar permanentemente a ${p.Patient_Name} (${p.Patient_ID})? Esto NO eliminará sus visitas ni registros de medicamentos. No se puede deshacer.`;
-  if (!confirm(msg)) return;
+  const confirmed = await confirmDialog({
+    heading: en ? `Delete ${p.Patient_Name}?` : `¿Eliminar a ${p.Patient_Name}?`,
+    message: en
+      ? `Are you sure you want to permanently delete ${p.Patient_Name} (${p.Patient_ID})? This will NOT delete their visits or medication records. This cannot be undone.`
+      : `¿Seguro que quieres eliminar permanentemente a ${p.Patient_Name} (${p.Patient_ID})? Esto NO eliminará sus visitas ni registros de medicamentos. No se puede deshacer.`,
+    okLabel:     en ? 'Yes, delete patient' : 'Sí, eliminar paciente',
+    cancelLabel: en ? 'Cancel'              : 'Cancelar',
+  });
+  if (!confirmed) return;
   try {
     const result = await deleteRow('Pacientes', p.Patient_ID);
     if (result && (result.status === 'ok' || result.ok)) {
@@ -2279,7 +2309,6 @@ async function confirmDeletePatient() {
         STATE.enrichedPatients = computePatientTiers(STATE.pacientes, STATE.visitas, STATE.tools);
       }
       showToast(en ? `${p.Patient_Name} deleted.` : `${p.Patient_Name} eliminado/a.`, { variant: 'success' });
-      // Navigate back to registry
       window.location.href = 'registro.html';
     } else {
       showToast((en ? 'Delete failed: ' : 'Error al eliminar: ') + (result?.message || 'unknown'), { variant: 'error' });
