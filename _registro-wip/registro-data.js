@@ -822,6 +822,25 @@ function computePatientTiers(pacientes, visitas, tools) {
       primaryScore = isNaN(numScore) ? null : numScore;
     }
 
+    // ── Last psych review date ─────────────────────────────────
+    // = max of: stored Last_Psych_Consult_Date, any visit logged by a psychiatrist
+    // Brigade visits (any therapist entry during a brigade) are also counted
+    // if the visit was logged by a team member with role=psychiatrist.
+    const psychNames = new Set(
+      (typeof STATE !== 'undefined' && STATE.team ? STATE.team : [])
+        .filter(tm => tm.role === 'psychiatrist')
+        .map(tm => tm.name.trim().toLowerCase())
+    );
+    const psychVisitDates = visits
+      .filter(v => v.Therapist && psychNames.has(String(v.Therapist).trim().toLowerCase()))
+      .map(v => v.Visit_Date)
+      .filter(Boolean);
+    const allPsychDates = [
+      p.Last_Psych_Consult_Date,
+      ...psychVisitDates,
+    ].filter(Boolean).sort();
+    const _lastPsychDate = allPsychDates.length ? allPsychDates[allPsychDates.length - 1] : '';
+
     return {
       ...p,
       _visits: visits,
@@ -831,6 +850,7 @@ function computePatientTiers(pacientes, visitas, tools) {
       _tierScore: worstScore,
       _toolScores: toolScores,
       _lastVisitDate: lastVisitDate,
+      _lastPsychDate,
       _daysSinceLastVisit: lastVisitDate ? daysBetween(lastVisitDate, todayISO()) : 9999,
       _safetyActive: isTruthyFlag(p.Safety_Flag) && !p.Safety_Flag_Ack_At,
       _primaryCondition: primaryCondition,

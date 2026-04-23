@@ -760,6 +760,22 @@ function updateDatasetToggleUI() {
 // ════════════════════════════════════════════════════════════════
 // RENDER
 // ════════════════════════════════════════════════════════════════
+// ── Column sort state ───────────────────────────────────────────
+// col: one of 'therapist'|'patient'|'delta'|'last_visit'|'last_contact'|'last_psych'
+// dir: 'asc' | 'desc'
+const TABLE_SORT = { col: null, dir: 'asc' };
+
+function thSortClick(col) {
+  if (TABLE_SORT.col === col) {
+    TABLE_SORT.dir = TABLE_SORT.dir === 'asc' ? 'desc' : 'asc';
+  } else {
+    TABLE_SORT.col = col;
+    TABLE_SORT.dir = col === 'last_visit' || col === 'last_contact' || col === 'last_psych' ? 'desc' : 'asc';
+  }
+  renderAll();
+}
+if (typeof window !== 'undefined') window.thSortClick = thSortClick;
+
 function renderAll() {
   const lang = getLang();
   const list = filterAndSortPatients(STATE.enrichedPatients);
@@ -829,6 +845,41 @@ function filterAndSortPatients(all) {
       return b._daysSinceLastVisit - a._daysSinceLastVisit;
     });
   }
+
+  // ── Column header sort (overrides sortBy dropdown when active) ──
+  if (TABLE_SORT.col) {
+    const dir = TABLE_SORT.dir === 'asc' ? 1 : -1;
+    list.sort((a, b) => {
+      let av, bv;
+      switch (TABLE_SORT.col) {
+        case 'therapist':
+          return dir * String(a.Therapist||'').localeCompare(String(b.Therapist||''));
+        case 'patient':
+          return dir * String(a.Patient_Name||'').localeCompare(String(b.Patient_Name||''));
+        case 'delta': {
+          const da = a._primaryScore != null && a.Baseline_Score ? (a._primaryScore - Number(a.Baseline_Score)) : null;
+          const db2 = b._primaryScore != null && b.Baseline_Score ? (b._primaryScore - Number(b.Baseline_Score)) : null;
+          av = da == null ? (dir > 0 ? Infinity : -Infinity) : da;
+          bv = db2 == null ? (dir > 0 ? Infinity : -Infinity) : db2;
+          return dir * (av - bv);
+        }
+        case 'last_visit':
+          av = a._lastVisitDate || '0000';
+          bv = b._lastVisitDate || '0000';
+          return dir * av.localeCompare(bv);
+        case 'last_contact':
+          av = a.Last_BHCM_Contact_Date || '0000';
+          bv = b.Last_BHCM_Contact_Date || '0000';
+          return dir * av.localeCompare(bv);
+        case 'last_psych':
+          av = (a._lastPsychDate || a.Last_Psych_Consult_Date) || '0000';
+          bv = (b._lastPsychDate || b.Last_Psych_Consult_Date) || '0000';
+          return dir * av.localeCompare(bv);
+        default: return 0;
+      }
+    });
+  }
+
   list._sortBy = sortBy;
   return list;
 }
@@ -992,19 +1043,34 @@ function fmtDateWithAgo(iso) {
 
 function renderTierBlock(label, tierClass, patients, lang, opts={}) {
   const cols = visibleColumns();
+  // Sortable columns: col key → i18n key
+  const SORTABLE = {
+    therapist:    'th_therapist',
+    patient:      'th_paciente',
+    delta:        'th_delta',
+    last_visit:   'th_last_visit',
+    last_contact: 'th_last_contact',
+    last_psych:   'th_last_psych',
+  };
+  function th(label, colKey) {
+    if (!colKey) return `<th>${label}</th>`;
+    const active = TABLE_SORT.col === colKey;
+    const arrow = active ? (TABLE_SORT.dir === 'asc' ? ' ▲' : ' ▼') : '';
+    return `<th class="th-sortable${active?' th-sorted':''}" onclick="thSortClick('${colKey}')" title="${lang==='en'?'Click to sort':'Clic para ordenar'}">${label}${arrow}</th>`;
+  }
   const ths = [];
-  if (cols.therapist)    ths.push(`<th>${t('th_therapist')}</th>`);
-  if (cols.patient)      ths.push(`<th>${t('th_paciente')}</th>`);
-  if (cols.enrolled)     ths.push(`<th>${t('th_enrolled')}</th>`);
-  if (cols.conditions)   ths.push(`<th>${t('th_conditions')}</th>`);
-  if (cols.latest_score) ths.push(`<th>${t('th_latest_score')}</th>`);
-  if (cols.baseline)     ths.push(`<th>${t('th_baseline_on_main')}</th>`);
-  if (cols.delta)        ths.push(`<th>${t('th_delta')}</th>`);
-  if (cols.trend)        ths.push(`<th>${t('th_trend')}</th>`);
-  if (cols.last_visit)   ths.push(`<th>${t('th_last_visit')}</th>`);
-  if (cols.last_contact) ths.push(`<th>${t('th_last_contact')}</th>`);
-  if (cols.last_psych)   ths.push(`<th>${t('th_last_psych')}</th>`);
-  if (cols.flags)        ths.push(`<th>${t('th_flags')}</th>`);
+  if (cols.therapist)    ths.push(th(t('th_therapist'),    'therapist'));
+  if (cols.patient)      ths.push(th(t('th_paciente'),     'patient'));
+  if (cols.enrolled)     ths.push(th(t('th_enrolled'),     null));
+  if (cols.conditions)   ths.push(th(t('th_conditions'),   null));
+  if (cols.latest_score) ths.push(th(t('th_latest_score'), null));
+  if (cols.baseline)     ths.push(th(t('th_baseline_on_main'), null));
+  if (cols.delta)        ths.push(th(t('th_delta'),        'delta'));
+  if (cols.trend)        ths.push(th(t('th_trend'),        null));
+  if (cols.last_visit)   ths.push(th(t('th_last_visit'),   'last_visit'));
+  if (cols.last_contact) ths.push(th(t('th_last_contact'), 'last_contact'));
+  if (cols.last_psych)   ths.push(th(t('th_last_psych'),   'last_psych'));
+  if (cols.flags)        ths.push(th(t('th_flags'),        null));
   return `
     <div class="tier-block">
       <div class="tier-pill ${tierClass}">${label} · ${patients.length}</div>
@@ -1196,7 +1262,7 @@ function renderPatientRow(p, lang, opts={}) {
   if (cols.trend) tds.push(`<td data-label="${t('th_trend')}">${sparkline(visitsOfTool.map(v => Number(v.Score)))}</td>`);
   if (cols.last_visit) tds.push(`<td data-label="${t('th_last_visit')}">${p._lastVisitDate ? escapeHtml(p._lastVisitDate) : '<span class="cell-empty">—</span>'}<div class="pat-meta">${daysLabel}</div></td>`);
   if (cols.last_contact) tds.push(`<td data-label="${t('th_last_contact')}">${fmtDateWithAgo(p.Last_BHCM_Contact_Date)}</td>`);
-  if (cols.last_psych) tds.push(`<td data-label="${t('th_last_psych')}">${fmtDateWithAgo(p.Last_Psych_Consult_Date)}</td>`);
+  if (cols.last_psych) tds.push(`<td data-label="${t('th_last_psych')}">${fmtDateWithAgo(p._lastPsychDate || p.Last_Psych_Consult_Date)}</td>`);
   if (cols.flags) tds.push(`<td data-label="${t('th_flags')}">${flags.join(' ') || '<span class="cell-empty">—</span>'}</td>`);
 
   return `<tr class="${rowClass}" onclick="goPatient('${p.Patient_ID}')">${tds.join('')}</tr>`;
@@ -1217,10 +1283,11 @@ function isPsychReviewOverdue(p) {
   const graceNeverConsulted = isStable ? 112 : 56;
   // If never had a consult AND has been enrolled beyond the grace window, count as overdue
   const enrolledDays = daysSinceISO(p.Enrollment_Date);
-  if (!p.Last_Psych_Consult_Date) {
+  const effectivePsychDate = p._lastPsychDate || p.Last_Psych_Consult_Date || '';
+  if (!effectivePsychDate) {
     return enrolledDays != null && enrolledDays > graceNeverConsulted;
   }
-  const days = daysSinceISO(p.Last_Psych_Consult_Date);
+  const days = daysSinceISO(effectivePsychDate);
   return days != null && days > threshold;
 }
 
