@@ -668,20 +668,52 @@ async function submitNewPatient(skipDupCheck=false) {
   }
   closeNewPatientModal();
   renderAll();
-  // PSC-17 prompt: offer to open the qualifying screening for this new patient
+  // PSC-17 prompt: offer to copy the share link for the qualifying screening
   if (saveOk) {
-    setTimeout(() => {
-      const en = getLang() === 'en';
-      const firstName = String(name || '').trim().split(/\s+/)[0] || (en ? 'this patient' : 'este paciente');
-      const msg = en
-        ? `Open PSC-17 (qualifying screening) for ${firstName} now?\n\nThis is the one-time screening that determines CoCM eligibility and primary condition.`
-        : `¿Abrir PSC-17 (cribado de ingreso) para ${firstName} ahora?\n\nEs el cribado inicial que determina la elegibilidad para CoCM y la condición principal.`;
-      if (window.confirm(msg)) {
-        window.open('https://cocm-camasca.github.io/cocm-pediatrico-honduras/psc17.html', '_blank', 'noopener');
-      }
-    }, 400);
+    setTimeout(() => showPsc17Prompt(name, nextId), 400);
   }
 }
+
+function showPsc17Prompt(patientName, patientId) {
+  const en = getLang() === 'en';
+  const firstName = String(patientName || '').trim().split(/\s+/)[0] || (en ? 'this patient' : 'este paciente');
+  const psc17Url = 'https://registry.cocm-camasca.org/psc17.html';
+  const shareMsg = en
+    ? `Hello — please help us by completing this short questionnaire about ${firstName}. It helps us determine the best care for them.\n\nPSC-17:\n${psc17Url}`
+    : `Hola — por favor ayúdenos completando este breve cuestionario sobre ${firstName}. Nos ayuda a determinar la mejor atención para su hijo/a.\n\nPSC-17:\n${psc17Url}`;
+
+  // Build modal
+  const overlay = document.createElement('div');
+  overlay.id = 'psc17Prompt';
+  overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;';
+  overlay.innerHTML = `
+    <div style="background:var(--color-surface);border-radius:var(--radius-lg);padding:var(--space-5);max-width:420px;width:100%;box-shadow:0 8px 32px rgba(0,0,0,0.35);">
+      <div style="font-size:var(--text-xs);text-transform:uppercase;letter-spacing:0.08em;color:var(--color-primary);font-weight:700;margin-bottom:var(--space-2);">PSC-17</div>
+      <h3 style="margin:0 0 var(--space-2);font-size:var(--text-lg);">${en ? 'Patient saved — send PSC-17?' : 'Paciente guardado — ¿enviar PSC-17?'}</h3>
+      <p style="font-size:var(--text-sm);color:var(--color-text-muted);margin:0 0 var(--space-3);line-height:1.5;">
+        ${en
+          ? `${firstName} was added successfully. The PSC-17 is a one-time qualifying screening. Copy the message below to send to a caregiver via WhatsApp or email.`
+          : `${firstName} fue agregado exitosamente. El PSC-17 es un cribado inicial de uso único. Copia el mensaje abajo para enviar a un cuidador por WhatsApp o correo.`
+        }
+      </p>
+      <textarea id="psc17ShareText" readonly style="width:100%;height:110px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:10px;font-size:var(--text-xs);color:var(--color-text);resize:none;line-height:1.5;box-sizing:border-box;">${shareMsg}</textarea>
+      <div style="display:flex;gap:8px;margin-top:var(--space-3);">
+        <button id="psc17CopyBtn" onclick="
+          navigator.clipboard && navigator.clipboard.writeText(document.getElementById('psc17ShareText').value).then(()=>{
+            this.textContent='${en ? '✓ Copied!' : '✓ Copiado!'}';
+            this.style.background='var(--color-success)';
+            setTimeout(()=>document.getElementById('psc17Prompt')?.remove(), 1200);
+          }).catch(()=>{ document.getElementById('psc17ShareText').select(); document.execCommand('copy'); this.textContent='${en ? '✓ Copied!' : '✓ Copiado!'}'; setTimeout(()=>document.getElementById('psc17Prompt')?.remove(),1200); });
+        " style="flex:1;padding:9px;background:var(--color-primary);color:white;border:none;border-radius:var(--radius-md);font-weight:700;font-size:var(--text-sm);cursor:pointer;">📋 ${en ? 'Copy message' : 'Copiar mensaje'}</button>
+        <button onclick="document.getElementById('psc17Prompt')?.remove()" style="padding:9px 14px;background:transparent;border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text-muted);font-size:var(--text-sm);cursor:pointer;">${en ? 'Skip' : 'Omitir'}</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  // Close on backdrop click
+  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+}
+if (typeof window !== 'undefined') window.showPsc17Prompt = showPsc17Prompt;
 
 function showDuplicateWarning(dups) {
   const host = document.getElementById('newPatientForm');
