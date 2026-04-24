@@ -276,7 +276,7 @@ function renderNewPatientForm(showAll) {
               'SMFQ-P':            lang==='en'?'Depression, parent ·≤11':'Depresión padres ·≤11',
               'GAD-7':             lang==='en'?'Anxiety ·12+':'Ansiedad ·12+',
               'SCARED':            lang==='en'?'Anxiety ·≤11':'Ansiedad ·≤11',
-              'CAP':               lang==='en'?'PTSD · all ages':'TEPT · todos',
+              'CAP':               lang==='en'?'ADHD · ≤11':'TDAH · ≤11',
               'SNAP-IV':           lang==='en'?'ADHD parent/teacher ·≤11':'TDAH padres/maestros ·≤11',
               'Vanderbilt-Parent': lang==='en'?'ADHD, parent ·≤11':'TDAH padres ·≤11',
               'Vanderbilt-Teacher':lang==='en'?'ADHD, teacher ·≤11':'TDAH maestros ·≤11',

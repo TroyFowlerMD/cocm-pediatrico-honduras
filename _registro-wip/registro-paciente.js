@@ -1504,7 +1504,7 @@ function openEditPatientModal() {
     'SMFQ-P':            { es: 'Depresión, padres · ≤11', en: 'Depression, parent · ≤11' },
     'GAD-7':             { es: 'Ansiedad · 12+',          en: 'Anxiety · 12+' },
     'SCARED':            { es: 'Ansiedad · ≤11',          en: 'Anxiety · ≤11' },
-    'CAP':               { es: 'TEPT · todos',            en: 'PTSD · all ages' },
+    'CAP':               { es: 'TDAH · ≤11',              en: 'ADHD · ≤11' },
     'SNAP-IV':           { es: 'TDAH, padres/maestros · ≤11', en: 'ADHD, parent/teacher · ≤11' },
     'Vanderbilt-Parent': { es: 'TDAH, padres · ≤11',     en: 'ADHD, parent · ≤11' },
     'Vanderbilt-Teacher':{ es: 'TDAH, maestros · ≤11',   en: 'ADHD, teacher · ≤11' },
