@@ -240,37 +240,88 @@ function render() {
     ${renderPrompts(p, lang)}
 
     <!-- LAUNCH TOOLS -->
-    <div class="sec-card">
-      <h2><span>${t('pat_complete_tool')}</span></h2>
-      <p style="font-size: 10.5px; line-height: 1.4; color: var(--color-text-muted); margin-bottom: var(--space-3);">${t('pat_tools_help')}</p>
-      <div class="tool-launch-grid">
-        ${toolKeys.map(tk => {
-          const hasBase = !!TOOL_URL_MAP[tk];
-          const hasExt  = !!(typeof TOOL_EXT_URL_MAP !== 'undefined' && TOOL_EXT_URL_MAP[tk]);
-          if (!hasBase) return `<span class="tool-launch-btn" style="opacity:0.4;">${tk}</span>`;
-          const safeTk = tk.replace(/'/g, "\\'");
-          return `<div class="tool-launch-row" style="display:inline-flex;align-items:stretch;gap:0;">
-            <a class="tool-launch-btn" href="${TOOL_URL_MAP[tk]}" target="_blank" title="${getLang()==='en' ? 'Open clinician version' : 'Abrir versión para clínico'}" style="${hasExt ? 'border-top-right-radius:0;border-bottom-right-radius:0;' : ''}">${tk}</a>
-            ${hasExt ? `<button class="tool-launch-btn" onclick="shareToolLink('${safeTk}')" title="${getLang()==='en' ? 'Copy share message (for parent/teacher)' : 'Copiar mensaje para compartir (padre/maestro)'}" style="border-left:0;border-top-left-radius:0;border-bottom-left-radius:0;padding-left:10px;padding-right:10px;" aria-label="Share">📤</button>` : ''}
-          </div>`;
-        }).join('')}
-      </div>
-      ${(() => {
-        const shareableKeys = toolKeys.filter(tk => typeof TOOL_EXT_URL_MAP !== 'undefined' && TOOL_EXT_URL_MAP[tk]);
-        if (shareableKeys.length < 2) return '';
-        const en = getLang() === 'en';
-        return `<button class="tool-launch-btn" onclick="shareAllTools()" style="margin-top:var(--space-2);width:100%;padding:7px;font-weight:600;border-radius:var(--radius-md);" title="${en ? 'Copy one combined share message with all questionnaire links' : 'Copiar un mensaje combinado con todos los cuestionarios'}">📤 ${en ? 'Share all questionnaires' : 'Compartir todos los cuestionarios'}</button>`;
-      })()}
-      ${!toolKeys.includes('PSC-17') ? `
-        <div style="margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px dashed var(--color-border);">
-          <div style="font-size:var(--text-xs);color:var(--color-text-muted);margin-bottom:6px;">${getLang()==='en' ? 'Screening tool (not part of monitoring panel)' : 'Herramienta de detección (no es parte del panel de monitoreo)'}</div>
-          <div class="tool-launch-row" style="display:inline-flex;align-items:stretch;gap:0;">
-            <a class="tool-launch-btn" href="${TOOL_URL_MAP['PSC-17']}" target="_blank" title="${getLang()==='en' ? 'Open PSC-17 (one-time screening, clinician version)' : 'Abrir PSC-17 (cribado de una sola vez, versión para clínico)'}" style="border-top-right-radius:0;border-bottom-right-radius:0;">📋 PSC-17</a>
-            <button class="tool-launch-btn" onclick="shareToolLink('PSC-17')" title="${getLang()==='en' ? 'Copy share message (for parent)' : 'Copiar mensaje para compartir (padre/madre)'}" style="border-left:0;border-top-left-radius:0;border-bottom-left-radius:0;padding-left:10px;padding-right:10px;" aria-label="Share PSC-17">📤</button>
+    ${(() => {
+      const en = getLang() === 'en';
+      // Build schema maps
+      const schemaMap = {};
+      if (typeof TOOL_SCHEMA !== 'undefined') TOOL_SCHEMA.forEach(s => schemaMap[s.key] = s);
+      // Compute completed tools (have at least one score)
+      const completedSet = new Set((PSTATE.visits||[]).filter(v=>v.Score!==''&&v.Score!=null).map(v=>v.Tool).filter(Boolean));
+      // Patient tool list — always ensure PSC-17 is in it
+      const rawKeys = (p.Tools||'').split(',').map(s=>s.trim()).filter(Boolean);
+      const allToolKeys = rawKeys.includes('PSC-17') ? rawKeys : ['PSC-17', ...rawKeys];
+      // Split into screening vs monitoring based on TOOL_SCHEMA type
+      const screeningKeys = [];
+      const monitoringKeys = [];
+      // PSC-17 always first in screening
+      if (allToolKeys.includes('PSC-17')) screeningKeys.push('PSC-17');
+      allToolKeys.forEach(tk => {
+        if (tk === 'PSC-17') return; // already added
+        const ts = schemaMap[tk];
+        if (!ts) { monitoringKeys.push(tk); return; } // unknown → monitoring
+        if (ts.type === 'screening') screeningKeys.push(tk);
+        else if (ts.type === 'monitoring') monitoringKeys.push(tk);
+        else if (ts.type === 'both') monitoringKeys.push(tk); // 'both' → monitoring launch section
+      });
+      // Also add any schema 'both' tools that are in allToolKeys but weren't placed in screening
+      // (they are already in monitoringKeys via the loop above)
+
+      // Render one tool row: clinician launch btn + optional share btn
+      function toolRow(tk, opts) {
+        opts = opts || {};
+        const hasBase = !!TOOL_URL_MAP[tk];
+        const hasExt  = !!(typeof TOOL_EXT_URL_MAP !== 'undefined' && TOOL_EXT_URL_MAP[tk]);
+        const isDone  = completedSet.has(tk);
+        const doneStyle = (opts.screening && isDone) ? 'opacity:0.45;text-decoration:line-through;' : '';
+        const doneHint  = (opts.screening && isDone) ? `<span style="font-size:9px;color:var(--color-success,#5dba5d);margin-left:4px;">✓ ${en?'done':'listo'}</span>` : '';
+        const noteHint  = opts.note ? `<span style="font-size:9px;color:var(--color-text-muted);margin-left:4px;">(${opts.note})</span>` : '';
+        const safeTk = tk.replace(/'/g, "\\'");
+        if (!hasBase) return `<div style="display:inline-flex;align-items:center;gap:4px;"><span class="tool-launch-btn" style="opacity:0.4;${doneStyle}">${tk}</span>${doneHint}${noteHint}</div>`;
+        return `<div style="display:inline-flex;align-items:center;gap:4px;">
+          <div style="display:inline-flex;align-items:stretch;gap:0;${doneStyle}">
+            <a class="tool-launch-btn" href="${TOOL_URL_MAP[tk]}" target="_blank" style="${hasExt?'border-top-right-radius:0;border-bottom-right-radius:0;':''};${doneStyle}" title="${en?'Open clinician version':'Abrir versión para clínico'}">${tk}</a>
+            ${hasExt ? `<button class="tool-launch-btn" onclick="shareToolLink('${safeTk}')" title="${en?'Copy share message':'Copiar mensaje para compartir'}" style="border-left:0;border-top-left-radius:0;border-bottom-left-radius:0;padding-left:10px;padding-right:10px;" aria-label="Share">📤</button>` : ''}
+          </div>${doneHint}${noteHint}
+        </div>`;
+      }
+
+      // Sub-section header
+      function subHdr(label) {
+        return `<div style="width:100%;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--color-text-muted);margin:10px 0 6px;padding-bottom:3px;border-bottom:1px solid var(--color-border);">${label}</div>`;
+      }
+
+      const screeningRows = screeningKeys.map(tk => toolRow(tk, {screening:true})).join('');
+      const monitoringRows = monitoringKeys.map(tk => {
+        const note = (tk === 'CAP') ? (en?'priority · teacher':'prioridad · maestro') :
+                     (tk === 'Vanderbilt-Teacher' && monitoringKeys.includes('CAP')) ? (en?'if CAP not viable':'si CAP no es viable') : null;
+        return toolRow(tk, {note});
+      }).join('');
+
+      // Share multiple questionnaires — checkbox selector
+      const shareableAll = allToolKeys.filter(tk => typeof TOOL_EXT_URL_MAP !== 'undefined' && TOOL_EXT_URL_MAP[tk]);
+      const shareSection = shareableAll.length ? `
+        <div id="shareMultiPanel" style="margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--color-border);">
+          <div style="font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--color-text-muted);margin-bottom:6px;">📤 ${en?'Share questionnaires':'Compartir cuestionarios'}</div>
+          <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
+            ${shareableAll.map(tk => `<label style="display:inline-flex;gap:4px;align-items:center;padding:4px 10px;background:var(--color-surface-offset);border-radius:var(--radius-full);font-size:var(--text-xs);cursor:pointer;"><input type="checkbox" name="shareToolSel" value="${escapeHtml(tk)}" checked style="margin:0;"/>${escapeHtml(tk)}</label>`).join('')}
           </div>
-        </div>
-      ` : ''}
-    </div>
+          <button class="tool-launch-btn" onclick="shareSelectedTools()" style="width:100%;padding:7px;font-weight:600;border-radius:var(--radius-md);">${en?'Copy selected':'Copiar seleccionados'}</button>
+        </div>` : '';
+
+      return `
+      <div class="sec-card">
+        <h2 style="display:flex;align-items:center;gap:8px;">
+          <span>${t('pat_complete_tool')}</span>
+          <button onclick="openEditPatientModal()" style="margin-left:auto;font-size:var(--text-xs);padding:4px 10px;border-radius:var(--radius-md);background:var(--color-surface-offset);border:1px solid var(--color-border);color:var(--color-text-muted);cursor:pointer;font-weight:600;" title="${en?'Edit tools tracked for this patient':'Editar herramientas para este paciente'}">✏️ ${en?'Edit tools':'Editar herramientas'}</button>
+        </h2>
+        <p style="font-size:10.5px;line-height:1.4;color:var(--color-text-muted);margin-bottom:var(--space-3);">${t('pat_tools_help')}</p>
+        ${subHdr(en?'Baseline Screening':'Detección Basal')}
+        <div class="tool-launch-grid" style="margin-bottom:var(--space-2);">${screeningRows||`<span style="font-size:var(--text-xs);color:var(--color-text-muted);">${en?'None':'Ninguna'}</span>`}</div>
+        ${subHdr(en?'Monitoring':'Monitoreo')}
+        <div class="tool-launch-grid">${monitoringRows||`<span style="font-size:var(--text-xs);color:var(--color-text-muted);">${en?'None':'Ninguna'}</span>`}</div>
+        ${shareSection}
+      </div>`;
+    })()}
 
     <!-- TRENDS -->
     <div class="sec-card">
@@ -1484,7 +1535,7 @@ function openEditPatientModal() {
     const d = PSTATE.conditions[c] || {};
     const lbl = en ? (d.en || c) : (d.es || c);
     return `<label style="display:flex;gap:8px;align-items:center;padding:6px 4px;cursor:pointer;font-size:var(--text-sm);">
-      <input type="checkbox" name="epCond" value="${escapeHtml(c)}" ${curConds.has(c)?'checked':''} style="width:16px;height:16px;cursor:pointer;"/>
+      <input type="checkbox" name="epCond" value="${escapeHtml(c)}" ${curConds.has(c)?'checked':''} style="width:16px;height:16px;cursor:pointer;" onchange="epUpdateTools()"/>
       <span>${escapeHtml(lbl)}</span>
     </label>`;
   }).join('') + `
@@ -1498,29 +1549,11 @@ function openEditPatientModal() {
       </div>
     </div>`;
 
-  const TOOL_META = {
-    'PHQ-A':             { es: 'Depresión · 12+',         en: 'Depression · 12+' },
-    'SMFQ-C':            { es: 'Depresión, auto · ≤11',   en: 'Depression, self · ≤11' },
-    'SMFQ-P':            { es: 'Depresión, padres · ≤11', en: 'Depression, parent · ≤11' },
-    'GAD-7':             { es: 'Ansiedad · 12+',          en: 'Anxiety · 12+' },
-    'SCARED':            { es: 'Ansiedad · ≤11',          en: 'Anxiety · ≤11' },
-    'CAP':               { es: 'TDAH · ≤11',              en: 'ADHD · ≤11' },
-    'SNAP-IV':           { es: 'TDAH, padres/maestros · ≤11', en: 'ADHD, parent/teacher · ≤11' },
-    'Vanderbilt-Parent': { es: 'TDAH, padres · ≤11',     en: 'ADHD, parent · ≤11' },
-    'Vanderbilt-Teacher':{ es: 'TDAH, maestros · ≤11',   en: 'ADHD, teacher · ≤11' },
-    'ASRS-5':            { es: 'TDAH, auto · 12+',       en: 'ADHD, self · 12+' },
-    'DAST-10':           { es: 'Sustancias · 12+',        en: 'Substances · 12+' },
-    'CRAFFT':            { es: 'Sustancias · 12+',        en: 'Substances · 12+' },
-    'PSC-17':            { es: 'Cribado inicial · todos', en: 'Initial screen · all ages' },
-  };
-  const toolRows = toolKeysAll.map(tk => {
-    const meta = TOOL_META[tk];
-    const desc = meta ? (en ? meta.en : meta.es) : '';
-    return `<label style="display:flex;gap:8px;align-items:flex-start;padding:6px 4px;cursor:pointer;font-size:var(--text-sm);">
-      <input type="checkbox" name="epTool" value="${escapeHtml(tk)}" ${curTools.has(tk)?'checked':''} style="width:16px;height:16px;cursor:pointer;margin-top:2px;flex-shrink:0;"/>
-      <span><span>${escapeHtml(tk)}</span>${desc ? `<br><span style="font-size:var(--text-xs);color:var(--color-text-muted);font-weight:400;">${escapeHtml(desc)}</span>` : ''}</span>
-    </label>`;
-  }).join('');
+  // Compute which tools have already been completed (have at least one score in Visitas)
+  const _completedToolsSet = new Set((PSTATE.visits||[]).filter(v=>v.Score!==''&&v.Score!=null).map(v=>v.Tool).filter(Boolean));
+  const completedToolsArr = [..._completedToolsSet];
+  const epAge = p.DOB ? Math.floor((Date.now()-new Date(p.DOB).getTime())/31557600000) : (p.Age ? Number(p.Age) : null);
+  const epConds = (p.Conditions||''). split(',').map(s=>s.trim()).filter(Boolean);
 
   const inputStyle = 'width:100%;padding:8px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);';
   document.getElementById('editPatientForm').innerHTML = `
@@ -1531,7 +1564,7 @@ function openEditPatientModal() {
       </div>
       <div>
         <label class="np-label">${en?'Date of birth':'Fecha de nacimiento'}</label>
-        <input type="date" id="epDOB" value="${escapeHtml(p.DOB||'')}" style="${inputStyle}" oninput="updateEpAge(this.value)"/>
+        <input type="date" id="epDOB" value="${escapeHtml(p.DOB||'')}" style="${inputStyle}" oninput="updateEpAge(this.value);epUpdateTools()"/>
       </div>
       <div>
         <label class="np-label">${en?'Age':'Edad'}</label>
@@ -1584,10 +1617,8 @@ function openEditPatientModal() {
       <label class="np-label" style="margin-bottom:6px;display:block;">${en?'Conditions':'Condiciones'}</label>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;">${condRows || `<span style="font-size:var(--text-xs);color:var(--color-text-muted);">${en?'No conditions configured':'No hay condiciones configuradas'}</span>`}</div>
     </div>
-    <div style="margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--color-border);">
-      <label class="np-label" style="margin-bottom:6px;display:block;">${en?'Monitored questionnaires':'Cuestionarios monitoreados'}</label>
-      <div style="font-size:var(--text-xs);color:var(--color-text-muted);margin-bottom:6px;">${en?'Tools this patient is being tracked with. PSC-17 is handled separately (one-time qualifier).':'Herramientas con las que se rastrea al paciente. PSC-17 se maneja por separado (una sola vez).'}</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;">${toolRows || `<span style="font-size:var(--text-xs);color:var(--color-text-muted);">${en?'No tools configured':'No hay herramientas configuradas'}</span>`}</div>
+    <div style="margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--color-border);" id="epToolsSection">
+      ${(typeof renderToolSelector==='function')?renderToolSelector('ep', [...curTools], epConds, en?'en':'es', epAge, completedToolsArr):'<span>Tools unavailable</span>'}
     </div>
     <div style="margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--color-border);">
       <label class="np-label">${en?'Notes':'Notas'}</label>
@@ -1604,6 +1635,23 @@ function closeEditPatientModal() {
   document.getElementById('editPatientModal').style.display = 'none';
 }
 if (typeof window !== 'undefined') window.closeEditPatientModal = closeEditPatientModal;
+
+// Re-renders tool selector when conditions or DOB change in edit patient modal
+function epUpdateTools() {
+  const lang = getLang();
+  const dobVal = document.getElementById('epDOB')?.value || '';
+  const age = dobVal ? (typeof computeAgeFromDOB === 'function' ? computeAgeFromDOB(dobVal) : Math.floor((Date.now() - new Date(dobVal).getTime()) / 31557600000)) : null;
+  const conds = [...document.querySelectorAll('input[name="epCond"]:checked')].map(c => c.value);
+  const primCond = document.getElementById('epPrimaryCondition')?.value || '';
+  if (primCond && !conds.includes(primCond)) conds.push(primCond);
+  const currentSel = [...document.querySelectorAll('#epToolsSection input[name="toolSel"]:checked')].map(c => c.value);
+  const completedToolsArr = [...new Set((PSTATE.visits||[]).filter(v=>v.Score!==''&&v.Score!=null).map(v=>v.Tool).filter(Boolean))];
+  const sec = document.getElementById('epToolsSection');
+  if (sec && typeof renderToolSelector === 'function') {
+    sec.innerHTML = renderToolSelector('ep', currentSel, conds, lang, age, completedToolsArr);
+  }
+}
+if (typeof window !== 'undefined') window.epUpdateTools = epUpdateTools;
 
 async function submitEditPatient() {
   const en = getLang() === 'en';
@@ -1629,7 +1677,7 @@ async function submitEditPatient() {
   const _epCondOtherText = (document.getElementById('epCondOtherText')?.value || '').trim();
   const _otherEntry = (_epCondOtherCb?.checked && _epCondOtherText) ? [_epCondOtherText] : [];
   const conds    = [...document.querySelectorAll('input[name="epCond"]:checked')].map(c=>c.value).concat(_otherEntry).join(',');
-  const tools    = [...document.querySelectorAll('input[name="epTool"]:checked')].map(c=>c.value).join(',');
+  const tools    = [...document.querySelectorAll('#epToolsSection input[name="toolSel"]:checked')].map(c=>c.value).join(',');
   const primaryCondition = (document.getElementById('epPrimaryCondition')?.value || '').trim();
 
   // Brigade flag is managed via the dedicated Brigade modal, not Edit Patient
@@ -1746,14 +1794,16 @@ async function shareToolLink(toolKey) {
 // Expose globally for inline onclick handlers
 if (typeof window !== 'undefined') window.shareToolLink = shareToolLink;
 
-// Share combined message for all shareable tools assigned to this patient.
-async function shareAllTools() {
+// ── Share selected questionnaires ─────────────────────────────────────────────
+// Reads checkboxes from shareToolSel, builds combined WhatsApp/email message,
+// copies to clipboard. Replaces the old shareAllTools single-button approach.
+async function shareSelectedTools() {
   try {
     const p = PSTATE.patient || {};
-    const toolKeys = (p.Tools||'').split(',').map(s=>s.trim()).filter(Boolean);
-    const shareableKeys = toolKeys.filter(tk => typeof TOOL_EXT_URL_MAP !== 'undefined' && TOOL_EXT_URL_MAP[tk]);
+    const checked = [...document.querySelectorAll('input[name="shareToolSel"]:checked')].map(c => c.value);
+    const shareableKeys = checked.filter(tk => typeof TOOL_EXT_URL_MAP !== 'undefined' && TOOL_EXT_URL_MAP[tk]);
     if (!shareableKeys.length) {
-      showToast(getLang()==='en' ? 'No shareable questionnaires for this patient' : 'No hay cuestionarios para compartir', { variant: 'warn' });
+      showToast(getLang()==='en' ? 'Select at least one questionnaire to share' : 'Selecciona al menos un cuestionario', { variant: 'warn' });
       return;
     }
     const fullName = String(p.Patient_Name || '').trim();
@@ -1787,8 +1837,8 @@ async function shareAllTools() {
     }
     if (copied) {
       showToast(isEN
-        ? `All ${shareableKeys.length} questionnaires copied — paste into WhatsApp/email`
-        : `${shareableKeys.length} cuestionarios copiados — pega en WhatsApp/correo`,
+        ? `${shareableKeys.length} questionnaire${shareableKeys.length===1?'':'s'} copied — paste into WhatsApp/email`
+        : `${shareableKeys.length} cuestionario${shareableKeys.length===1?'':'s'} copiado${shareableKeys.length===1?'':'s'} — pega en WhatsApp/correo`,
         { variant: 'success' });
     } else {
       window.prompt(isEN ? 'Copy this message:' : 'Copia este mensaje:', msg);
@@ -1797,6 +1847,10 @@ async function shareAllTools() {
     showToast((getLang()==='en' ? 'Share failed: ' : 'Error al compartir: ') + (err && err.message ? err.message : String(err)), { variant: 'error' });
   }
 }
+if (typeof window !== 'undefined') window.shareSelectedTools = shareSelectedTools;
+
+// Legacy alias — kept in case any old reference exists
+async function shareAllTools() { return shareSelectedTools(); }
 if (typeof window !== 'undefined') window.shareAllTools = shareAllTools;
 
 // ── Visit note expand/collapse ────────────────────────────────

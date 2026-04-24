@@ -201,7 +201,8 @@ const TOOL_URL_MAP = {
   "CAP":               COCM_TOOLS_BASE + "cap.html",
   "CRAFFT":            COCM_TOOLS_BASE + "crafft.html",
   "DAST-10":           COCM_TOOLS_BASE + "dast10.html",
-  "ASRS":              COCM_TOOLS_BASE + "asrs.html",
+  "ASRS-5":            COCM_TOOLS_BASE + "asrs.html",
+  "ASRS":              COCM_TOOLS_BASE + "asrs.html", // legacy alias
 };
 
 // Outside-party (ext) versions — stripped of navigation, safe to share with
@@ -215,6 +216,78 @@ const TOOL_EXT_URL_MAP = {
   "PSC-17":            COCM_TOOLS_BASE + "psc17-ext.html",
   "CAP":               COCM_TOOLS_BASE + "cap-ext.html",
 };
+
+// ════════════════════════════════════════════════════════════════
+// TOOL SCHEMA — single source of truth for all tool behaviour
+// type: 'screening' = one-time baseline, grey out after completion
+//        'monitoring' = ongoing, always shown
+// conds: which conditions this tool applies to (empty = universal)
+// maxAge / minAge: inclusive age bounds (null = no bound)
+// note: parenthetical hint shown in UI
+// shareable: has an -ext version the parent/teacher can fill out
+// ════════════════════════════════════════════════════════════════
+const TOOL_SCHEMA = [
+  // ── Universal baseline screening ─────────────────────────────
+  { key:'PSC-17',            type:'screening',  conds:[],               minAge:4,  maxAge:17, shareable:true,
+    es:'Tamizaje conductual universal',         en:'Universal behavioral screening' },
+  // ── Depression ───────────────────────────────────────────────
+  { key:'SMFQ-C',            type:'both',       conds:['depression'],   minAge:null, maxAge:11, shareable:false,
+    es:'Depresión, auto · ≤11',               en:'Depression, self · ≤11' },
+  { key:'SMFQ-P',            type:'monitoring', conds:['depression'],   minAge:null, maxAge:17, shareable:true,
+    es:'Depresión, padres · ≤11',             en:'Depression, parent · ≤11' },
+  { key:'PHQ-A',             type:'both',       conds:['depression'],   minAge:12, maxAge:null, shareable:false,
+    es:'Depresión · 12+',                      en:'Depression · 12+' },
+  // ── ADHD — screening ─────────────────────────────────────────
+  { key:'Vanderbilt-Parent', type:'screening',  conds:['adhd'],         minAge:null, maxAge:11, shareable:true,
+    es:'TDAH, padres · ≤11',                  en:'ADHD, parent · ≤11' },
+  { key:'Vanderbilt-Teacher',type:'screening',  conds:['adhd'],         minAge:null, maxAge:11, shareable:true,
+    es:'TDAH, maestros · ≤11',               en:'ADHD, teacher · ≤11' },
+  { key:'SNAP-IV',           type:'both',       conds:['adhd'],         minAge:12, maxAge:null, shareable:true,
+    es:'TDAH, padres/maestros · 12+',          en:'ADHD, parent/teacher · 12+' },
+  { key:'ASRS-5',            type:'both',       conds:['adhd'],         minAge:12, maxAge:null, shareable:false,
+    es:'TDAH, auto · 12+',                     en:'ADHD, self · 12+' },
+  // ── ADHD — monitoring only ────────────────────────────────────
+  { key:'CAP',               type:'monitoring', conds:['adhd'],         minAge:null, maxAge:11, shareable:true,
+    note:'priority · completed by teacher',    noteEs:'prioridad · completa el maestro',
+    es:'TDAH (monitoreo) · ≤11',              en:'ADHD (monitoring) · ≤11' },
+  // Vanderbilt-Teacher also serves as ADHD monitoring backup for ≤11 (already defined above)
+  // ── Anxiety ───────────────────────────────────────────────────
+  { key:'SCARED-N',          type:'both',       conds:['anxiety'],      minAge:null, maxAge:11, shareable:false,
+    es:'Ansiedad, niño/a · ≤11',              en:'Anxiety, child · ≤11' },
+  { key:'SCARED-Parent',     type:'both',       conds:['anxiety'],      minAge:null, maxAge:11, shareable:true,
+    es:'Ansiedad, padres · ≤11',              en:'Anxiety, parent · ≤11' },
+  { key:'GAD-7',             type:'both',       conds:['anxiety'],      minAge:12, maxAge:null, shareable:false,
+    es:'Ansiedad · 12+',                       en:'Anxiety · 12+' },
+  // ── Risk / SUD ────────────────────────────────────────────────
+  { key:'CRAFFT',            type:'screening',  conds:['sud','risk'],   minAge:12, maxAge:null, shareable:false,
+    es:'Sustancias · 12+',                     en:'Substances · 12+' },
+  { key:'DAST-10',           type:'monitoring', conds:['sud','risk'],   minAge:12, maxAge:null, shareable:false,
+    es:'Sustancias (monitoreo) · 12+',         en:'Substances (monitoring) · 12+' },
+];
+
+// Helper: get suggested tools for a given condition set + age
+// Returns { screening: [...keys], monitoring: [...keys] }
+function suggestTools(condsList, age) {
+  const ageNum = age != null ? Number(age) : null;
+  const condsSet = new Set((condsList || []).map(s => String(s).trim().toLowerCase()));
+  const screening = [], monitoring = [];
+  for (const ts of TOOL_SCHEMA) {
+    // Universal (PSC-17) always applies; condition-specific: patient must have that condition
+    const condMatch = ts.conds.length === 0 || ts.conds.some(c => condsSet.has(c));
+    if (!condMatch) continue;
+    // Age filter
+    if (ageNum != null) {
+      if (ts.minAge != null && ageNum < ts.minAge) continue;
+      if (ts.maxAge != null && ageNum > ts.maxAge) continue;
+    }
+    if (ts.type === 'screening' || ts.type === 'both') screening.push(ts.key);
+    if (ts.type === 'monitoring' || ts.type === 'both') monitoring.push(ts.key);
+  }
+  // For ADHD ≤11 monitoring: CAP is priority, Vanderbilt-Teacher is backup — both included
+  return { screening, monitoring };
+}
+if (typeof window !== 'undefined') window.suggestTools = suggestTools;
+if (typeof window !== 'undefined') window.TOOL_SCHEMA = TOOL_SCHEMA;
 
 // ── Severity tier ordering ─────────────────────────────────────
 const TIER_ORDER = ["Severa","Moderada","Leve","Remisión","Sin datos"];

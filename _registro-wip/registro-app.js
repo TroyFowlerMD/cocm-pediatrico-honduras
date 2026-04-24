@@ -198,6 +198,114 @@ async function submitAddMe() {
 }
 
 // ════════════════════════════════════════════════════════════════
+// TOOL SELECTOR — shared renderer for new patient + edit patient
+// prefix: 'np' | 'ep'  selectedTools: array of currently-checked keys
+// completedTools: array of tool keys that already have a score entry (screening greyed)
+// age: numeric age or null
+// ════════════════════════════════════════════════════════════════
+function renderToolSelector(prefix, selectedTools, condsList, lang, age, completedTools) {
+  const en = lang === 'en';
+  const ageNum = (age != null && age !== '') ? Number(age) : null;
+  const selSet = new Set(selectedTools || []);
+  const doneSet = new Set(completedTools || []);
+  const condsArr = (condsList || []).map(s => String(s).trim().toLowerCase()).filter(Boolean);
+
+  // Build suggested sets from TOOL_SCHEMA
+  const suggested = (typeof suggestTools === 'function') ? suggestTools(condsArr, ageNum) : { screening: [], monitoring: [] };
+  const sugScreenSet = new Set(suggested.screening);
+  const sugMonSet    = new Set(suggested.monitoring);
+
+  // All tools from schema for the "see more" full list
+  const allSchemaKeys = (typeof TOOL_SCHEMA !== 'undefined') ? TOOL_SCHEMA.map(t => t.key) : [];
+  const schemaMap = {};
+  if (typeof TOOL_SCHEMA !== 'undefined') TOOL_SCHEMA.forEach(t => schemaMap[t.key] = t);
+
+  // Pill renderer for one tool checkbox
+  function toolPill(key, isAuto, isCompleted, noteOverride) {
+    const ts = schemaMap[key] || {};
+    const desc = en ? (ts.en || key) : (ts.es || key);
+    const noteRaw = noteOverride || (en ? ts.note : ts.noteEs) || '';
+    const note = noteRaw ? ` (${noteRaw})` : '';
+    const isChecked = selSet.has(key) || isAuto;
+    const autoStyle = isAuto ? 'background:oklch(from var(--color-primary) l c h / 0.13);border:1px solid oklch(from var(--color-primary) l c h / 0.35);' : 'background:var(--color-surface-offset);border:1px solid transparent;';
+    const completedStyle = isCompleted ? 'opacity:0.45;text-decoration:line-through;' : '';
+    const autoHint = isAuto ? `<span style="font-size:9px;color:var(--color-primary);font-weight:700;padding-left:18px;line-height:1.2;">${en ? 'auto-suggested' : 'auto-sugerido'}</span>` : '';
+    const completedHint = isCompleted ? `<span style="font-size:9px;color:var(--color-success,#5dba5d);padding-left:18px;line-height:1.2;">✓ ${en ? 'completed' : 'completado'}</span>` : '';
+    return `<label style="display:inline-flex;flex-direction:column;gap:1px;padding:5px 10px;${autoStyle}border-radius:var(--radius-md);font-size:var(--text-xs);cursor:pointer;${completedStyle}" title="${escapeHtml(desc+note)}">
+      <span style="display:flex;gap:4px;align-items:center;"><input type="checkbox" name="toolSel" value="${escapeHtml(key)}" ${isChecked?'checked':''} style="margin:0;"/><strong>${escapeHtml(key)}</strong></span>
+      <span style="font-size:10px;color:var(--color-text-muted);padding-left:18px;line-height:1.2;">${escapeHtml(desc)}${escapeHtml(note)}</span>
+      ${autoHint}${completedHint}
+    </label>`;
+  }
+
+  // Section header
+  function sectionHdr(label) {
+    return `<div style="width:100%;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--color-text-muted);margin:10px 0 4px;padding-bottom:3px;border-bottom:1px solid var(--color-border);">${label}</div>`;
+  }
+
+  // Screening section
+  const screeningKeys = [...sugScreenSet];
+  // Also include any manually-selected tools that are screening type but not in suggested
+  for (const k of selSet) {
+    if (!sugScreenSet.has(k) && !sugMonSet.has(k)) {
+      const ts = schemaMap[k];
+      if (ts && (ts.type === 'screening' || ts.type === 'both')) screeningKeys.push(k);
+    }
+  }
+  const screeningPills = screeningKeys.map(k => toolPill(k, sugScreenSet.has(k) && !selSet.has(k), doneSet.has(k))).join('');
+
+  // Monitoring section
+  const monKeys = [...sugMonSet];
+  for (const k of selSet) {
+    if (!sugMonSet.has(k)) {
+      const ts = schemaMap[k];
+      if (ts && (ts.type === 'monitoring' || ts.type === 'both') && !sugScreenSet.has(k)) monKeys.push(k);
+    }
+  }
+  // ADHD ≤11 monitoring note: CAP priority, Vanderbilt-T backup
+  const monPills = monKeys.map(k => {
+    const noteOvr = (k === 'CAP') ? (en ? 'priority · completed by teacher' : 'prioridad · completa el maestro') :
+                   (k === 'Vanderbilt-Teacher' && monKeys.includes('CAP')) ? (en ? 'if CAP not viable' : 'si CAP no es viable') : null;
+    return toolPill(k, sugMonSet.has(k) && !selSet.has(k), false, noteOvr);
+  }).join('');
+
+  // "See more" full list (tools not already shown)
+  const shownKeys = new Set([...screeningKeys, ...monKeys]);
+  const extraKeys = allSchemaKeys.filter(k => !shownKeys.has(k));
+  const extraPills = extraKeys.map(k => toolPill(k, false, false)).join('');
+  const seeMoreId = `${prefix}ToolsSeeMore`;
+  const seeMoreBtn = extraKeys.length ? `
+    <div style="width:100%;">
+      <button type="button" onclick="document.getElementById('${seeMoreId}').style.display=document.getElementById('${seeMoreId}').style.display==='none'?'flex':'none';this.textContent=this.textContent.includes('+')?(this.textContent.replace('+','−')):(this.textContent.replace('−','+'));" style="background:transparent;border:none;color:var(--color-primary);font-size:var(--text-xs);cursor:pointer;padding:4px 0;font-weight:600;">+ ${en?'See more tools':'Ver más herramientas'}</button>
+      <div id="${seeMoreId}" style="display:none;flex-wrap:wrap;gap:6px;margin-top:6px;">${extraPills}</div>
+    </div>` : '';
+
+  return `
+    <label style="font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--color-text-muted);">${en?'Tools':'Herramientas'}</label>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">
+      ${sectionHdr(en ? 'Baseline Screening Tools' : 'Herramientas de Detección Basal')}
+      ${screeningPills || `<span style="font-size:var(--text-xs);color:var(--color-text-muted);">${en?'No baseline screening tools for this condition/age':'Sin herramientas de detección para esta condición/edad'}</span>`}
+      ${sectionHdr(en ? 'Monitoring Tools' : 'Herramientas de Monitoreo')}
+      ${monPills || `<span style="font-size:var(--text-xs);color:var(--color-text-muted);">${en?'No monitoring tools for this condition/age':'Sin herramientas de monitoreo para esta condición/edad'}</span>`}
+      ${seeMoreBtn}
+    </div>`;
+}
+
+// Triggered when conditions or DOB change in new patient form — re-renders tool selector
+function npUpdateTools() {
+  const lang = getLang();
+  const dobVal = document.getElementById('npDOB')?.value || '';
+  const age = dobVal ? computeAgeFromDOB(dobVal) : null;
+  const conds = [...document.querySelectorAll('#npConds input:checked')].map(c => c.value);
+  const primCond = document.getElementById('npPrimaryCond')?.value || '';
+  if (primCond && !conds.includes(primCond)) conds.push(primCond);
+  const currentSel = [...document.querySelectorAll('#npToolsSection input[name="toolSel"]:checked')].map(c => c.value);
+  const sec = document.getElementById('npToolsSection');
+  if (sec) sec.innerHTML = renderToolSelector('np', currentSel, conds, lang, age, []);
+}
+if (typeof window !== 'undefined') window.npUpdateTools = npUpdateTools;
+
+// ════════════════════════════════════════════════════════════════
 // NEW PATIENT — Quick-Add flow
 // ════════════════════════════════════════════════════════════════
 function newPatientModal() {
@@ -223,7 +331,7 @@ function renderNewPatientForm(showAll) {
     <div class="np-minimal">
       ${npField('npName', 'label_full_name', 'text', true, '', 'placeholder-name')}
       <div class="np-row-2">
-        ${npField('npDOB', 'label_dob', 'date', false, '')}
+        <div><label class="np-label">${t('label_dob')}</label><input type="date" id="npDOB" style="width:100%;padding:8px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);" oninput="npUpdateTools()"/></div>
         ${npSelect('npSex', 'label_sex', [
           ['F', t('sex_f')],
           ['M', t('sex_m')],
@@ -231,9 +339,7 @@ function renderNewPatientForm(showAll) {
         ])}
       </div>
       <div class="np-row-2">
-        ${npSelect('npPrimaryCond', 'label_primary_cond',
-          conds.map(([k,v]) => [k, lang==='en' ? v.en : v.es])
-        )}
+        <div><label class="np-label">${t('label_primary_cond')}</label><select id="npPrimaryCond" style="width:100%;padding:8px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);" onchange="npUpdateTools()"><option value="">—</option>${conds.map(([k,v])=>`<option value="${k}">${lang==='en'?v.en:v.es}</option>`).join('')}</select></div>
         ${npSelect('npTherapist', 'label_therapist',
           therapists.map(t => [t.name, t.name])
         )}
@@ -256,7 +362,7 @@ function renderNewPatientForm(showAll) {
       <div style="margin-top: var(--space-3);">
         <label class="np-label">${t('label_conditions')}</label>
         <div id="npConds" style="display:flex;flex-wrap:wrap;gap:6px;align-items:flex-start;">
-          ${conds.map(([k,v]) => `<label style="display:inline-flex;gap:4px;align-items:center;padding:4px 10px;background:var(--color-surface-offset);border-radius:var(--radius-full);font-size:var(--text-xs);cursor:pointer;"><input type="checkbox" value="${k}"/>${lang==='en'?v.en:v.es}</label>`).join('')}
+          ${conds.map(([k,v]) => `<label style="display:inline-flex;gap:4px;align-items:center;padding:4px 10px;background:var(--color-surface-offset);border-radius:var(--radius-full);font-size:var(--text-xs);cursor:pointer;"><input type="checkbox" value="${k}" onchange="npUpdateTools()"/>${lang==='en'?v.en:v.es}</label>`).join('')}
           <label id="npCondOtherLabel" style="display:inline-flex;gap:4px;align-items:center;padding:4px 10px;background:var(--color-surface-offset);border-radius:var(--radius-full);font-size:var(--text-xs);cursor:pointer;">
             <input type="checkbox" id="npCondOtherCb" onclick="(function(cb){var w=document.getElementById('npCondOtherWrap');w.style.display=cb.checked?'block':'none';if(cb.checked)setTimeout(()=>document.getElementById('npCondOtherText').focus(),50);})(this)"/>
             ${lang==='en'?'Other':'Otro'}
@@ -266,34 +372,8 @@ function renderNewPatientForm(showAll) {
           </div>
         </div>
       </div>
-      <div style="margin-top: var(--space-3);">
-        <label class="np-label">${t('label_tools')}</label>
-        <div id="npTools" style="display:flex;flex-wrap:wrap;gap:6px;">
-          ${(() => {
-            const NP_TOOL_META = {
-              'PHQ-A':             lang==='en'?'Depression ·12+':'Depresión ·12+',
-              'SMFQ-C':            lang==='en'?'Depression, self ·≤11':'Depresión auto ·≤11',
-              'SMFQ-P':            lang==='en'?'Depression, parent ·≤11':'Depresión padres ·≤11',
-              'GAD-7':             lang==='en'?'Anxiety ·12+':'Ansiedad ·12+',
-              'SCARED':            lang==='en'?'Anxiety ·≤11':'Ansiedad ·≤11',
-              'CAP':               lang==='en'?'ADHD · ≤11':'TDAH · ≤11',
-              'SNAP-IV':           lang==='en'?'ADHD parent/teacher ·≤11':'TDAH padres/maestros ·≤11',
-              'Vanderbilt-Parent': lang==='en'?'ADHD, parent ·≤11':'TDAH padres ·≤11',
-              'Vanderbilt-Teacher':lang==='en'?'ADHD, teacher ·≤11':'TDAH maestros ·≤11',
-              'ASRS-5':            lang==='en'?'ADHD, self ·12+':'TDAH auto ·12+',
-              'DAST-10':           lang==='en'?'Substances ·12+':'Sustancias ·12+',
-              'CRAFFT':            lang==='en'?'Substances ·12+':'Sustancias ·12+',
-              'PSC-17':            lang==='en'?'Initial screen · all ages':'Cribado inicial · todos',
-            };
-            return toolKeys.map(k => {
-              const desc = NP_TOOL_META[k] || '';
-              return `<label title="${desc}" style="display:inline-flex;flex-direction:column;gap:1px;padding:4px 10px;background:var(--color-surface-offset);border-radius:var(--radius-full);font-size:var(--text-xs);cursor:pointer;">
-                <span style="display:flex;gap:4px;align-items:center;"><input type="checkbox" value="${k}" style="margin:0;"/>${k}</span>
-                ${desc ? `<span style="font-size:10px;color:var(--color-text-muted);padding-left:18px;line-height:1.1;">${desc}</span>` : ''}
-              </label>`;
-            }).join('');
-          })()}
-        </div>
+      <div style="margin-top:var(--space-3);" id="npToolsSection">
+        ${renderToolSelector('np', [], null, lang)}
       </div>
       <div style="margin-top: var(--space-3);">
         <label class="np-label">${t('label_notes')}</label>
@@ -332,7 +412,7 @@ function togglePatientDetails() {
     npConds: [...document.querySelectorAll('#npConds input:checked')].map(c => c.value),
     npCondOtherChecked: !!document.getElementById('npCondOtherCb')?.checked,
     npCondOtherText: document.getElementById('npCondOtherText')?.value || '',
-    npTools: [...document.querySelectorAll('#npTools input:checked')].map(c => c.value),
+    npTools: [...document.querySelectorAll('#npToolsSection input[name="toolSel"]:checked')].map(c => c.value),
   };
   renderNewPatientForm(!current);
   // Restore
@@ -353,7 +433,7 @@ function togglePatientDetails() {
     if (otherText) otherText.value = saved.npCondOtherText;
   }
   for (const v of saved.npTools) {
-    const cb = document.querySelector(`#npTools input[value="${v}"]`);
+    const cb = document.querySelector(`#npToolsSection input[name="toolSel"][value="${v}"]`);
     if (cb) cb.checked = true;
   }
 }
@@ -555,7 +635,7 @@ async function submitNewPatient(skipDupCheck=false) {
   if (primaryCond && !conds.includes(primaryCond)) conds.unshift(primaryCond);
   const condsStr = conds.join(',');
 
-  const tools = [...document.querySelectorAll('#npTools input:checked')].map(c => c.value).join(',');
+  const tools = [...document.querySelectorAll('#npToolsSection input[name="toolSel"]:checked')].map(c => c.value).join(',');
 
   // Next ID
   const maxId = STATE.pacientes.reduce((m,p) => {
