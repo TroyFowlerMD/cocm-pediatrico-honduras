@@ -397,6 +397,20 @@ function renderNewPatientForm() {
       </div>
     </div>
     <div style="margin-top:var(--space-3);">
+      <label class="np-label">${en?'Status':'Estado'}</label>
+      <select id="npStatus" style="${inputSt}">
+        <option value="Activo" selected>${en?'Therapy + CoCM':'Terapia + CoCM'}</option>
+        <option value="Estable">${en?'Stable; ↓ CoCM frequency':'Estable; ↓ frec. CoCM'}</option>
+        <option value="Inactivo">${en?'Therapy only':'Solo terapia'}</option>
+        <option value="Transferido">${en?'Transferred':'Transferido'}</option>
+      </select>
+      <div style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:4px;">
+        ${en
+          ? '"Therapy only" patients may still be reviewed periodically, but at a lower frequency than active patients.'
+          : 'Los pacientes de “solo terapia” pueden revisarse periódicamente, pero a menor frecuencia que los pacientes activos.'}
+      </div>
+    </div>
+    <div style="margin-top:var(--space-3);">
       <label class="np-label">${t('label_conditions')}</label>
       <div id="npConds" style="display:flex;flex-wrap:wrap;gap:6px;align-items:flex-start;margin-top:4px;">
         ${conds.map(([k,v]) => `<label style="display:inline-flex;gap:4px;align-items:center;padding:4px 10px;background:var(--color-surface-offset);border-radius:var(--radius-full);font-size:var(--text-xs);cursor:pointer;"><input type="checkbox" value="${k}" onchange="npUpdateTools()"/>${en?v.en:v.es}</label>`).join('')}
@@ -655,7 +669,7 @@ async function submitNewPatient(skipDupCheck=false) {
     Primary_Condition_Verified: primaryCond ? 'TRUE' : '',
     Tools: tools,
     Enrollment_Date: document.getElementById('npEnrolled')?.value || new Date().toISOString().slice(0,10),
-    Status: 'Activo',
+    Status: document.getElementById('npStatus')?.value || 'Activo',
     Priority: '',
     Safety_Flag: 'FALSE',
     Safety_Flag_Ack_By: '',

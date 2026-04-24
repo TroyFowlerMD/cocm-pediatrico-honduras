@@ -937,9 +937,9 @@ async function raiseSafety() {
 function toggleStatus() {
   const cur = PSTATE.patient.Status || 'Activo';
   const options = [
-    { v:'Activo',      defEs:'Monitoreo CoCM completo',                          defEn:'Full CoCM monitoring' },
-    { v:'Estable',     defEs:'Monitoreo reducido, cadencia de 16 semanas',        defEn:'Decreased CoCM monitoring, 16-week cadence' },
-    { v:'Inactivo',    defEs:'Terapeuta continúa, CoCM pausado',                   defEn:'Therapist continues, CoCM paused' },
+    { v:'Activo',      defEs:'Terapia y monitoreo CoCM activo',                   defEn:'Active therapy and CoCM monitoring' },
+    { v:'Estable',     defEs:'Monitoreo CoCM reducido, cadencia de 16 semanas',   defEn:'Reduced CoCM monitoring, 16-week cadence' },
+    { v:'Inactivo',    defEs:'Solo terapia — CoCM pausado. Puede revisarse periódicamente a menor frecuencia.', defEn:'Therapy only — CoCM paused. May still be reviewed periodically at a lower frequency than active patients.' },
     { v:'Transferido', defEs:'Ya no es estudiante de Camasca',                    defEn:'No longer a Camasca student' },
     { v:'Otro',        defEs:'Especificar (texto libre)',                         defEn:'Specify (freetext)' },
   ];
@@ -1593,6 +1593,20 @@ function openEditPatientModal() {
         <label class="np-label">${en?'Caregiver phone':'Tel\u00e9fono del cuidador'}</label>
         <input type="tel" id="epPhone" value="${escapeHtml(p.Caregiver_Phone||'')}" placeholder="+504..." style="${inputStyle}"/>
       </div>
+      <div style="grid-column:1 / -1;">
+        <label class="np-label">${en?'Status':'Estado'}</label>
+        <select id="epStatus" style="${inputStyle}">
+          <option value="Activo" ${(p.Status||'Activo')==='Activo'?'selected':''}>${en?'Therapy + CoCM':'Terapia + CoCM'}</option>
+          <option value="Estable" ${p.Status==='Estable'?'selected':''}>${en?'Stable; ↓ CoCM frequency':'Estable; ↓ frec. CoCM'}</option>
+          <option value="Inactivo" ${p.Status==='Inactivo'?'selected':''}>${en?'Therapy only':'Solo terapia'}</option>
+          <option value="Transferido" ${p.Status==='Transferido'?'selected':''}>${en?'Transferred':'Transferido'}</option>
+        </select>
+        <div style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:4px;">
+          ${en
+            ? '"Therapy only" patients may still be reviewed periodically, but at a lower frequency than active patients.'
+            : 'Los pacientes de “solo terapia” pueden revisarse periódicamente, pero a menor frecuencia que los pacientes activos.'}
+        </div>
+      </div>
     </div>
     <div style="margin-top:var(--space-4);padding-top:var(--space-3);border-top:1px solid var(--color-border);">
       <label class="np-label" style="margin-bottom:6px;display:flex;align-items:center;gap:8px;">
@@ -1671,6 +1685,7 @@ async function submitEditPatient() {
   const conds    = [...document.querySelectorAll('input[name="epCond"]:checked')].map(c=>c.value).concat(_otherEntry).join(',');
   const tools    = [...new Set([...document.querySelectorAll('#epToolsSection input[name="toolSel-s"]:checked, #epToolsSection input[name="toolSel-m"]:checked')].map(c => c.value))].join(',');
   const primaryCondition = (document.getElementById('epPrimaryCondition')?.value || '').trim();
+  const status = (document.getElementById('epStatus')?.value || '').trim() || (p.Status || 'Activo');
 
   // Brigade flag is managed via the dedicated Brigade modal, not Edit Patient
   const brigadeFlag = p.Brigade_Flag || '';
@@ -1679,7 +1694,7 @@ async function submitEditPatient() {
   // Capture previous values for undo
   const prev = {
     Patient_Name: p.Patient_Name || '',
-    Initials: p.Initials || '', // kept for undo
+    Initials: p.Initials || '',
     DOB: p.DOB || '',
     Age: p.Age || '',
     Sex: p.Sex || '',
@@ -1690,6 +1705,7 @@ async function submitEditPatient() {
     Primary_Condition_Verified: p.Primary_Condition_Verified || '',
     Tools: p.Tools || '',
     Notes: p.Notes || '',
+    Status: p.Status || '',
     Brigade_Flag: p.Brigade_Flag || '',
     Brigade_Reason: p.Brigade_Reason || '',
   };
@@ -1707,6 +1723,7 @@ async function submitEditPatient() {
     Primary_Condition_Verified: primaryCondition ? 'TRUE' : '',
     Tools: tools,
     Notes: notes,
+    Status: status,
     Brigade_Flag: brigadeFlag,
     Brigade_Reason: brigadeReason,
     Updated_By: PSTATE.user || '',

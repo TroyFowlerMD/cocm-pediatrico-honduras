@@ -274,10 +274,10 @@ const REG_I18N = {
   sort_recent: { es: 'Visita más reciente', en: 'Most recent visit' },
 
   // ── status ─────────────────────────────────────────────────
-  status_activo:     { es: 'Activo',                en: 'Active' },
-  status_estable:    { es: 'Estable',               en: 'Stable' },
+  status_activo:     { es: 'Terapia + CoCM',        en: 'Therapy + CoCM' },
+  status_estable:    { es: 'Estable; ↓ frec. CoCM', en: 'Stable; ↓ CoCM frequency' },
   status_baja:       { es: 'Prioridad Baja',        en: 'Low Priority' },
-  status_inactivo:   { es: 'Inactivo',              en: 'Inactive' },
+  status_inactivo:   { es: 'Solo terapia',          en: 'Therapy only' },
   status_transfer:   { es: 'Transferido',           en: 'Transferred' },
   status_otro:       { es: 'Otro',                  en: 'Other' },
   status_safety:     { es: '⚠ Con bandera de seguridad', en: '⚠ Safety flag' },
