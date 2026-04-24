@@ -571,7 +571,12 @@ async function writeRow(tab, row) {
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ op: 'append', tab: resolved, row, email: getClientEmail() }),
       }, 12000);
-      return await res.json();
+      const data = await res.json();
+      // Server returns { ok: false, error: '...' } on auth/server errors — treat as throw
+      if (data && data.ok === false && !data.queued) {
+        throw new Error(data.error || 'Server error');
+      }
+      return data;
     } catch (e) {
       lastErr = e;
       if (attempt < 3) await new Promise(r => setTimeout(r, 500 * attempt));
@@ -597,7 +602,9 @@ async function updateRow(tab, rowId, updates) {
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ op: 'update', tab: resolved, rowId, updates, email: getClientEmail() }),
       }, 12000);
-      return await res.json();
+      const data = await res.json();
+      if (data && data.ok === false && !data.queued) throw new Error(data.error || 'Server error');
+      return data;
     } catch (e) {
       lastErr = e;
       if (attempt < 3) await new Promise(r => setTimeout(r, 500 * attempt));
@@ -621,7 +628,9 @@ async function deleteRow(tab, rowId) {
         headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({ op: 'delete', tab: resolved, rowId, email: getClientEmail() }),
       }, 12000);
-      return await res.json();
+      const data = await res.json();
+      if (data && data.ok === false && !data.queued) throw new Error(data.error || 'Server error');
+      return data;
     } catch (e) {
       lastErr = e;
       if (attempt < 3) await new Promise(r => setTimeout(r, 500 * attempt));
