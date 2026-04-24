@@ -203,93 +203,101 @@ async function submitAddMe() {
 // completedTools: array of tool keys that already have a score entry (screening greyed)
 // age: numeric age or null
 // ════════════════════════════════════════════════════════════════
+// ── Tool selector (new patient, edit patient, edit tools dialog) ──────────────
+// Renders ALL tools from TOOL_SCHEMA grouped by condition, always fully visible.
+// Suggestion = teal highlight + note text ONLY — no auto-checking.
+// Checked state = what's in selectedTools (existing patient) or nothing (new).
+// completedTools = keys that have at least one score in Visitas (screening greyed).
 function renderToolSelector(prefix, selectedTools, condsList, lang, age, completedTools) {
   const en = lang === 'en';
   const ageNum = (age != null && age !== '') ? Number(age) : null;
-  const selSet = new Set(selectedTools || []);
+  const selSet  = new Set(selectedTools || []);
   const doneSet = new Set(completedTools || []);
   const condsArr = (condsList || []).map(s => String(s).trim().toLowerCase()).filter(Boolean);
 
-  // Build suggested sets from TOOL_SCHEMA
+  if (typeof TOOL_SCHEMA === 'undefined') return `<span style="color:var(--color-text-muted);font-size:var(--text-xs);">${en?'Tools unavailable':'Herramientas no disponibles'}</span>`;
+
+  // Build suggestion set (purely for visual highlight — does NOT affect checked state)
   const suggested = (typeof suggestTools === 'function') ? suggestTools(condsArr, ageNum) : { screening: [], monitoring: [] };
-  const sugScreenSet = new Set(suggested.screening);
-  const sugMonSet    = new Set(suggested.monitoring);
+  const sugSet = new Set([...suggested.screening, ...suggested.monitoring]);
 
-  // All tools from schema for the "see more" full list
-  const allSchemaKeys = (typeof TOOL_SCHEMA !== 'undefined') ? TOOL_SCHEMA.map(t => t.key) : [];
+  // Condition group definitions — order mirrors the flowsheet
+  const GROUPS = [
+    { labelEn: 'Universal',           labelEs: 'Universal',             condKey: null,       keys: ['PSC-17'] },
+    { labelEn: 'Depression',          labelEs: 'Depresión',             condKey: 'depression', keys: ['SMFQ-C','SMFQ-P','PHQ-A'] },
+    { labelEn: 'ADHD',                labelEs: 'TDAH',                  condKey: 'adhd',     keys: ['Vanderbilt-Parent','Vanderbilt-Teacher','SNAP-IV','ASRS-5','CAP'] },
+    { labelEn: 'Anxiety',             labelEs: 'Ansiedad',              condKey: 'anxiety',  keys: ['SCARED-N','SCARED-Parent','GAD-7'] },
+    { labelEn: 'Substances / Risk',   labelEs: 'Sustancias / Riesgo',   condKey: 'sud',      keys: ['CRAFFT','DAST-10'] },
+  ];
+
   const schemaMap = {};
-  if (typeof TOOL_SCHEMA !== 'undefined') TOOL_SCHEMA.forEach(t => schemaMap[t.key] = t);
+  TOOL_SCHEMA.forEach(s => schemaMap[s.key] = s);
 
-  // Pill renderer for one tool checkbox
-  function toolPill(key, isAuto, isCompleted, noteOverride) {
+  function toolPill(key) {
     const ts = schemaMap[key] || {};
+    const isSuggested = sugSet.has(key);
+    const isChecked   = selSet.has(key);
+    const isDone      = doneSet.has(key) && (ts.type === 'screening' || ts.type === 'both');
+
     const desc = en ? (ts.en || key) : (ts.es || key);
-    const noteRaw = noteOverride || (en ? ts.note : ts.noteEs) || '';
-    const note = noteRaw ? ` (${noteRaw})` : '';
-    const isChecked = selSet.has(key) || isAuto;
-    const autoStyle = isAuto ? 'background:oklch(from var(--color-primary) l c h / 0.13);border:1px solid oklch(from var(--color-primary) l c h / 0.35);' : 'background:var(--color-surface-offset);border:1px solid transparent;';
-    const completedStyle = isCompleted ? 'opacity:0.45;text-decoration:line-through;' : '';
-    const autoHint = isAuto ? `<span style="font-size:9px;color:var(--color-primary);font-weight:700;padding-left:18px;line-height:1.2;">${en ? 'auto-suggested' : 'auto-sugerido'}</span>` : '';
-    const completedHint = isCompleted ? `<span style="font-size:9px;color:var(--color-success,#5dba5d);padding-left:18px;line-height:1.2;">✓ ${en ? 'completed' : 'completado'}</span>` : '';
-    return `<label style="display:inline-flex;flex-direction:column;gap:1px;padding:5px 10px;${autoStyle}border-radius:var(--radius-md);font-size:var(--text-xs);cursor:pointer;${completedStyle}" title="${escapeHtml(desc+note)}">
-      <span style="display:flex;gap:4px;align-items:center;"><input type="checkbox" name="toolSel" value="${escapeHtml(key)}" ${isChecked?'checked':''} style="margin:0;"/><strong>${escapeHtml(key)}</strong></span>
-      <span style="font-size:10px;color:var(--color-text-muted);padding-left:18px;line-height:1.2;">${escapeHtml(desc)}${escapeHtml(note)}</span>
-      ${autoHint}${completedHint}
+    const noteRaw = (key === 'CAP')
+      ? (en ? 'priority · teacher' : 'prioridad · maestro')
+      : (key === 'Vanderbilt-Teacher')
+        ? (en ? 'if CAP not viable' : 'si CAP no viable')
+        : (en ? ts.note : ts.noteEs) || '';
+    const noteSpan = noteRaw ? `<span style="color:var(--color-text-muted);"> (${noteRaw})</span>` : '';
+
+    const bgStyle = isSuggested
+      ? 'background:color-mix(in srgb,var(--color-primary) 12%,transparent);border:1px solid color-mix(in srgb,var(--color-primary) 40%,transparent);'
+      : 'background:var(--color-surface-offset);border:1px solid transparent;';
+    const doneStyle = isDone ? 'opacity:0.45;text-decoration:line-through;' : '';
+
+    const sugHint = isSuggested
+      ? `<span style="font-size:9px;color:var(--color-primary);font-weight:600;padding-left:18px;line-height:1.4;">${en ? 'suggested for selected conditions' : 'sugerido por condiciones seleccionadas'}</span>`
+      : '';
+    const doneHint = isDone
+      ? `<span style="font-size:9px;color:var(--color-success,#5dba5d);padding-left:18px;line-height:1.4;">✓ ${en ? 'baseline completed' : 'basal completado'}</span>`
+      : '';
+
+    return `<label style="display:inline-flex;flex-direction:column;gap:1px;padding:5px 10px;${bgStyle}border-radius:var(--radius-md);font-size:var(--text-xs);cursor:pointer;${doneStyle}">
+      <span style="display:flex;gap:4px;align-items:center;">
+        <input type="checkbox" name="toolSel" value="${escapeHtml(key)}" ${isChecked?'checked':''} style="margin:0;"/>
+        <strong>${escapeHtml(key)}</strong>
+      </span>
+      <span style="font-size:10px;color:var(--color-text-muted);padding-left:18px;line-height:1.3;">${escapeHtml(desc)}${noteSpan}</span>
+      ${sugHint}${doneHint}
     </label>`;
   }
 
-  // Section header
-  function sectionHdr(label) {
-    return `<div style="width:100%;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--color-text-muted);margin:10px 0 4px;padding-bottom:3px;border-bottom:1px solid var(--color-border);">${label}</div>`;
+  function groupBlock(grp) {
+    const isActiveCondition = grp.condKey === null
+      ? true
+      : condsArr.some(c => c === grp.condKey || (grp.condKey === 'sud' && (c === 'sud' || c === 'risk')));
+
+    const label = en ? grp.labelEn : grp.labelEs;
+    const hdrAccent = (isActiveCondition && grp.condKey !== null)
+      ? 'border-left:3px solid var(--color-primary);padding-left:6px;'
+      : 'border-left:3px solid var(--color-border);padding-left:6px;';
+    const hdrColor = (isActiveCondition && grp.condKey !== null)
+      ? 'color:var(--color-primary);'
+      : 'color:var(--color-text-muted);';
+
+    const pills = grp.keys.map(k => toolPill(k)).join('');
+
+    return `
+      <div style="width:100%;margin-top:10px;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;${hdrColor}${hdrAccent}margin-bottom:6px;">${label}</div>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">${pills}</div>
+      </div>`;
   }
 
-  // Screening section
-  const screeningKeys = [...sugScreenSet];
-  // Also include any manually-selected tools that are screening type but not in suggested
-  for (const k of selSet) {
-    if (!sugScreenSet.has(k) && !sugMonSet.has(k)) {
-      const ts = schemaMap[k];
-      if (ts && (ts.type === 'screening' || ts.type === 'both')) screeningKeys.push(k);
-    }
-  }
-  const screeningPills = screeningKeys.map(k => toolPill(k, sugScreenSet.has(k) && !selSet.has(k), doneSet.has(k))).join('');
-
-  // Monitoring section
-  const monKeys = [...sugMonSet];
-  for (const k of selSet) {
-    if (!sugMonSet.has(k)) {
-      const ts = schemaMap[k];
-      if (ts && (ts.type === 'monitoring' || ts.type === 'both') && !sugScreenSet.has(k)) monKeys.push(k);
-    }
-  }
-  // ADHD ≤11 monitoring note: CAP priority, Vanderbilt-T backup
-  const monPills = monKeys.map(k => {
-    const noteOvr = (k === 'CAP') ? (en ? 'priority · completed by teacher' : 'prioridad · completa el maestro') :
-                   (k === 'Vanderbilt-Teacher' && monKeys.includes('CAP')) ? (en ? 'if CAP not viable' : 'si CAP no es viable') : null;
-    return toolPill(k, sugMonSet.has(k) && !selSet.has(k), false, noteOvr);
-  }).join('');
-
-  // "See more" full list (tools not already shown)
-  const shownKeys = new Set([...screeningKeys, ...monKeys]);
-  const extraKeys = allSchemaKeys.filter(k => !shownKeys.has(k));
-  const extraPills = extraKeys.map(k => toolPill(k, false, false)).join('');
-  const seeMoreId = `${prefix}ToolsSeeMore`;
-  const seeMoreBtn = extraKeys.length ? `
-    <div style="width:100%;">
-      <button type="button" onclick="document.getElementById('${seeMoreId}').style.display=document.getElementById('${seeMoreId}').style.display==='none'?'flex':'none';this.textContent=this.textContent.includes('+')?(this.textContent.replace('+','−')):(this.textContent.replace('−','+'));" style="background:transparent;border:none;color:var(--color-primary);font-size:var(--text-xs);cursor:pointer;padding:4px 0;font-weight:600;">+ ${en?'See more tools':'Ver más herramientas'}</button>
-      <div id="${seeMoreId}" style="display:none;flex-wrap:wrap;gap:6px;margin-top:6px;">${extraPills}</div>
-    </div>` : '';
+  const groupsHtml = GROUPS.map(groupBlock).join('');
 
   return `
     <label style="font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--color-text-muted);">${en?'Tools':'Herramientas'}</label>
-    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:6px;">
-      ${sectionHdr(en ? 'Baseline Screening Tools' : 'Herramientas de Detección Basal')}
-      ${screeningPills || `<span style="font-size:var(--text-xs);color:var(--color-text-muted);">${en?'No baseline screening tools for this condition/age':'Sin herramientas de detección para esta condición/edad'}</span>`}
-      ${sectionHdr(en ? 'Monitoring Tools' : 'Herramientas de Monitoreo')}
-      ${monPills || `<span style="font-size:var(--text-xs);color:var(--color-text-muted);">${en?'No monitoring tools for this condition/age':'Sin herramientas de monitoreo para esta condición/edad'}</span>`}
-      ${seeMoreBtn}
-    </div>`;
+    ${groupsHtml}`;
 }
+
 
 // Triggered when conditions or DOB change in new patient form — re-renders tool selector
 function npUpdateTools() {
@@ -309,7 +317,7 @@ if (typeof window !== 'undefined') window.npUpdateTools = npUpdateTools;
 // NEW PATIENT — Quick-Add flow
 // ════════════════════════════════════════════════════════════════
 function newPatientModal() {
-  renderNewPatientForm(false);
+  renderNewPatientForm();
   // Always reset save button — it lives outside the re-rendered form div
   const btn = document.getElementById('npSaveBtn');
   if (btn) { btn.disabled = false; btn.textContent = getLang()==='en' ? 'Save' : 'Guardar'; }
@@ -320,122 +328,65 @@ function closeNewPatientModal() {
   document.getElementById('newPatientModal').style.display = 'none';
 }
 
-function renderNewPatientForm(showAll) {
+function renderNewPatientForm() {
   const lang = getLang();
+  const en = lang === 'en';
   const conds = Object.entries(STATE.conditions);
-  const toolKeys = Object.keys(STATE.tools);
   const therapists = STATE.team.filter(t => t.role === 'therapist');
+  const inputSt = 'width:100%;padding:8px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);';
 
-  // MINIMAL fields always visible
-  const minimal = `
-    <div class="np-minimal">
+  document.getElementById('newPatientForm').innerHTML = `
+    <div>
       ${npField('npName', 'label_full_name', 'text', true, '', 'placeholder-name')}
-      <div class="np-row-2">
-        <div><label class="np-label">${t('label_dob')}</label><input type="date" id="npDOB" style="width:100%;padding:8px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);" oninput="npUpdateTools()"/></div>
-        ${npSelect('npSex', 'label_sex', [
-          ['F', t('sex_f')],
-          ['M', t('sex_m')],
-          ['O', t('sex_o')],
-        ])}
-      </div>
-      <div class="np-row-2">
-        <div><label class="np-label">${t('label_primary_cond')}</label><select id="npPrimaryCond" style="width:100%;padding:8px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);" onchange="npUpdateTools()"><option value="">—</option>${conds.map(([k,v])=>`<option value="${k}">${lang==='en'?v.en:v.es}</option>`).join('')}</select></div>
-        ${npSelect('npTherapist', 'label_therapist',
-          therapists.map(t => [t.name, t.name])
-        )}
-      </div>
-      <div>
-        <label class="np-label">${lang==='en'?'Caregiver phone':'Tel\u00e9fono del cuidador'}</label>
-        <input type="tel" id="npPhone" style="width:100%;padding:8px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);" placeholder="+504..."/>
-      </div>
-      <p style="font-size:var(--text-xs);color:var(--color-text-muted);margin-top:8px;">${t('modal_newpat_min_hint')}</p>
     </div>
-    <button type="button" class="np-toggle-details" id="npToggleDetails" onclick="togglePatientDetails()" style="margin-top:var(--space-3);background:transparent;border:1px dashed var(--color-border);color:var(--color-primary);padding:8px 14px;border-radius:var(--radius-md);font-size:var(--text-xs);cursor:pointer;width:100%;font-weight:600;">
-      ${showAll ? '▴ ' + t('label_add_details').replace(/^Agregar /,'Ocultar ').replace(/^Add /,'Hide ') : '▾ ' + t('label_add_details')}
-    </button>
-  `;
-
-  // FULL fields (collapsed by default)
-  const full = showAll ? `
-    <div class="np-full" style="margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--color-divider);">
+    <div class="np-row-2" style="margin-top:var(--space-3);">
+      <div><label class="np-label">${t('label_dob')}</label><input type="date" id="npDOB" style="${inputSt}" oninput="npUpdateTools()"/></div>
+      ${npSelect('npSex', 'label_sex', [['F', t('sex_f')],['M', t('sex_m')],['O', t('sex_o')]])}
+    </div>
+    <div class="np-row-2" style="margin-top:var(--space-3);">
+      <div><label class="np-label">${t('label_primary_cond')}</label><select id="npPrimaryCond" style="${inputSt}" onchange="npUpdateTools()"><option value="">—</option>${conds.map(([k,v])=>`<option value="${k}">${en?v.en:v.es}</option>`).join('')}</select></div>
+      ${npSelect('npTherapist', 'label_therapist', therapists.map(th => [th.name, th.name]))}
+    </div>
+    <div class="np-row-2" style="margin-top:var(--space-3);">
       ${npField('npEnrolled', 'label_enrollment', 'date', false, new Date().toISOString().slice(0,10))}
-      <div style="margin-top: var(--space-3);">
-        <label class="np-label">${t('label_conditions')}</label>
-        <div id="npConds" style="display:flex;flex-wrap:wrap;gap:6px;align-items:flex-start;">
-          ${conds.map(([k,v]) => `<label style="display:inline-flex;gap:4px;align-items:center;padding:4px 10px;background:var(--color-surface-offset);border-radius:var(--radius-full);font-size:var(--text-xs);cursor:pointer;"><input type="checkbox" value="${k}" onchange="npUpdateTools()"/>${lang==='en'?v.en:v.es}</label>`).join('')}
-          <label id="npCondOtherLabel" style="display:inline-flex;gap:4px;align-items:center;padding:4px 10px;background:var(--color-surface-offset);border-radius:var(--radius-full);font-size:var(--text-xs);cursor:pointer;">
-            <input type="checkbox" id="npCondOtherCb" onclick="(function(cb){var w=document.getElementById('npCondOtherWrap');w.style.display=cb.checked?'block':'none';if(cb.checked)setTimeout(()=>document.getElementById('npCondOtherText').focus(),50);})(this)"/>
-            ${lang==='en'?'Other':'Otro'}
-          </label>
-          <div id="npCondOtherWrap" style="display:none;width:100%;margin-top:2px;">
-            <input type="text" id="npCondOtherText" placeholder="${lang==='en'?'Specify condition':'Especificar condición'}" style="width:100%;padding:7px 8px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);font-size:var(--text-sm);"/>
-          </div>
+      <div>
+        <label class="np-label">${en?'Caregiver phone':'Teléfono del cuidador'}</label>
+        <input type="tel" id="npPhone" style="${inputSt}" placeholder="+504..."/>
+      </div>
+    </div>
+    <div style="margin-top:var(--space-3);">
+      <label class="np-label">${t('label_conditions')}</label>
+      <div id="npConds" style="display:flex;flex-wrap:wrap;gap:6px;align-items:flex-start;margin-top:4px;">
+        ${conds.map(([k,v]) => `<label style="display:inline-flex;gap:4px;align-items:center;padding:4px 10px;background:var(--color-surface-offset);border-radius:var(--radius-full);font-size:var(--text-xs);cursor:pointer;"><input type="checkbox" value="${k}" onchange="npUpdateTools()"/>${en?v.en:v.es}</label>`).join('')}
+        <label style="display:inline-flex;gap:4px;align-items:center;padding:4px 10px;background:var(--color-surface-offset);border-radius:var(--radius-full);font-size:var(--text-xs);cursor:pointer;">
+          <input type="checkbox" id="npCondOtherCb" onclick="(function(cb){var w=document.getElementById('npCondOtherWrap');w.style.display=cb.checked?'block':'none';if(cb.checked)setTimeout(()=>document.getElementById('npCondOtherText').focus(),50);})(this)"/>
+          ${en?'Other':'Otro'}
+        </label>
+        <div id="npCondOtherWrap" style="display:none;width:100%;margin-top:2px;">
+          <input type="text" id="npCondOtherText" placeholder="${en?'Specify condition':'Especificar condición'}" style="${inputSt}font-size:var(--text-sm);"/>
         </div>
       </div>
-      <div style="margin-top:var(--space-3);" id="npToolsSection">
-        ${renderToolSelector('np', [], null, lang)}
-      </div>
-      <div style="margin-top: var(--space-3);">
-        <label class="np-label">${t('label_notes')}</label>
-        <textarea id="npNotes" rows="3" style="width:100%;padding:8px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);"></textarea>
-      </div>
-      <div style="margin-top: var(--space-3); border-top: 1px solid var(--color-border); padding-top: var(--space-3);">
-        <label class="np-label">${lang==='en'?'Baseline psychometric scores (optional)':'Puntajes psicométricos basales (opcional)'}</label>
-        <p style="font-size:var(--text-xs);color:var(--color-text-muted);margin-bottom:var(--space-2);">${lang==='en'?'If scores are available at enrollment, enter them here. Each will be logged as a baseline visit.':'Si hay puntajes disponibles al ingreso, ingréselos aquí. Cada uno se registrará como visita basal.'}</p>
-        <div id="npScoreRows"></div>
-        <button type="button" onclick="addNpScoreRow()" style="margin-top:var(--space-2);background:transparent;border:1px dashed var(--color-border);color:var(--color-primary);padding:6px 12px;border-radius:var(--radius-md);font-size:var(--text-xs);cursor:pointer;width:100%;">+ ${lang==='en'?'Add baseline score':'Agregar puntaje basal'}</button>
-      </div>
-      <div style="margin-top: var(--space-3); border-top: 1px solid var(--color-border); padding-top: var(--space-3);">
-        <label class="np-label">${lang==='en'?'Medications (optional)':'Medicamentos (opcional)'}</label>
-        <p style="font-size:var(--text-xs);color:var(--color-text-muted);margin-bottom:var(--space-2);">${lang==='en'?'Log any medications being started at enrollment.':'Registra medicamentos que se inician al ingreso.'}</p>
-        <div id="npMedRows"></div>
-        <button type="button" onclick="addNpMedRow()" style="margin-top:var(--space-2);background:transparent;border:1px dashed var(--color-border);color:var(--color-primary);padding:6px 12px;border-radius:var(--radius-md);font-size:var(--text-xs);cursor:pointer;width:100%;">+ ${lang==='en'?'Add medication':'Agregar medicamento'}</button>
-      </div>
     </div>
-  ` : '';
-
-  document.getElementById('newPatientForm').innerHTML = minimal + full;
-}
-
-function togglePatientDetails() {
-  const current = document.querySelector('.np-full') != null;
-  // Preserve entered values before re-render
-  const saved = {
-    npName: document.getElementById('npName')?.value || '',
-    npDOB: document.getElementById('npDOB')?.value || '',
-    npSex: document.getElementById('npSex')?.value || '',
-    npPrimaryCond: document.getElementById('npPrimaryCond')?.value || '',
-    npTherapist: document.getElementById('npTherapist')?.value || '',
-    npEnrolled: document.getElementById('npEnrolled')?.value || '',
-    npNotes: document.getElementById('npNotes')?.value || '',
-    npPhone: document.getElementById('npPhone')?.value || '',
-    npConds: [...document.querySelectorAll('#npConds input:checked')].map(c => c.value),
-    npCondOtherChecked: !!document.getElementById('npCondOtherCb')?.checked,
-    npCondOtherText: document.getElementById('npCondOtherText')?.value || '',
-    npTools: [...document.querySelectorAll('#npToolsSection input[name="toolSel"]:checked')].map(c => c.value),
-  };
-  renderNewPatientForm(!current);
-  // Restore
-  for (const id of ['npName','npDOB','npSex','npPrimaryCond','npTherapist','npEnrolled','npNotes','npPhone']) {
-    const el = document.getElementById(id);
-    if (el && saved[id]) el.value = saved[id];
-  }
-  for (const v of saved.npConds) {
-    const cb = document.querySelector(`#npConds input[value="${v}"]`);
-    if (cb) cb.checked = true;
-  }
-  if (saved.npCondOtherChecked) {
-    const otherCb = document.getElementById('npCondOtherCb');
-    const otherWrap = document.getElementById('npCondOtherWrap');
-    const otherText = document.getElementById('npCondOtherText');
-    if (otherCb) otherCb.checked = true;
-    if (otherWrap) otherWrap.style.display = 'block';
-    if (otherText) otherText.value = saved.npCondOtherText;
-  }
-  for (const v of saved.npTools) {
-    const cb = document.querySelector(`#npToolsSection input[name="toolSel"][value="${v}"]`);
-    if (cb) cb.checked = true;
-  }
+    <div style="margin-top:var(--space-3);" id="npToolsSection">
+      ${renderToolSelector('np', [], null, lang)}
+    </div>
+    <div style="margin-top:var(--space-3);">
+      <label class="np-label">${t('label_notes')}</label>
+      <textarea id="npNotes" rows="3" style="${inputSt}"></textarea>
+    </div>
+    <div style="margin-top:var(--space-3);border-top:1px solid var(--color-border);padding-top:var(--space-3);">
+      <label class="np-label">${en?'Baseline psychometric scores (optional)':'Puntajes psicométricos basales (opcional)'}</label>
+      <p style="font-size:var(--text-xs);color:var(--color-text-muted);margin-bottom:var(--space-2);">${en?'If scores are available at enrollment, enter them here. Each will be logged as a baseline visit.':'Si hay puntajes disponibles al ingreso, ingréselos aquí. Cada uno se registrará como visita basal.'}</p>
+      <div id="npScoreRows"></div>
+      <button type="button" onclick="addNpScoreRow()" style="margin-top:var(--space-2);background:transparent;border:1px dashed var(--color-border);color:var(--color-primary);padding:6px 12px;border-radius:var(--radius-md);font-size:var(--text-xs);cursor:pointer;width:100%;">+ ${en?'Add baseline score':'Agregar puntaje basal'}</button>
+    </div>
+    <div style="margin-top:var(--space-3);border-top:1px solid var(--color-border);padding-top:var(--space-3);">
+      <label class="np-label">${en?'Medications (optional)':'Medicamentos (opcional)'}</label>
+      <p style="font-size:var(--text-xs);color:var(--color-text-muted);margin-bottom:var(--space-2);">${en?'Log any medications being started at enrollment.':'Registra medicamentos que se inician al ingreso.'}</p>
+      <div id="npMedRows"></div>
+      <button type="button" onclick="addNpMedRow()" style="margin-top:var(--space-2);background:transparent;border:1px dashed var(--color-border);color:var(--color-primary);padding:6px 12px;border-radius:var(--radius-md);font-size:var(--text-xs);cursor:pointer;width:100%;">+ ${en?'Add medication':'Agregar medicamento'}</button>
+    </div>
+  `;
 }
 
 // Age in years from an ISO YYYY-MM-DD DOB string.
