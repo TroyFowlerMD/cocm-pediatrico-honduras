@@ -204,10 +204,12 @@ async function submitAddMe() {
 // age: numeric age or null
 // ════════════════════════════════════════════════════════════════
 // ── Tool selector (new patient, edit patient, edit tools dialog) ──────────────
-// Renders ALL tools from TOOL_SCHEMA grouped by condition, always fully visible.
-// Suggestion = teal highlight + note text ONLY — no auto-checking.
-// Checked state = what's in selectedTools (existing patient) or nothing (new).
-// completedTools = keys that have at least one score in Visitas (screening greyed).
+// Groups by condition. Within each group: Screening sub-row + Monitoring sub-row.
+// Tools typed 'both' appear in BOTH sub-rows as independent checkboxes.
+// name="toolSel-s" for screening checkboxes, name="toolSel-m" for monitoring.
+// submitNewPatient / submitEditPatient must read both names — handled below.
+// Suggestion = teal highlight only, no auto-check.
+// completedTools = keys with ≥1 score (screening pills dimmed/struck).
 function renderToolSelector(prefix, selectedTools, condsList, lang, age, completedTools) {
   const en = lang === 'en';
   const ageNum = (age != null && age !== '') ? Number(age) : null;
@@ -217,32 +219,55 @@ function renderToolSelector(prefix, selectedTools, condsList, lang, age, complet
 
   if (typeof TOOL_SCHEMA === 'undefined') return `<span style="color:var(--color-text-muted);font-size:var(--text-xs);">${en?'Tools unavailable':'Herramientas no disponibles'}</span>`;
 
-  // Build suggestion set (purely for visual highlight — does NOT affect checked state)
+  // Suggestion set — visual highlight only
   const suggested = (typeof suggestTools === 'function') ? suggestTools(condsArr, ageNum) : { screening: [], monitoring: [] };
-  const sugSet = new Set([...suggested.screening, ...suggested.monitoring]);
-
-  // Condition group definitions — order mirrors the flowsheet
-  const GROUPS = [
-    { labelEn: 'Universal',           labelEs: 'Universal',             condKey: null,       keys: ['PSC-17'] },
-    { labelEn: 'Depression',          labelEs: 'Depresión',             condKey: 'depression', keys: ['SMFQ-C','SMFQ-P','PHQ-A'] },
-    { labelEn: 'ADHD',                labelEs: 'TDAH',                  condKey: 'adhd',     keys: ['Vanderbilt-Parent','Vanderbilt-Teacher','SNAP-IV','ASRS-5','CAP'] },
-    { labelEn: 'Anxiety',             labelEs: 'Ansiedad',              condKey: 'anxiety',  keys: ['SCARED-N','SCARED-Parent','GAD-7'] },
-    { labelEn: 'Substances / Risk',   labelEs: 'Sustancias / Riesgo',   condKey: 'sud',      keys: ['CRAFFT','DAST-10'] },
-  ];
+  const sugScreenSet = new Set(suggested.screening);
+  const sugMonSet    = new Set(suggested.monitoring);
 
   const schemaMap = {};
   TOOL_SCHEMA.forEach(s => schemaMap[s.key] = s);
 
-  function toolPill(key) {
+  // Condition groups — each has screeningKeys + monitoringKeys
+  const GROUPS = [
+    {
+      labelEn: 'Universal', labelEs: 'Universal', condKey: null,
+      screeningKeys: ['PSC-17'], monitoringKeys: [],
+    },
+    {
+      labelEn: 'Depression', labelEs: 'Depresión', condKey: 'depression',
+      screeningKeys: ['SMFQ-C', 'PHQ-A'],
+      monitoringKeys: ['SMFQ-C', 'SMFQ-P', 'PHQ-A'],
+    },
+    {
+      labelEn: 'ADHD', labelEs: 'TDAH', condKey: 'adhd',
+      screeningKeys: ['Vanderbilt-Parent', 'Vanderbilt-Teacher', 'SNAP-IV', 'ASRS-5'],
+      monitoringKeys: ['CAP', 'Vanderbilt-Teacher', 'SNAP-IV', 'ASRS-5'],
+    },
+    {
+      labelEn: 'Anxiety', labelEs: 'Ansiedad', condKey: 'anxiety',
+      screeningKeys: ['SCARED-N', 'SCARED-Parent', 'GAD-7'],
+      monitoringKeys: ['SCARED-N', 'SCARED-Parent', 'GAD-7'],
+    },
+    {
+      labelEn: 'Substances / Risk', labelEs: 'Sustancias / Riesgo', condKey: 'sud',
+      screeningKeys: ['CRAFFT'],
+      monitoringKeys: ['DAST-10'],
+    },
+  ];
+
+  // One pill — role is 'screening' or 'monitoring' to control name + done-style
+  function toolPill(key, role) {
     const ts = schemaMap[key] || {};
-    const isSuggested = sugSet.has(key);
+    const isSugScreen = sugScreenSet.has(key);
+    const isSugMon    = sugMonSet.has(key);
+    const isSuggested = role === 'screening' ? isSugScreen : isSugMon;
     const isChecked   = selSet.has(key);
-    const isDone      = doneSet.has(key) && (ts.type === 'screening' || ts.type === 'both');
+    const isDone      = role === 'screening' && doneSet.has(key);
 
     const desc = en ? (ts.en || key) : (ts.es || key);
     const noteRaw = (key === 'CAP')
       ? (en ? 'priority · teacher' : 'prioridad · maestro')
-      : (key === 'Vanderbilt-Teacher')
+      : (key === 'Vanderbilt-Teacher' && role === 'monitoring')
         ? (en ? 'if CAP not viable' : 'si CAP no viable')
         : (en ? ts.note : ts.noteEs) || '';
     const noteSpan = noteRaw ? `<span style="color:var(--color-text-muted);"> (${noteRaw})</span>` : '';
@@ -253,15 +278,18 @@ function renderToolSelector(prefix, selectedTools, condsList, lang, age, complet
     const doneStyle = isDone ? 'opacity:0.45;text-decoration:line-through;' : '';
 
     const sugHint = isSuggested
-      ? `<span style="font-size:9px;color:var(--color-primary);font-weight:600;padding-left:18px;line-height:1.4;">${en ? 'suggested for selected conditions' : 'sugerido por condiciones seleccionadas'}</span>`
+      ? `<span style="font-size:9px;color:var(--color-primary);font-weight:600;padding-left:18px;line-height:1.4;">${en?'suggested for selected conditions':'sugerido por condiciones seleccionadas'}</span>`
       : '';
     const doneHint = isDone
-      ? `<span style="font-size:9px;color:var(--color-success,#5dba5d);padding-left:18px;line-height:1.4;">✓ ${en ? 'baseline completed' : 'basal completado'}</span>`
+      ? `<span style="font-size:9px;color:var(--color-success,#5dba5d);padding-left:18px;line-height:1.4;">✓ ${en?'baseline completed':'basal completado'}</span>`
       : '';
+
+    // name encodes role so submit can read screening vs monitoring separately
+    const inputName = role === 'screening' ? 'toolSel-s' : 'toolSel-m';
 
     return `<label style="display:inline-flex;flex-direction:column;gap:1px;padding:5px 10px;${bgStyle}border-radius:var(--radius-md);font-size:var(--text-xs);cursor:pointer;${doneStyle}">
       <span style="display:flex;gap:4px;align-items:center;">
-        <input type="checkbox" name="toolSel" value="${escapeHtml(key)}" ${isChecked?'checked':''} style="margin:0;"/>
+        <input type="checkbox" name="${inputName}" value="${escapeHtml(key)}" ${isChecked?'checked':''} style="margin:0;"/>
         <strong>${escapeHtml(key)}</strong>
       </span>
       <span style="font-size:10px;color:var(--color-text-muted);padding-left:18px;line-height:1.3;">${escapeHtml(desc)}${noteSpan}</span>
@@ -269,25 +297,38 @@ function renderToolSelector(prefix, selectedTools, condsList, lang, age, complet
     </label>`;
   }
 
+  // Sub-row label (Screening / Monitoring inside a group)
+  function subRowLabel(label) {
+    return `<div style="width:100%;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--color-text-faint,var(--color-text-muted));margin:5px 0 4px;padding-left:2px;">${label}</div>`;
+  }
+
   function groupBlock(grp) {
-    const isActiveCondition = grp.condKey === null
+    const isActive = grp.condKey === null
       ? true
       : condsArr.some(c => c === grp.condKey || (grp.condKey === 'sud' && (c === 'sud' || c === 'risk')));
 
     const label = en ? grp.labelEn : grp.labelEs;
-    const hdrAccent = (isActiveCondition && grp.condKey !== null)
+    const hdrAccent = (isActive && grp.condKey !== null)
       ? 'border-left:3px solid var(--color-primary);padding-left:6px;'
       : 'border-left:3px solid var(--color-border);padding-left:6px;';
-    const hdrColor = (isActiveCondition && grp.condKey !== null)
+    const hdrColor = (isActive && grp.condKey !== null)
       ? 'color:var(--color-primary);'
       : 'color:var(--color-text-muted);';
 
-    const pills = grp.keys.map(k => toolPill(k)).join('');
+    const screeningPills = grp.screeningKeys.map(k => toolPill(k, 'screening')).join('');
+    const monitoringPills = grp.monitoringKeys.map(k => toolPill(k, 'monitoring')).join('');
+
+    const screeningRow = grp.screeningKeys.length ? `
+      ${subRowLabel(en?'Screening':'Detección')}
+      <div style="display:flex;flex-wrap:wrap;gap:5px;">${screeningPills}</div>` : '';
+    const monitoringRow = grp.monitoringKeys.length ? `
+      ${subRowLabel(en?'Monitoring':'Monitoreo')}
+      <div style="display:flex;flex-wrap:wrap;gap:5px;">${monitoringPills}</div>` : '';
 
     return `
-      <div style="width:100%;margin-top:10px;">
-        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;${hdrColor}${hdrAccent}margin-bottom:6px;">${label}</div>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;">${pills}</div>
+      <div style="width:100%;margin-top:12px;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;${hdrColor}${hdrAccent}margin-bottom:5px;">${label}</div>
+        ${screeningRow}${monitoringRow}
       </div>`;
   }
 
@@ -299,6 +340,7 @@ function renderToolSelector(prefix, selectedTools, condsList, lang, age, complet
 }
 
 
+
 // Triggered when conditions or DOB change in new patient form — re-renders tool selector
 function npUpdateTools() {
   const lang = getLang();
@@ -307,7 +349,7 @@ function npUpdateTools() {
   const conds = [...document.querySelectorAll('#npConds input:checked')].map(c => c.value);
   const primCond = document.getElementById('npPrimaryCond')?.value || '';
   if (primCond && !conds.includes(primCond)) conds.push(primCond);
-  const currentSel = [...document.querySelectorAll('#npToolsSection input[name="toolSel"]:checked')].map(c => c.value);
+  const currentSel = [...new Set([...document.querySelectorAll('#npToolsSection input[name="toolSel-s"]:checked, #npToolsSection input[name="toolSel-m"]:checked')].map(c => c.value))];
   const sec = document.getElementById('npToolsSection');
   if (sec) sec.innerHTML = renderToolSelector('np', currentSel, conds, lang, age, []);
 }
@@ -586,7 +628,7 @@ async function submitNewPatient(skipDupCheck=false) {
   if (primaryCond && !conds.includes(primaryCond)) conds.unshift(primaryCond);
   const condsStr = conds.join(',');
 
-  const tools = [...document.querySelectorAll('#npToolsSection input[name="toolSel"]:checked')].map(c => c.value).join(',');
+  const tools = [...new Set([...document.querySelectorAll('#npToolsSection input[name="toolSel-s"]:checked, #npToolsSection input[name="toolSel-m"]:checked')].map(c => c.value))].join(',');
 
   // Next ID
   const maxId = STATE.pacientes.reduce((m,p) => {

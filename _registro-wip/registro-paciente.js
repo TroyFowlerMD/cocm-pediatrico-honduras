@@ -242,63 +242,55 @@ function render() {
     <!-- LAUNCH TOOLS -->
     ${(() => {
       const en = getLang() === 'en';
-      // Build schema maps
       const schemaMap = {};
       if (typeof TOOL_SCHEMA !== 'undefined') TOOL_SCHEMA.forEach(s => schemaMap[s.key] = s);
-      // Compute completed tools (have at least one score)
       const completedSet = new Set((PSTATE.visits||[]).filter(v=>v.Score!==''&&v.Score!=null).map(v=>v.Tool).filter(Boolean));
-      // Patient tool list — always ensure PSC-17 is in it
       const rawKeys = (p.Tools||'').split(',').map(s=>s.trim()).filter(Boolean);
       const allToolKeys = rawKeys.includes('PSC-17') ? rawKeys : ['PSC-17', ...rawKeys];
-      // Split into screening vs monitoring based on TOOL_SCHEMA type
+
+      // Build screening and monitoring key lists — 'both' tools appear in BOTH
       const screeningKeys = [];
       const monitoringKeys = [];
-      // PSC-17 always first in screening
-      if (allToolKeys.includes('PSC-17')) screeningKeys.push('PSC-17');
       allToolKeys.forEach(tk => {
-        if (tk === 'PSC-17') return; // already added
         const ts = schemaMap[tk];
-        if (!ts) { monitoringKeys.push(tk); return; } // unknown → monitoring
-        if (ts.type === 'screening') screeningKeys.push(tk);
-        else if (ts.type === 'monitoring') monitoringKeys.push(tk);
-        else if (ts.type === 'both') monitoringKeys.push(tk); // 'both' → monitoring launch section
+        if (!ts) { monitoringKeys.push(tk); return; }
+        if (ts.type === 'screening' || ts.type === 'both') screeningKeys.push(tk);
+        if (ts.type === 'monitoring' || ts.type === 'both') monitoringKeys.push(tk);
       });
-      // Also add any schema 'both' tools that are in allToolKeys but weren't placed in screening
-      // (they are already in monitoringKeys via the loop above)
+      // PSC-17 first in screening
+      const scIdx = screeningKeys.indexOf('PSC-17');
+      if (scIdx > 0) { screeningKeys.splice(scIdx, 1); screeningKeys.unshift('PSC-17'); }
 
-      // Render one tool row: clinician launch btn + optional share btn
-      function toolRow(tk, opts) {
-        opts = opts || {};
+      // One launch button row (clinician + optional share)
+      function toolRow(tk, isScreening) {
         const hasBase = !!TOOL_URL_MAP[tk];
         const hasExt  = !!(typeof TOOL_EXT_URL_MAP !== 'undefined' && TOOL_EXT_URL_MAP[tk]);
-        const isDone  = completedSet.has(tk);
-        const doneStyle = (opts.screening && isDone) ? 'opacity:0.45;text-decoration:line-through;' : '';
-        const doneHint  = (opts.screening && isDone) ? `<span style="font-size:9px;color:var(--color-success,#5dba5d);margin-left:4px;">✓ ${en?'done':'listo'}</span>` : '';
-        const noteHint  = opts.note ? `<span style="font-size:9px;color:var(--color-text-muted);margin-left:4px;">(${opts.note})</span>` : '';
+        const isDone  = isScreening && completedSet.has(tk);
+        const doneStyle = isDone ? 'opacity:0.45;text-decoration:line-through;' : '';
+        const doneHint  = isDone ? `<span style="font-size:9px;color:var(--color-success,#5dba5d);margin-left:4px;">✓ ${en?'done':'listo'}</span>` : '';
+        let noteText = '';
+        if (tk === 'CAP') noteText = en?'priority · teacher':'prioridad · maestro';
+        else if (tk === 'Vanderbilt-Teacher' && !isScreening && monitoringKeys.includes('CAP')) noteText = en?'if CAP not viable':'si CAP no viable';
+        const noteHint = noteText ? `<span style="font-size:9px;color:var(--color-text-muted);margin-left:4px;">(${noteText})</span>` : '';
         const safeTk = tk.replace(/'/g, "\\'");
         if (!hasBase) return `<div style="display:inline-flex;align-items:center;gap:4px;"><span class="tool-launch-btn" style="opacity:0.4;${doneStyle}">${tk}</span>${doneHint}${noteHint}</div>`;
         return `<div style="display:inline-flex;align-items:center;gap:4px;">
-          <div style="display:inline-flex;align-items:stretch;gap:0;${doneStyle}">
-            <a class="tool-launch-btn" href="${TOOL_URL_MAP[tk]}" target="_blank" style="${hasExt?'border-top-right-radius:0;border-bottom-right-radius:0;':''};${doneStyle}" title="${en?'Open clinician version':'Abrir versión para clínico'}">${tk}</a>
+          <div style="display:inline-flex;align-items:stretch;gap:0;">
+            <a class="tool-launch-btn" href="${TOOL_URL_MAP[tk]}" target="_blank" style="${hasExt?'border-top-right-radius:0;border-bottom-right-radius:0;':''}${doneStyle}" title="${en?'Open clinician version':'Abrir versión para clínico'}">${tk}</a>
             ${hasExt ? `<button class="tool-launch-btn" onclick="shareToolLink('${safeTk}')" title="${en?'Copy share message':'Copiar mensaje para compartir'}" style="border-left:0;border-top-left-radius:0;border-bottom-left-radius:0;padding-left:10px;padding-right:10px;" aria-label="Share">📤</button>` : ''}
           </div>${doneHint}${noteHint}
         </div>`;
       }
 
-      // Sub-section header
       function subHdr(label) {
         return `<div style="width:100%;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--color-text-muted);margin:10px 0 6px;padding-bottom:3px;border-bottom:1px solid var(--color-border);">${label}</div>`;
       }
 
-      const screeningRows = screeningKeys.map(tk => toolRow(tk, {screening:true})).join('');
-      const monitoringRows = monitoringKeys.map(tk => {
-        const note = (tk === 'CAP') ? (en?'priority · teacher':'prioridad · maestro') :
-                     (tk === 'Vanderbilt-Teacher' && monitoringKeys.includes('CAP')) ? (en?'if CAP not viable':'si CAP no es viable') : null;
-        return toolRow(tk, {note});
-      }).join('');
+      const screeningRows = screeningKeys.map(tk => toolRow(tk, true)).join('');
+      const monitoringRows = monitoringKeys.map(tk => toolRow(tk, false)).join('');
 
-      // Share multiple questionnaires — checkbox selector
-      const shareableAll = allToolKeys.filter(tk => typeof TOOL_EXT_URL_MAP !== 'undefined' && TOOL_EXT_URL_MAP[tk]);
+      // Share panel — deduplicated shareable keys
+      const shareableAll = [...new Set(allToolKeys)].filter(tk => typeof TOOL_EXT_URL_MAP !== 'undefined' && TOOL_EXT_URL_MAP[tk]);
       const shareSection = shareableAll.length ? `
         <div id="shareMultiPanel" style="margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--color-border);">
           <div style="font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--color-text-muted);margin-bottom:6px;">📤 ${en?'Share questionnaires':'Compartir cuestionarios'}</div>
@@ -1644,7 +1636,7 @@ function epUpdateTools() {
   const conds = [...document.querySelectorAll('input[name="epCond"]:checked')].map(c => c.value);
   const primCond = document.getElementById('epPrimaryCondition')?.value || '';
   if (primCond && !conds.includes(primCond)) conds.push(primCond);
-  const currentSel = [...document.querySelectorAll('#epToolsSection input[name="toolSel"]:checked')].map(c => c.value);
+  const currentSel = [...new Set([...document.querySelectorAll('#epToolsSection input[name="toolSel-s"]:checked, #epToolsSection input[name="toolSel-m"]:checked')].map(c => c.value))];
   const completedToolsArr = [...new Set((PSTATE.visits||[]).filter(v=>v.Score!==''&&v.Score!=null).map(v=>v.Tool).filter(Boolean))];
   const sec = document.getElementById('epToolsSection');
   if (sec && typeof renderToolSelector === 'function') {
@@ -1677,7 +1669,7 @@ async function submitEditPatient() {
   const _epCondOtherText = (document.getElementById('epCondOtherText')?.value || '').trim();
   const _otherEntry = (_epCondOtherCb?.checked && _epCondOtherText) ? [_epCondOtherText] : [];
   const conds    = [...document.querySelectorAll('input[name="epCond"]:checked')].map(c=>c.value).concat(_otherEntry).join(',');
-  const tools    = [...document.querySelectorAll('#epToolsSection input[name="toolSel"]:checked')].map(c=>c.value).join(',');
+  const tools    = [...new Set([...document.querySelectorAll('#epToolsSection input[name="toolSel-s"]:checked, #epToolsSection input[name="toolSel-m"]:checked')].map(c => c.value))].join(',');
   const primaryCondition = (document.getElementById('epPrimaryCondition')?.value || '').trim();
 
   // Brigade flag is managed via the dedicated Brigade modal, not Edit Patient
