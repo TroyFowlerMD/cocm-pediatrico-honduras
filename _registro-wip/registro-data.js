@@ -500,7 +500,7 @@ if (typeof window !== 'undefined') window.renderMarkdownInline = renderMarkdownI
 // Cache last-known registry data in localStorage so back-nav / repeat loads paint
 // instantly. Cache is ONLY used as a first-paint fallback; fresh data always
 // overwrites. Per-tab cache so bad writes can't corrupt others.
-const REG_CACHE_KEY = REG_LS.CACHE + '.v3'; // bumped: Primary_Condition columns added to sheet
+const REG_CACHE_KEY = REG_LS.CACHE + '.v4'; // bumped: force re-fetch after Aurora manual insert + V9 deploy
 function readCache() {
   try {
     const raw = localStorage.getItem(REG_CACHE_KEY);
