@@ -525,6 +525,13 @@ async function submitNewPatient(skipDupCheck=false) {
     document.getElementById('npName')?.focus();
     return;
   }
+  const therapistVal = document.getElementById('npTherapist')?.value || '';
+  if (!therapistVal) {
+    reenable();
+    showToast(getLang()==='en' ? 'Therapist is required.' : 'El terapeuta es obligatorio.', { variant: 'warn' });
+    document.getElementById('npTherapist')?.focus();
+    return;
+  }
   // DOB-based age calculation (DOB replaces Age on the form)
   const dobStr = document.getElementById('npDOB')?.value || '';
   const ageStr = dobStr ? String(computeAgeFromDOB(dobStr)) : '';
@@ -1043,7 +1050,6 @@ function filterAndSortPatients(all) {
     return true;
   });
 
-  // Sort — when groupByCondition is active, pre-sort within group by score desc
   if (STATE.groupByCondition) {
     list.sort((a, b) => {
       const groupOrder = PRIMARY_GROUPS.indexOf(a._primaryGroup) - PRIMARY_GROUPS.indexOf(b._primaryGroup);
