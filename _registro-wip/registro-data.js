@@ -1,4 +1,4 @@
-// @version 3b0fbf3
+// @version 8e9ef57
 /* ============================================================
    CoCM Camasca — Registry data layer
    ============================================================
@@ -289,6 +289,136 @@ function suggestTools(condsList, age) {
 }
 if (typeof window !== 'undefined') window.suggestTools = suggestTools;
 if (typeof window !== 'undefined') window.TOOL_SCHEMA = TOOL_SCHEMA;
+
+// ── renderToolSelector — shared across registro-app.js + registro-paciente.js ──
+// Defined here in registro-data.js so both pages have access without loading
+// the full registro-app.js bundle on the patient page.
+function renderToolSelector(prefix, selectedTools, condsList, lang, age, completedTools) {
+  const en = lang === 'en';
+  const ageNum = (age != null && age !== '') ? Number(age) : null;
+  const selSet  = new Set(selectedTools || []);
+  const doneSet = new Set(completedTools || []);
+  const condsArr = (condsList || []).map(s => String(s).trim().toLowerCase()).filter(Boolean);
+
+  const _TS = TOOL_SCHEMA;
+  const _suggest = suggestTools;
+  if (!_TS) return `<span style="color:var(--color-text-muted);font-size:var(--text-xs);">${en?'Tools unavailable':'Herramientas no disponibles'}</span>`;
+
+  const suggested = (typeof _suggest === 'function') ? _suggest(condsArr, ageNum) : { screening: [], monitoring: [] };
+  const sugScreenSet = new Set(suggested.screening);
+  const sugMonSet    = new Set(suggested.monitoring);
+
+  const schemaMap = {};
+  _TS.forEach(s => schemaMap[s.key] = s);
+
+  const GROUPS = [
+    {
+      labelEn: 'Universal', labelEs: 'Universal', condKey: null,
+      screeningKeys: ['PSC-17'], monitoringKeys: [],
+    },
+    {
+      labelEn: 'Depression', labelEs: 'Depresión', condKey: 'depression',
+      screeningKeys: ['SMFQ-C', 'PHQ-A'],
+      monitoringKeys: ['SMFQ-C', 'SMFQ-P', 'PHQ-A'],
+    },
+    {
+      labelEn: 'ADHD', labelEs: 'TDAH', condKey: 'adhd',
+      screeningKeys: ['Vanderbilt-Parent', 'Vanderbilt-Teacher', 'SNAP-IV', 'ASRS-5'],
+      monitoringKeys: ['CAP', 'Vanderbilt-Teacher', 'SNAP-IV', 'ASRS-5'],
+    },
+    {
+      labelEn: 'Anxiety', labelEs: 'Ansiedad', condKey: 'anxiety',
+      screeningKeys: ['SCARED-N', 'SCARED-Parent', 'GAD-7'],
+      monitoringKeys: ['SCARED-N', 'SCARED-Parent', 'GAD-7'],
+    },
+    {
+      labelEn: 'Substances / Risk', labelEs: 'Sustancias / Riesgo', condKey: 'sud',
+      screeningKeys: ['CRAFFT'],
+      monitoringKeys: ['DAST-10'],
+    },
+  ];
+
+  function toolPill(key, role) {
+    const ts = schemaMap[key] || {};
+    const isSugScreen = sugScreenSet.has(key);
+    const isSugMon    = sugMonSet.has(key);
+    const isSuggested = role === 'screening' ? isSugScreen : isSugMon;
+    const isChecked   = selSet.has(key);
+    const isDone      = role === 'screening' && doneSet.has(key);
+
+    const desc = en ? (ts.en || key) : (ts.es || key);
+    const noteRaw = (key === 'CAP')
+      ? (en ? 'priority · teacher' : 'prioridad · maestro')
+      : (key === 'Vanderbilt-Teacher' && role === 'monitoring')
+        ? (en ? 'if CAP not viable' : 'si CAP no viable')
+        : (en ? ts.note : ts.noteEs) || '';
+    const noteSpan = noteRaw ? `<span style="color:var(--color-text-muted);"> (${noteRaw})</span>` : '';
+
+    const bgStyle = isSuggested
+      ? 'background:color-mix(in srgb,var(--color-primary) 12%,transparent);border:1px solid color-mix(in srgb,var(--color-primary) 40%,transparent);'
+      : 'background:var(--color-surface-offset);border:1px solid transparent;';
+    const doneStyle = isDone ? 'opacity:0.45;text-decoration:line-through;' : '';
+
+    const sugHint = isSuggested
+      ? `<span style="font-size:9px;color:var(--color-primary);font-weight:600;padding-left:18px;line-height:1.4;">${en?'suggested for selected conditions':'sugerido por condiciones seleccionadas'}</span>`
+      : '';
+    const doneHint = isDone
+      ? `<span style="font-size:9px;color:var(--color-success,#5dba5d);padding-left:18px;line-height:1.4;">✓ ${en?'baseline completed':'basal completado'}</span>`
+      : '';
+
+    const inputName = role === 'screening' ? 'toolSel-s' : 'toolSel-m';
+
+    return `<label style="display:inline-flex;flex-direction:column;gap:1px;padding:5px 10px;${bgStyle}border-radius:var(--radius-md);font-size:var(--text-xs);cursor:pointer;${doneStyle}">
+      <span style="display:flex;gap:4px;align-items:center;">
+        <input type="checkbox" name="${inputName}" value="${escapeHtml(key)}" ${isChecked?'checked':''} style="margin:0;"/>
+        <strong>${escapeHtml(key)}</strong>
+      </span>
+      <span style="font-size:10px;color:var(--color-text-muted);padding-left:18px;line-height:1.3;">${escapeHtml(desc)}${noteSpan}</span>
+      ${sugHint}${doneHint}
+    </label>`;
+  }
+
+  function subRowLabel(label) {
+    return `<div style="width:100%;font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.08em;color:var(--color-text-faint,var(--color-text-muted));margin:5px 0 4px;padding-left:2px;">${label}</div>`;
+  }
+
+  function groupBlock(grp) {
+    const isActive = grp.condKey === null
+      ? true
+      : condsArr.some(c => c === grp.condKey || (grp.condKey === 'sud' && (c === 'sud' || c === 'risk')));
+
+    const label = en ? grp.labelEn : grp.labelEs;
+    const hdrAccent = (isActive && grp.condKey !== null)
+      ? 'border-left:3px solid var(--color-primary);padding-left:6px;'
+      : 'border-left:3px solid var(--color-border);padding-left:6px;';
+    const hdrColor = (isActive && grp.condKey !== null)
+      ? 'color:var(--color-primary);'
+      : 'color:var(--color-text-muted);';
+
+    const screeningPills = grp.screeningKeys.map(k => toolPill(k, 'screening')).join('');
+    const monitoringPills = grp.monitoringKeys.map(k => toolPill(k, 'monitoring')).join('');
+
+    const screeningRow = grp.screeningKeys.length ? `
+      ${subRowLabel(en?'Screening':'Detección')}
+      <div style="display:flex;flex-wrap:wrap;gap:5px;">${screeningPills}</div>` : '';
+    const monitoringRow = grp.monitoringKeys.length ? `
+      ${subRowLabel(en?'Monitoring':'Monitoreo')}
+      <div style="display:flex;flex-wrap:wrap;gap:5px;">${monitoringPills}</div>` : '';
+
+    return `
+      <div style="width:100%;margin-top:12px;">
+        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;${hdrColor}${hdrAccent}margin-bottom:5px;">${label}</div>
+        ${screeningRow}${monitoringRow}
+      </div>`;
+  }
+
+  const groupsHtml = GROUPS.map(groupBlock).join('');
+
+  return `
+    <label style="font-size:var(--text-xs);font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--color-text-muted);">${en?'Tools':'Herramientas'}</label>
+    ${groupsHtml}`;
+}
+if (typeof window !== 'undefined') window.renderToolSelector = renderToolSelector;
 
 // ── Severity tier ordering ─────────────────────────────────────
 const TIER_ORDER = ["Severa","Moderada","Leve","Remisión","Sin datos"];

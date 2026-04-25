@@ -1,4 +1,4 @@
-// @version 3b0fbf3
+// @version 8e9ef57
 /* ============================================================
    CoCM Camasca — Patient detail page (streamlined)
    ============================================================ */
@@ -1625,7 +1625,7 @@ function openEditPatientModal() {
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;">${condRows || `<span style="font-size:var(--text-xs);color:var(--color-text-muted);">${en?'No conditions configured':'No hay condiciones configuradas'}</span>`}</div>
     </div>
     <div style="margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--color-border);" id="epToolsSection">
-      ${(typeof renderToolSelector==='function')?renderToolSelector('ep', [...curTools], epConds, en?'en':'es', epAge, completedToolsArr):'<span>Tools unavailable</span>'}
+      ${window.renderToolSelector('ep', [...curTools], epConds, en?'en':'es', epAge, completedToolsArr)}
     </div>
     <div style="margin-top:var(--space-3);padding-top:var(--space-3);border-top:1px solid var(--color-border);">
       <label class="np-label">${en?'Notes':'Notas'}</label>
@@ -1654,8 +1654,8 @@ function epUpdateTools() {
   const currentSel = [...new Set([...document.querySelectorAll('#epToolsSection input[name="toolSel-s"]:checked, #epToolsSection input[name="toolSel-m"]:checked')].map(c => c.value))];
   const completedToolsArr = [...new Set((PSTATE.visits||[]).filter(v=>v.Score!==''&&v.Score!=null).map(v=>v.Tool).filter(Boolean))];
   const sec = document.getElementById('epToolsSection');
-  if (sec && typeof renderToolSelector === 'function') {
-    sec.innerHTML = renderToolSelector('ep', currentSel, conds, lang, age, completedToolsArr);
+  if (sec) {
+    sec.innerHTML = window.renderToolSelector('ep', currentSel, conds, lang, age, completedToolsArr);
   }
 }
 if (typeof window !== 'undefined') window.epUpdateTools = epUpdateTools;
