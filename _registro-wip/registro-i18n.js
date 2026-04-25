@@ -1,3 +1,4 @@
+// @version 3b0fbf3
 /* ============================================================
    CoCM Camasca — shared i18n helper
    Exposes: t(key, vars) and getLang().

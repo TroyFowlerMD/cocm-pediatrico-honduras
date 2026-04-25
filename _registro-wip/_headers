@@ -1,0 +1,8 @@
+/*
+  Cache-Control: no-cache, must-revalidate
+
+/_registro-wip/*.js
+  Cache-Control: no-cache, must-revalidate
+
+/_registro-wip/*.html
+  Cache-Control: no-cache, must-revalidate
