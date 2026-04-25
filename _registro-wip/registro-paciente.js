@@ -243,7 +243,7 @@ function render() {
     ${(() => {
       const en = getLang() === 'en';
       const schemaMap = {};
-      if (typeof TOOL_SCHEMA !== 'undefined') TOOL_SCHEMA.forEach(s => schemaMap[s.key] = s);
+      const _TS = window.TOOL_SCHEMA; if (_TS) _TS.forEach(s => schemaMap[s.key] = s);
       const completedSet = new Set((PSTATE.visits||[]).filter(v=>v.Score!==''&&v.Score!=null).map(v=>v.Tool).filter(Boolean));
       const rawKeys = (p.Tools||'').split(',').map(s=>s.trim()).filter(Boolean);
       const allToolKeys = rawKeys.includes('PSC-17') ? rawKeys : ['PSC-17', ...rawKeys];

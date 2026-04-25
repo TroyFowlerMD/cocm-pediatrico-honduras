@@ -217,10 +217,12 @@ function renderToolSelector(prefix, selectedTools, condsList, lang, age, complet
   const doneSet = new Set(completedTools || []);
   const condsArr = (condsList || []).map(s => String(s).trim().toLowerCase()).filter(Boolean);
 
-  if (typeof TOOL_SCHEMA === 'undefined') return `<span style="color:var(--color-text-muted);font-size:var(--text-xs);">${en?'Tools unavailable':'Herramientas no disponibles'}</span>`;
+  const TOOL_SCHEMA = window.TOOL_SCHEMA;
+  const suggestTools = window.suggestTools;
+  if (!TOOL_SCHEMA) return `<span style="color:var(--color-text-muted);font-size:var(--text-xs);">${en?'Tools unavailable':'Herramientas no disponibles'}</span>`;
 
   // Suggestion set — visual highlight only
-  const suggested = (typeof suggestTools === 'function') ? suggestTools(condsArr, ageNum) : { screening: [], monitoring: [] };
+  const suggested = (typeof suggestTools === 'function') ? suggestTools(condsArr, ageNum) : { screening: [], monitoring: [] }; // eslint-disable-line no-redeclare
   const sugScreenSet = new Set(suggested.screening);
   const sugMonSet    = new Set(suggested.monitoring);
 
