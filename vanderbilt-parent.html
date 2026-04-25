@@ -1440,47 +1440,6 @@ a, button, [role='button'], input, select {
   flex-shrink: 0;
 }
 
-/* ── Dual Results View (Vanderbilt) ── */
-.results-dual-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--space-4);
-  margin-top: var(--space-5);
-}
-@media (max-width: 700px) {
-  .results-dual-container { grid-template-columns: 1fr; }
-}
-.results-view-block {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
-}
-.results-view-label {
-  font-size: var(--text-xs);
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--color-text-muted);
-}
-.detailed-note-box {
-  font-family: ui-monospace, 'Cascadia Code', 'Source Code Pro', Menlo, Consolas, monospace;
-  font-size: 0.78rem;
-  line-height: 1.65;
-  white-space: pre-wrap;
-  word-break: break-word;
-  background: var(--color-surface-offset);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  padding: var(--space-4);
-  color: var(--color-text);
-  min-height: 80px;
-  flex: 1;
-}
-.results-view-actions {
-  display: flex;
-  gap: var(--space-2);
-  flex-wrap: wrap;
-}
 </style>
   
 </head>
@@ -3106,41 +3065,14 @@ a, button, [role='button'], input, select {
 
 
 
-    <!-- ── Dual Results View ── -->
-    <div class="results-dual-container" style="margin-top:var(--space-4);">
-      <!-- Detailed View -->
-      <div class="results-view-block">
-        <div class="results-view-label">
-          <span class="es-label">Vista Detallada</span>
-          <span class="en-label">Detailed View</span>
-        </div>
-        <div class="detailed-note-box" id="detailedNoteBox"></div>
-        <div class="results-view-actions">
-          <button type="button" class="btn-secondary" onclick="copyDetailedNote()" style="font-size:var(--text-xs);display:inline-flex;align-items:center;gap:4px;padding:6px 12px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);font-weight:600;cursor:pointer;">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            <span class="es-label">Copiar Vista Detallada</span>
-            <span class="en-label">Copy Detailed View</span>
-          </button>
-          <span class="copy-feedback" id="copyDetailedFeedback">¡Copiado!</span>
-        </div>
-      </div>
-      <!-- Simple View -->
-      <div class="results-view-block">
-        <div class="results-view-label">
-          <span class="es-label">Vista Simple</span>
-          <span class="en-label">Simple View</span>
-        </div>
-        <pre id="copy-text-content" class="copy-text" style="white-space:pre-wrap;word-break:break-word;font-size:var(--text-xs);line-height:1.6;color:var(--color-text-muted)"></pre>
-        <div class="results-view-actions">
-          <button id="copy-btn" class="copy-btn" style="font-size:var(--text-xs);display:inline-flex;align-items:center;gap:4px;padding:6px 12px;background:var(--color-surface);border:1px solid var(--color-border);border-radius:var(--radius-md);font-weight:600;cursor:pointer;">
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            <span class="es-label">Copiar Vista Simple</span>
-            <span class="en-label">Copy Simple View</span>
-          </button>
-        </div>
-      </div>
+    <!-- Copy output -->
+    <div class="copy-box" style="margin-top:var(--space-4)">
+      <pre id="copy-text-content" class="copy-text" style="white-space:pre-wrap;word-break:break-word;font-size:var(--text-xs);line-height:1.6;color:var(--color-text-muted)"></pre>
+      <button id="copy-btn" class="copy-btn">
+        <span class="es-label">Copiar</span>
+        <span class="en-label">Copy</span>
+      </button>
     </div>
-
     <!-- Reset -->
     <button id="reset-btn" class="reset-btn" style="margin-top:var(--space-4);width:100%">
       <span class="es-label">Reiniciar</span>
@@ -3310,7 +3242,6 @@ function applyLang(l) {
     document.getElementById(id).classList.toggle('active', id === 'btn-' + l);
   });
   renderScore();
-  generateDetailedNote();
 }
 document.getElementById('btn-es').addEventListener('click',   () => applyLang('es'));
 document.getElementById('btn-en').addEventListener('click',   () => applyLang('en'));
@@ -3341,7 +3272,6 @@ document.getElementById('btn-en').addEventListener('click',   () => applyLang('e
         if (qblock) qblock.classList.add('answered');
 
         renderScore();
-  generateDetailedNote();
 
         var allBlocks = Array.from(document.querySelectorAll('.question-block'));
         var allAnswered = allBlocks.every(function(b) { return b.classList.contains('answered'); });
@@ -3373,7 +3303,6 @@ document.getElementById('reset-btn').addEventListener('click', () => {
   });
   document.querySelectorAll('.question-block').forEach(b => b.classList.remove('answered'));
   renderScore();
-  generateDetailedNote();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 });
 
@@ -3396,139 +3325,10 @@ applyTheme(savedTheme);
 const urlLang = new URLSearchParams(location.search).get('lang') || 'es';
 applyLang(urlLang);
 renderScore();
-  generateDetailedNote();
-  generateDetailedNote();
 // Update back link with current lang
 document.querySelectorAll('a[href="index.html"]').forEach(a => a.href='index.html?lang='+urlLang);
 
 
-// ===== DETAILED NOTE (Vanderbilt) =====
-function generateDetailedNote() {
-  const lang = document.documentElement.getAttribute('data-lang') || 'es';
-  const isEN = lang === 'en';
-
-  function tx(esText, enText) { return isEN ? enText : esText; }
-
-  // Collect question blocks
-  const qblocks = Array.from(document.querySelectorAll('.question-block[id^="q"]'));
-
-  const answered = [];
-  const unanswered = [];
-
-  qblocks.forEach(block => {
-    const n = parseInt(block.id.replace('q', ''), 10);
-    const val = answers[n] !== undefined ? answers[n] : null;
-    // Get question text
-    const esEl = block.querySelector('.question-text .es-label');
-    const enEl = block.querySelector('.question-text .en-label');
-    const qText = isEN ? (enEl ? enEl.textContent.trim() : '') : (esEl ? esEl.textContent.trim() : '');
-    const numLabel = 'Q' + String(n).padStart(2, '0');
-
-    if (val !== null) {
-      // Get label for this value
-      const optEl = block.querySelector(`.option-btn[data-val="${val}"] .${isEN ? 'en' : 'es'}-label`);
-      const lbl = optEl ? optEl.textContent.trim() : String(val);
-      answered.push({ n, numLabel, val, lbl, qText });
-    } else {
-      unanswered.push({ n, numLabel, qText });
-    }
-  });
-
-  const total = qblocks.length;
-  const done = answered.length;
-  const box = document.getElementById('detailedNoteBox');
-
-  if (done === 0) {
-    box.textContent = tx(
-      '(Complete las preguntas para ver el detalle)',
-      '(Complete questions to see detailed view)'
-    );
-    return;
-  }
-
-  // Pull Simple View (copy-text-content)
-  const simpleEl = document.getElementById('copy-text-content');
-  const simpleText = simpleEl ? simpleEl.textContent : '';
-
-  // Group by label value, highest first
-  const byVal = {};
-  answered.forEach(a => {
-    if (!byVal[a.val]) byVal[a.val] = { lbl: a.lbl, items: [] };
-    byVal[a.val].items.push(`${a.numLabel}. ${a.qText}`);
-  });
-  const valKeys = Object.keys(byVal).map(Number).sort((a, b) => b - a);
-
-  const lines = [];
-
-  // Header: score summary from simple view
-  if (simpleText.trim()) {
-    lines.push(simpleText.trim());
-    lines.push('');
-  }
-
-  if (done < total) {
-    lines.push(tx(
-      `Nota: ${done}/${total} preguntas respondidas. Resultados parciales.`,
-      `Note: ${done}/${total} questions answered. Partial results below.`
-    ));
-    lines.push('');
-  }
-
-  // Endorsed (score ≥ 2 = clinically significant for Vanderbilt)
-  const significantKeys = valKeys.filter(v => v >= 2);
-  const lowKeys         = valKeys.filter(v => v > 0 && v < 2);
-  const zeroKeys        = valKeys.filter(v => v === 0);
-
-  if (significantKeys.length > 0) {
-    lines.push(tx('── CLÍNICAMENTE SIGNIFICATIVO (≥2) ─────', '── CLINICALLY SIGNIFICANT (≥2) ─────'));
-    significantKeys.forEach(v => {
-      const g = byVal[v];
-      lines.push(`${tx('Calificado', 'Rated')} "${g.lbl}" (${v}):`);
-      g.items.forEach(it => lines.push('  ' + it));
-    });
-    lines.push('');
-  }
-
-  if (lowKeys.length > 0) {
-    lines.push(tx('── A VECES (1) ──────────────────────', '── SOMETIMES (1) ────────────────────'));
-    lowKeys.forEach(v => {
-      const g = byVal[v];
-      lines.push(`${tx('Calificado', 'Rated')} "${g.lbl}" (${v}):`);
-      g.items.forEach(it => lines.push('  ' + it));
-    });
-    lines.push('');
-  }
-
-  if (zeroKeys.length > 0) {
-    lines.push(tx('── NO ENDOSADOS (0) ─────────────────', '── NOT ENDORSED (0) ─────────────────'));
-    zeroKeys.forEach(v => {
-      const g = byVal[v];
-      lines.push(`${tx('No endosado', 'Not endorsed')} ("${g.lbl}"):`);
-      g.items.forEach(it => lines.push('  ' + it));
-    });
-  }
-
-  if (unanswered.length > 0) {
-    lines.push('');
-    lines.push(tx('── SIN RESPONDER ────────────────────', '── UNANSWERED ───────────────────────'));
-    unanswered.forEach(u => lines.push('  ' + u.numLabel + '. ' + u.qText));
-  }
-
-  box.textContent = lines.join('\n');
-}
-
-function copyDetailedNote() {
-  const box = document.getElementById('detailedNoteBox');
-  const text = box.textContent;
-  if (!text) return;
-  navigator.clipboard.writeText(text).then(() => {
-    const fb = document.getElementById('copyDetailedFeedback');
-    const lang = document.documentElement.getAttribute('data-lang') || 'es';
-    fb.textContent = lang === 'en' ? 'Copied!' : '¡Copiado!';
-    fb.classList.add('show');
-    setTimeout(() => fb.classList.remove('show'), 2500);
-  }).catch(() => {});
-}
 
 </script>
 </body>
