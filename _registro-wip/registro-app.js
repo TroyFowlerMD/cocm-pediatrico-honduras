@@ -1,4 +1,4 @@
-// @version 8e9ef57
+// @version 495077a
 /* ============================================================
    CoCM Camasca — Registry main app (streamlined)
    ============================================================ */
@@ -212,10 +212,7 @@ async function submitAddMe() {
 // Suggestion = teal highlight only, no auto-check.
 // completedTools = keys with ≥1 score (screening pills dimmed/struck).
 // renderToolSelector is defined in registro-data.js and exported as window.renderToolSelector.
-// This wrapper allows registro-app.js to call it by bare name as before.
-function renderToolSelector(prefix, selectedTools, condsList, lang, age, completedTools) {
-  return window.renderToolSelector(prefix, selectedTools, condsList, lang, age, completedTools);
-}
+// Use window.renderToolSelector directly — do NOT redeclare here (would overwrite the definition).
 
 
 
@@ -229,7 +226,7 @@ function npUpdateTools() {
   if (primCond && !conds.includes(primCond)) conds.push(primCond);
   const currentSel = [...new Set([...document.querySelectorAll('#npToolsSection input[name="toolSel-s"]:checked, #npToolsSection input[name="toolSel-m"]:checked')].map(c => c.value))];
   const sec = document.getElementById('npToolsSection');
-  if (sec) sec.innerHTML = renderToolSelector('np', currentSel, conds, lang, age, []);
+  if (sec) sec.innerHTML = window.renderToolSelector('np', currentSel, conds, lang, age, []);
 }
 if (typeof window !== 'undefined') window.npUpdateTools = npUpdateTools;
 
@@ -302,7 +299,7 @@ function renderNewPatientForm() {
       </div>
     </div>
     <div style="margin-top:var(--space-3);" id="npToolsSection">
-      ${renderToolSelector('np', [], null, lang)}
+      ${window.renderToolSelector('np', [], null, lang)}
     </div>
     <div style="margin-top:var(--space-3);">
       <label class="np-label">${t('label_notes')}</label>
