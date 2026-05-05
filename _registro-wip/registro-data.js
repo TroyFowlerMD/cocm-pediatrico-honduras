@@ -150,7 +150,12 @@ const REG_HEADERS = {
   //   Baseline_Date            — date baseline was collected (optional)
   // All new fields are OPTIONAL. Missing values render as "—" and never
   // break layout or derived flags.
-  Pacientes: ["Patient_ID","Patient_Name","Initials","DOB","Age","Sex","Therapist","Conditions","Primary_Condition","Primary_Condition_Verified","Tools","Enrollment_Date","Status","Priority","Safety_Flag","Safety_Flag_Ack_By","Safety_Flag_Ack_At","Notes","Last_Psych_Consult_Date","Last_BHCM_Contact_Date","Last_BHCM_Contact_Note","Last_BHCM_Contact_By","Review_Flag","Review_Flag_Note","Baseline_Tool","Baseline_Score","Baseline_Date","Brigade_Flag","Brigade_Reason","Todo_Items","Created_By","Created_At","Updated_By","Updated_At","Schema_Version"],
+  // NOTE: The column ORDER in the live Google Sheet does not match this array.
+  // That is intentional and harmless — Apps Script reads column names from row 1
+  // dynamically, so position never matters. Do not reorder the sheet columns to
+  // match this array; it would require migrating live data and serves no benefit.
+  // Columns were added to the sheet over time and appear in insertion order there.
+  Pacientes: ["Patient_ID","Patient_Name","Initials","DOB","Age","Sex","Therapist","Conditions","Primary_Condition","Primary_Condition_Verified","Tools","Enrollment_Date","Status","Priority","Safety_Flag","Safety_Flag_Ack_By","Safety_Flag_Ack_At","Notes","Last_Psych_Consult_Date","Last_BHCM_Contact_Date","Last_BHCM_Contact_Note","Last_BHCM_Contact_By","Review_Flag","Review_Flag_Note","Baseline_Tool","Baseline_Score","Baseline_Date","Brigade_Flag","Brigade_Reason","Todo_Items","Caregiver_Phone","Created_By","Created_At","Updated_By","Updated_At","Schema_Version"],
   Visitas:   ["Visit_ID","Patient_ID","Visit_Date","Therapist","Tool","Score","Baseline_Score","Subscale_Scores","SI_Positive","Not_Improving_Flag","Visit_Note","Entry_Type","Created_By","Created_At","Updated_By","Updated_At","Schema_Version"],
   Medicamentos: ["Med_ID","Patient_ID","Date","Medication","Dose","Frequency","Action","Prescriber","Reason","Notes","Created_By","Created_At","Schema_Version","Is_External","External_Provider","Start_Date"],
   Config:    ["Category","Key","Value","Display_ES","Display_EN","Active","Notes"],
