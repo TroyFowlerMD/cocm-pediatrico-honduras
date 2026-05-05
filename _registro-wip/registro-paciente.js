@@ -230,7 +230,7 @@ function render() {
         } catch(_) { return ''; }
       })()}
       <div class="quick-actions">
-        <button class="primary" onclick="openVisitModal()" title="${getLang()==='en' ? 'Log a visit (with or without a psychometric score)' : 'Registrar visita (con o sin puntaje)'}">${t('action_add_visit')}</button>
+        <button class="primary" data-log-chooser-anchor="1" data-log-chooser-id="qa" aria-haspopup="menu" aria-expanded="false" onclick="openLogChooser(event)" title="${getLang()==='en' ? 'Log a visit (with or without a psychometric score)' : 'Registrar visita (con o sin puntaje)'}">${t('action_add_visit')} <span style="font-size:9px;opacity:0.7;margin-left:2px;">▾</span></button>
         <button class="primary" onclick="openScoreModal()" title="${getLang()==='en' ? 'Log a score without a visit' : 'Registrar puntaje sin visita'}">📊 ${getLang()==='en'?'Log score only':'Solo puntaje'}</button>
         <button class="ghost" onclick="openMedModal()">${t('action_add_med2')}</button>
         ${!safetyActive ? `<button class="danger" onclick="raiseSafety()">${t('action_raise_safety')}</button>` : ''}
@@ -340,7 +340,7 @@ function render() {
       <h2>
         <span>${t('visit_score_history')}</span>
         <span style="font-size: var(--text-sm); color: var(--color-text-muted); font-weight: 400;">${PSTATE.visits.length} ${PSTATE.visits.length === 1 ? t('visit_singular') : t('visits')}</span>
-        <button onclick="openVisitModal()" style="margin-left:auto;font-size:var(--text-xs);padding:4px 10px;border-radius:var(--radius-md);background:var(--color-surface-offset);border:1px solid var(--color-border);color:var(--color-text-muted);cursor:pointer;font-weight:600;" title="${getLang()==='en' ? 'Log a visit (with or without a psychometric score)' : 'Registrar visita (con o sin puntaje)'}">+ ${getLang()==='en'?'Log visit':'Registrar visita'}</button>
+        <button data-log-chooser-anchor="1" data-log-chooser-id="hist" aria-haspopup="menu" aria-expanded="false" onclick="openLogChooser(event)" style="margin-left:auto;font-size:var(--text-xs);padding:4px 10px;border-radius:var(--radius-md);background:var(--color-surface-offset);border:1px solid var(--color-border);color:var(--color-text-muted);cursor:pointer;font-weight:600;" title="${getLang()==='en' ? 'Log a visit (with or without a psychometric score)' : 'Registrar visita (con o sin puntaje)'}">+ ${getLang()==='en'?'Log visit':'Registrar visita'} <span style="font-size:9px;opacity:0.7;margin-left:2px;">▾</span></button>
       </h2>
       ${renderVisits(lang)}
     </div>
@@ -1086,6 +1086,15 @@ async function setStatus(newStatus) {
 
 // ── Visit modal ────────────────────────────────────────────────
 function openVisitModal() {
+  // Guard: if patient hasn't finished loading, abort silently rather than
+  // throwing inside the .Tools access (which would leave the click with no
+  // visible effect).
+  if (!PSTATE || !PSTATE.patient) {
+    if (typeof showToast === 'function') showToast(getLang()==='en' ? 'Patient still loading — try again in a moment.' : 'Paciente aún cargando — inténtalo en un momento.', { variant: 'warn' });
+    return;
+  }
+  // Close the chooser if it's open (the chooser opens the modal via this fn)
+  if (typeof closeLogChooser === 'function') closeLogChooser();
   const patientTools = (PSTATE.patient.Tools||'').split(',').map(s=>s.trim()).filter(Boolean);
   // Sticky tool: prefer most recently used tool for this patient
   const lastUsedTool = PSTATE.visits[0]?.Tool;
@@ -2503,41 +2512,135 @@ document.addEventListener('DOMContentLoaded', async () => {
 
 
 // ════════════════════════════════════════════════════════════════
-// PHASE 2.5 — LOG MENU (split-button dropdown)
+// LOG VISIT CHOOSER — two-option popover (visit+score · visit only)
+// Anchored to whichever "Log visit" button was clicked. A single floating
+// popover element (#logChooserPopover) is reused for both buttons.
 // ════════════════════════════════════════════════════════════════
-function toggleLogMenu(ev) {
-  if (ev) ev.stopPropagation();
-  const m = document.getElementById('logMenu');
-  const btn = document.getElementById('logMenuBtn');
-  if (!m) return;
-  const show = m.style.display === 'none' || !m.style.display;
-  m.style.display = show ? 'block' : 'none';
-  if (btn) btn.setAttribute('aria-expanded', show ? 'true' : 'false');
-  if (show) {
-    setTimeout(() => {
-      document.addEventListener('click', closeLogMenuOnOutside, { once: true });
-    }, 0);
-  }
+function _ensureLogChooserPopover() {
+  let pop = document.getElementById('logChooserPopover');
+  if (pop) return pop;
+  pop = document.createElement('div');
+  pop.id = 'logChooserPopover';
+  pop.setAttribute('role', 'menu');
+  pop.style.cssText = [
+    'position:absolute',
+    'display:none',
+    'z-index:300',
+    'min-width:240px',
+    'background:var(--color-surface, #1f1f23)',
+    'border:1px solid var(--color-border, #3a3a3f)',
+    'border-radius:var(--radius-md, 8px)',
+    'box-shadow:0 6px 24px rgba(0,0,0,0.35)',
+    'padding:6px',
+    'font-size:var(--text-sm, 13px)'
+  ].join(';');
+  document.body.appendChild(pop);
+  return pop;
 }
-function closeLogMenu() {
-  const m = document.getElementById('logMenu');
-  const btn = document.getElementById('logMenuBtn');
-  if (m) m.style.display = 'none';
-  if (btn) btn.setAttribute('aria-expanded', 'false');
-}
-function closeLogMenuOnOutside(e) {
-  const m = document.getElementById('logMenu');
-  const btn = document.getElementById('logMenuBtn');
-  if (!m) return;
-  if (m.contains(e.target) || (btn && btn.contains(e.target))) {
-    document.addEventListener('click', closeLogMenuOnOutside, { once: true });
+
+function openLogChooser(ev) {
+  if (ev && ev.stopPropagation) ev.stopPropagation();
+  if (!PSTATE || !PSTATE.patient) {
+    if (typeof showToast === 'function') showToast(getLang()==='en' ? 'Patient still loading — try again in a moment.' : 'Paciente aún cargando — inténtalo en un momento.', { variant: 'warn' });
     return;
   }
-  closeLogMenu();
+  const en = getLang() === 'en';
+  const anchor = ev && ev.currentTarget ? ev.currentTarget : (ev && ev.target && ev.target.closest ? ev.target.closest('button') : null);
+  const pop = _ensureLogChooserPopover();
+
+  // If popover is already open from this same anchor, treat the click as a toggle-close.
+  if (pop.style.display === 'block' && pop.dataset.anchorRef && anchor && pop.dataset.anchorRef === anchor.dataset.logChooserId) {
+    closeLogChooser();
+    return;
+  }
+
+  const itemBase = 'display:flex;align-items:flex-start;gap:8px;width:100%;padding:8px 10px;background:transparent;border:0;border-radius:var(--radius-sm, 6px);cursor:pointer;text-align:left;color:var(--color-text);font:inherit;line-height:1.35;';
+  const subTxt   = 'display:block;font-size:var(--text-xs, 11px);color:var(--color-text-muted, #9aa);font-weight:400;margin-top:2px;';
+  pop.innerHTML = `
+    <button type="button" class="logChooserItem" data-choice="visit" style="${itemBase}">
+      <span style="font-size:16px;line-height:1.1;flex:0 0 auto;">📋</span>
+      <span style="flex:1 1 auto;">
+        <strong style="font-weight:600;">${en ? 'Visit + score' : 'Visita + puntaje'}</strong>
+        <span style="${subTxt}">${en ? 'Standard visit with one or more psychometric scores.' : 'Visita estándar con uno o más puntajes psicométricos.'}</span>
+      </span>
+    </button>
+    <button type="button" class="logChooserItem" data-choice="visitOnly" style="${itemBase}">
+      <span style="font-size:16px;line-height:1.1;flex:0 0 auto;">🗓</span>
+      <span style="flex:1 1 auto;">
+        <strong style="font-weight:600;">${en ? 'Visit only (no score)' : 'Solo visita (sin puntaje)'}</strong>
+        <span style="${subTxt}">${en ? 'Note-only visit. No psychometric tool recorded.' : 'Visita solo de nota. Sin instrumento psicométrico.'}</span>
+      </span>
+    </button>
+  `;
+
+  pop.querySelectorAll('.logChooserItem').forEach(b => {
+    b.addEventListener('mouseenter', () => { b.style.background = 'var(--color-surface-offset, #2a2a30)'; });
+    b.addEventListener('mouseleave', () => { b.style.background = 'transparent'; });
+    b.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const choice = b.getAttribute('data-choice');
+      closeLogChooser();
+      if (choice === 'visit')          openVisitModal();
+      else if (choice === 'visitOnly') openVisitOnlyModal();
+    });
+  });
+
+  pop.style.display = 'block';
+  let top = 100, left = 100;
+  if (anchor && anchor.getBoundingClientRect) {
+    const r = anchor.getBoundingClientRect();
+    top  = r.bottom + window.scrollY + 4;
+    left = r.left   + window.scrollX;
+    const popW = pop.offsetWidth || 240;
+    const maxLeft = window.scrollX + document.documentElement.clientWidth - popW - 8;
+    if (left > maxLeft) left = Math.max(8 + window.scrollX, maxLeft);
+  }
+  pop.style.top  = top  + 'px';
+  pop.style.left = left + 'px';
+  if (anchor && anchor.setAttribute) anchor.setAttribute('aria-expanded', 'true');
+  pop.dataset.anchorRef = (anchor && anchor.dataset.logChooserId) || '';
+
+  setTimeout(() => {
+    document.addEventListener('click', _logChooserOutsideHandler, { once: true });
+    document.addEventListener('keydown', _logChooserKeyHandler);
+  }, 0);
 }
+
+function closeLogChooser() {
+  const pop = document.getElementById('logChooserPopover');
+  if (pop) {
+    pop.style.display = 'none';
+    delete pop.dataset.anchorRef;
+  }
+  document.querySelectorAll('[data-log-chooser-anchor="1"]').forEach(b => b.setAttribute('aria-expanded', 'false'));
+  document.removeEventListener('keydown', _logChooserKeyHandler);
+}
+
+function _logChooserOutsideHandler(e) {
+  const pop = document.getElementById('logChooserPopover');
+  if (!pop || pop.style.display === 'none') return;
+  if (pop.contains(e.target)) {
+    document.addEventListener('click', _logChooserOutsideHandler, { once: true });
+    return;
+  }
+  // If the click is on any Log Visit anchor, openLogChooser will handle reopen/toggle;
+  // do nothing here so we do not race with that handler.
+  if (e.target.closest && e.target.closest('[data-log-chooser-anchor="1"]')) {
+    return;
+  }
+  closeLogChooser();
+}
+
+function _logChooserKeyHandler(e) {
+  if (e.key === 'Escape') closeLogChooser();
+}
+
 if (typeof window !== 'undefined') {
-  window.toggleLogMenu = toggleLogMenu;
-  window.closeLogMenu = closeLogMenu;
+  window.openLogChooser  = openLogChooser;
+  window.closeLogChooser = closeLogChooser;
+  // Back-compat shims so any stale onclick="toggleLogMenu(...)" still works
+  window.toggleLogMenu   = openLogChooser;
+  window.closeLogMenu    = closeLogChooser;
 }
 
 // ════════════════════════════════════════════════════════════════
@@ -2545,6 +2648,11 @@ if (typeof window !== 'undefined') {
 // Entry_Type='Visit', Tool/Score blank. Required: date + note.
 // ════════════════════════════════════════════════════════════════
 function openVisitOnlyModal() {
+  if (!PSTATE || !PSTATE.patient) {
+    if (typeof showToast === 'function') showToast(getLang()==='en' ? 'Patient still loading — try again in a moment.' : 'Paciente aún cargando — inténtalo en un momento.', { variant: 'warn' });
+    return;
+  }
+  if (typeof closeLogChooser === 'function') closeLogChooser();
   const en = getLang() === 'en';
   const primaryConds = (PSTATE.patient.Conditions||'').split(',').map(s=>s.trim());
   const needsSafetyFirst = primaryConds.some(c => /depress|anxiety|mdd|gad/i.test(c));
