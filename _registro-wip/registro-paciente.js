@@ -230,8 +230,7 @@ function render() {
         } catch(_) { return ''; }
       })()}
       <div class="quick-actions">
-        <button class="primary" onclick="openVisitModal()" title="${getLang()==='en' ? 'Log a visit with a psychometric score' : 'Registrar visita con puntaje'}">${t('action_add_visit')}</button>
-        <button class="primary" onclick="openVisitOnlyModal()" title="${getLang()==='en' ? 'Log a visit without a score' : 'Registrar visita sin puntaje'}">🗒 ${getLang()==='en'?'Log visit (no score)':'Registrar visita (sin puntaje)'}</button>
+        <button class="primary" onclick="openVisitModal()" title="${getLang()==='en' ? 'Log a visit (with or without a psychometric score)' : 'Registrar visita (con o sin puntaje)'}">${t('action_add_visit')}</button>
         <button class="primary" onclick="openScoreModal()" title="${getLang()==='en' ? 'Log a score without a visit' : 'Registrar puntaje sin visita'}">📊 ${getLang()==='en'?'Log score only':'Solo puntaje'}</button>
         <button class="ghost" onclick="openMedModal()">${t('action_add_med2')}</button>
         ${!safetyActive ? `<button class="danger" onclick="raiseSafety()">${t('action_raise_safety')}</button>` : ''}
@@ -340,6 +339,7 @@ function render() {
       <h2>
         <span>${t('visit_score_history')}</span>
         <span style="font-size: var(--text-sm); color: var(--color-text-muted); font-weight: 400;">${PSTATE.visits.length} ${PSTATE.visits.length === 1 ? t('visit_singular') : t('visits')}</span>
+        <button onclick="openVisitModal()" style="margin-left:auto;font-size:var(--text-xs);padding:4px 10px;border-radius:var(--radius-md);background:var(--color-surface-offset);border:1px solid var(--color-border);color:var(--color-text-muted);cursor:pointer;font-weight:600;" title="${getLang()==='en' ? 'Log a visit (with or without a psychometric score)' : 'Registrar visita (con o sin puntaje)'}">+ ${getLang()==='en'?'Log visit':'Registrar visita'}</button>
       </h2>
       ${renderVisits(lang)}
     </div>
@@ -1121,9 +1121,15 @@ function openVisitModal() {
       <input type="date" id="vDate" value="${new Date().toISOString().slice(0,10)}" style="${inputSt}max-width:200px;"/>
     </div>
     <div id="vToolRows" style="margin-top:var(--space-3);display:flex;flex-direction:column;gap:var(--space-2);"></div>
-    <button type="button" id="vAddToolBtn" onclick="addVisitToolRow()" style="margin-top:var(--space-2);background:transparent;border:1px dashed var(--color-border);color:var(--color-primary);padding:6px 12px;border-radius:var(--radius-md);font-size:var(--text-sm);cursor:pointer;">+ ${en?'Add another tool':'Agregar otra herramienta'}</button>
-    <div style="margin-top: var(--space-3);">
-      <label class="np-label">${t('label_note')} <span style="font-size:var(--text-xs);color:var(--color-text-muted);font-weight:400;text-transform:none;">(${t('label_optional')})</span></label>
+    <div id="vNoScoreBanner" style="display:none;margin-top:var(--space-2);background:oklch(from var(--color-warning) l c h / 0.08);border:1px solid oklch(from var(--color-warning) l c h / 0.3);border-radius:var(--radius-md);padding:var(--space-2) var(--space-3);font-size:var(--text-xs);color:var(--color-text-muted);line-height:1.5;">
+      ${en ? '<strong>Visit only (no score).</strong> No psychometric tool will be recorded for this visit. A note is required below.' : '<strong>Solo visita (sin puntaje).</strong> No se registrará ningún instrumento psicométrico. Se requiere una nota a continuación.'}
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:var(--space-2);">
+      <button type="button" id="vAddToolBtn" onclick="addVisitToolRow()" style="background:transparent;border:1px dashed var(--color-border);color:var(--color-primary);padding:6px 12px;border-radius:var(--radius-md);font-size:var(--text-sm);cursor:pointer;">+ ${en?'Add another tool':'Agregar otra herramienta'}</button>
+      <button type="button" id="vNoScoreBtn" onclick="setVisitNoScoreMode(true)" style="background:transparent;border:1px dashed var(--color-border);color:var(--color-text-muted);padding:6px 12px;border-radius:var(--radius-md);font-size:var(--text-sm);cursor:pointer;" title="${en?'Remove all tools and log this as a visit without a psychometric score':'Quitar todas las herramientas y registrar como visita sin puntaje'}">− ${en?'Visit only (no score)':'Solo visita (sin puntaje)'}</button>
+    </div>
+    <div id="vNoteWrap" style="margin-top: var(--space-3);">
+      <label class="np-label"><span id="vNoteLabelText">${t('label_note')}</span> <span id="vNoteOptional" style="font-size:var(--text-xs);color:var(--color-text-muted);font-weight:400;text-transform:none;">(${t('label_optional')})</span><span id="vNoteRequired" style="display:none;color:var(--color-error);">*</span></label>
       <textarea id="vNote" rows="2" style="${inputSt}" placeholder="${en?'Visit note (supports **bold** / *italic*)':'Nota de visita (admite **negrita** / *cursiva*)'}"></textarea>
     </div>
     <template id="vToolRowTmpl">
@@ -1169,14 +1175,52 @@ function removeVisitToolRow(btn) {
 
 function updateVisitRowRemoveButtons() {
   const rows = document.querySelectorAll('#vToolRows .v-tool-row');
-  rows.forEach((r, i) => {
+  // Allow remove on the last row too — removing it transitions the modal into
+  // 'visit only / no score' mode (mirrors clicking the − Visit only button).
+  rows.forEach((r) => {
     const btn = r.querySelector('.vRemoveRowBtn');
-    if (btn) btn.style.visibility = (rows.length === 1) ? 'hidden' : 'visible';
+    if (btn) btn.style.visibility = 'visible';
   });
+  // If user removed the last tool row, sync UI to no-score mode.
+  if (rows.length === 0) setVisitNoScoreMode(true);
 }
+
+// Toggle the visit modal between 'has tool rows' and 'no score' modes.
+// In no-score mode all tool rows are removed, the banner is shown, the note
+// becomes required, and the +/− buttons swap to offer 'Add a tool' to revert.
+function setVisitNoScoreMode(noScore) {
+  const en = getLang() === 'en';
+  const banner = document.getElementById('vNoScoreBanner');
+  const noteOpt = document.getElementById('vNoteOptional');
+  const noteReq = document.getElementById('vNoteRequired');
+  const noScoreBtn = document.getElementById('vNoScoreBtn');
+  const addToolBtn = document.getElementById('vAddToolBtn');
+  if (noScore) {
+    document.querySelectorAll('#vToolRows .v-tool-row').forEach(r => r.remove());
+    if (banner) banner.style.display = 'block';
+    if (noteOpt) noteOpt.style.display = 'none';
+    if (noteReq) noteReq.style.display = 'inline';
+    if (noScoreBtn) noScoreBtn.style.display = 'none';
+    if (addToolBtn) addToolBtn.textContent = `+ ${en ? 'Add a tool / score' : 'Agregar herramienta / puntaje'}`;
+  } else {
+    if (banner) banner.style.display = 'none';
+    if (noteOpt) noteOpt.style.display = 'inline';
+    if (noteReq) noteReq.style.display = 'none';
+    if (noScoreBtn) noScoreBtn.style.display = '';
+    if (addToolBtn) addToolBtn.textContent = `+ ${en ? 'Add another tool' : 'Agregar otra herramienta'}`;
+  }
+}
+
+// Wrapper invoked when user clicks the row remove button. If removing this row
+// will leave zero rows, restore default add-tool button text first; the
+// no-score-mode UI is then turned on by updateVisitRowRemoveButtons().
 if (typeof window !== 'undefined') {
-  window.addVisitToolRow = addVisitToolRow;
+  window.addVisitToolRow = function(preselect) {
+    setVisitNoScoreMode(false); // clicking 'Add a tool' from no-score mode reverts it
+    return addVisitToolRow(preselect);
+  };
   window.removeVisitToolRow = removeVisitToolRow;
+  window.setVisitNoScoreMode = setVisitNoScoreMode;
 }
 function closeVisitModal() { document.getElementById('visitModal').style.display = 'none'; }
 
@@ -1185,25 +1229,27 @@ async function submitVisit() {
   if (btn && btn.disabled) return;       // double-click guard
   const reenable = () => { if (btn) { btn.disabled = false; btn.textContent = (getLang()==='en'?'Save':'Guardar'); } };
 
-  // Collect tool/score pairs from all rows
+  // Collect tool/score pairs from all rows. Zero rows = 'visit only / no score'
+  // mode (replaces the old standalone Log Visit (No Score) modal).
   const rows = Array.from(document.querySelectorAll('#vToolRows .v-tool-row'));
   const entries = rows.map(r => ({
     tool: r.querySelector('.vToolSel')?.value || '',
     score: r.querySelector('.vScoreInp')?.value || '',
   })).filter(e => e.tool || e.score !== '');
 
-  if (!entries.length) {
-    showToast(t('err_tool_score_req'), { variant: 'warn' });
-    return;
-  }
-  for (const e of entries) {
-    if (!e.tool || e.score === '') {
-      showToast(t('err_tool_score_req'), { variant: 'warn' });
-      return;
-    }
-    if (!isNaN(Number(e.score)) && (Number(e.score) < 0 || Number(e.score) > 100)) {
-      showToast(t('err_score_range', { tool: e.tool }), { variant: 'warn' });
-      return;
+  const en = getLang() === 'en';
+  const isNoScore = entries.length === 0;
+
+  if (!isNoScore) {
+    for (const e of entries) {
+      if (!e.tool || e.score === '') {
+        showToast(t('err_tool_score_req'), { variant: 'warn' });
+        return;
+      }
+      if (!isNaN(Number(e.score)) && (Number(e.score) < 0 || Number(e.score) > 100)) {
+        showToast(t('err_score_range', { tool: e.tool }), { variant: 'warn' });
+        return;
+      }
     }
   }
 
@@ -1213,12 +1259,45 @@ async function submitVisit() {
   const siPositive = siEl && siEl.type === 'checkbox' ? (siEl.checked ? 'TRUE' : 'FALSE') : 'FALSE';
   const visitDate = document.getElementById('vDate').value;
   const visitNote = document.getElementById('vNote').value.trim();
+
+  // No-score mode: a clinical note is required (mirrors visit-only modal).
+  if (isNoScore && !visitNote) {
+    showToast(en ? 'Note required for a no-score visit' : 'Se requiere una nota para visita sin puntaje', { variant: 'warn' });
+    reenable();
+    return;
+  }
+
   const now = new Date().toISOString();
   const visitIdBase = `V-${Date.now()}`;
 
   const createdRows = [];
   try {
-    for (let i = 0; i < entries.length; i++) {
+    if (isNoScore) {
+      // Single no-score visit row — same shape as legacy submitVisitOnly()
+      const row = {
+        Visit_ID: visitIdBase,
+        Patient_ID: PSTATE.patient.Patient_ID,
+        Visit_Date: visitDate,
+        Therapist: PSTATE.user || PSTATE.patient.Therapist || '',
+        Tool: '',
+        Score: '',
+        Baseline_Score: '',
+        Subscale_Scores: '',
+        SI_Positive: siPositive,
+        Not_Improving_Flag: '',
+        Visit_Note: visitNote,
+        Entry_Type: 'Visit',
+        Created_By: PSTATE.user || 'unknown',
+        Created_At: now,
+        Updated_By: '',
+        Updated_At: '',
+        Schema_Version: '1.0',
+      };
+      await writeRow('Visitas', row);
+      createdRows.push(row);
+      showToast(en ? 'Visit saved' : 'Visita guardada', { variant: 'success' });
+    } else {
+      for (let i = 0; i < entries.length; i++) {
       const { tool, score } = entries[i];
       const baseline = PSTATE.visits.filter(v => v.Tool===tool).slice(-1)[0]?.Baseline_Score
                      || PSTATE.visits.filter(v => v.Tool===tool)[0]?.Score
@@ -1248,6 +1327,7 @@ async function submitVisit() {
     showToast(entries.length > 1
       ? (getLang()==='en' ? `${entries.length} tools logged` : `${entries.length} herramientas registradas`)
       : t('saved_visit'), { variant: 'success' });
+    } // end else (has-score branch)
   } catch (err) {
     showToast(t('generic_error', { msg: err.message }), { variant: 'error', retry: () => submitVisit() });
     reenable();
@@ -1576,7 +1656,14 @@ function openEditPatientModal() {
   const en = getLang() === 'en';
   const curConds = new Set((p.Conditions||'').split(',').map(s=>s.trim()).filter(Boolean));
   const curTools = new Set((p.Tools||'').split(',').map(s=>s.trim()).filter(Boolean));
-  const condKeys = Object.keys(PSTATE.conditions || {});
+  // Filter out any 'Other'/'Otro' Config rows — the hardcoded freetext 'Other' below is canonical.
+  const _isOtherCondKey = (k) => {
+    const norm = s => String(s || '').trim().toLowerCase();
+    if (['other', 'otro'].includes(norm(k))) return true;
+    const d = (PSTATE.conditions || {})[k] || {};
+    return ['other', 'otro'].includes(norm(d.en)) || ['other', 'otro'].includes(norm(d.es));
+  };
+  const condKeys = Object.keys(PSTATE.conditions || {}).filter(k => !_isOtherCondKey(k));
   const toolKeysAll = Object.keys(PSTATE.tools || {});
 
   const sexVal = (p.Sex || '').trim();

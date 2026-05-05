@@ -248,7 +248,15 @@ function closeNewPatientModal() {
 function renderNewPatientForm() {
   const lang = getLang();
   const en = lang === 'en';
-  const conds = Object.entries(STATE.conditions);
+  // Filter out any 'Other'/'Otro' Config rows so we don't render two 'Other' chips —
+  // the hardcoded freetext 'Other' below is the canonical one.
+  const _isOtherCond = ([k, v]) => {
+    const norm = s => String(s || '').trim().toLowerCase();
+    return ['other', 'otro'].includes(norm(k))
+        || ['other', 'otro'].includes(norm(v && v.en))
+        || ['other', 'otro'].includes(norm(v && v.es));
+  };
+  const conds = Object.entries(STATE.conditions).filter(e => !_isOtherCond(e));
   const therapists = STATE.team.filter(t => t.role === 'therapist');
   const inputSt = 'width:100%;padding:8px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);';
 
@@ -637,13 +645,20 @@ async function submitNewPatient(skipDupCheck=false) {
   }
   closeNewPatientModal();
   renderAll();
-  // PSC-17 prompt: offer to copy the share link for the qualifying screening
+  // PSC-17 prompt: offer to copy the share link for the qualifying screening.
+  // After the prompt is dismissed (or immediately if it can't open), navigate to the
+  // newly created patient's chart so the clinician can continue charting in context.
+  const _navToNewPatient = () => {
+    try { window.location.href = `registro-paciente.html?id=${encodeURIComponent(nextId)}`; } catch (_) {}
+  };
   if (saveOk) {
-    setTimeout(() => showPsc17Prompt(name, nextId), 400);
+    setTimeout(() => showPsc17Prompt(name, nextId, _navToNewPatient), 400);
+  } else {
+    _navToNewPatient();
   }
 }
 
-function showPsc17Prompt(patientName, patientId) {
+function showPsc17Prompt(patientName, patientId, onClose) {
   const en = getLang() === 'en';
   const firstName = String(patientName || '').trim().split(/\s+/)[0] || (en ? 'this patient' : 'este paciente');
   const psc17Url = 'https://registry.cocm-camasca.org/psc17.html';
@@ -651,7 +666,15 @@ function showPsc17Prompt(patientName, patientId) {
     ? `Hello — please help us by completing this short questionnaire about ${firstName}. It helps us determine the best care for them.\n\nPSC-17:\n${psc17Url}\n\nOnce completed, please copy the results and send them back to us.`
     : `Hola — por favor ayúdenos completando este breve cuestionario sobre ${firstName}. Nos ayuda a determinar la mejor atención para su hijo/a.\n\nPSC-17:\n${psc17Url}\n\nUna vez completado, por favor copie los resultados y envíenoslos de vuelta.`;
 
-  // Build modal
+  // Build modal. The overlay is set up so any close path (Skip button, Copy success,
+  // backdrop click) fires the optional onClose callback exactly once — used to
+  // navigate to the new patient's chart after creation.
+  let _onCloseFired = false;
+  const _fireOnClose = () => {
+    if (_onCloseFired) return;
+    _onCloseFired = true;
+    try { typeof onClose === 'function' && onClose(); } catch (_) {}
+  };
   const overlay = document.createElement('div');
   overlay.id = 'psc17Prompt';
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;';
@@ -667,20 +690,32 @@ function showPsc17Prompt(patientName, patientId) {
       </p>
       <textarea id="psc17ShareText" readonly style="width:100%;height:110px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);padding:10px;font-size:var(--text-xs);color:var(--color-text);resize:none;line-height:1.5;box-sizing:border-box;">${shareMsg}</textarea>
       <div style="display:flex;gap:8px;margin-top:var(--space-3);">
-        <button id="psc17CopyBtn" onclick="
-          navigator.clipboard && navigator.clipboard.writeText(document.getElementById('psc17ShareText').value).then(()=>{
-            this.textContent='${en ? '✓ Copied!' : '✓ Copiado!'}';
-            this.style.background='var(--color-success)';
-            setTimeout(()=>document.getElementById('psc17Prompt')?.remove(), 1200);
-          }).catch(()=>{ document.getElementById('psc17ShareText').select(); document.execCommand('copy'); this.textContent='${en ? '✓ Copied!' : '✓ Copiado!'}'; setTimeout(()=>document.getElementById('psc17Prompt')?.remove(),1200); });
-        " style="flex:1;padding:9px;background:var(--color-primary);color:white;border:none;border-radius:var(--radius-md);font-weight:700;font-size:var(--text-sm);cursor:pointer;">📋 ${en ? 'Copy message' : 'Copiar mensaje'}</button>
-        <button onclick="document.getElementById('psc17Prompt')?.remove()" style="padding:9px 14px;background:transparent;border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text-muted);font-size:var(--text-sm);cursor:pointer;">${en ? 'Skip' : 'Omitir'}</button>
+        <button id="psc17CopyBtn" style="flex:1;padding:9px;background:var(--color-primary);color:white;border:none;border-radius:var(--radius-md);font-weight:700;font-size:var(--text-sm);cursor:pointer;">📋 ${en ? 'Copy message' : 'Copiar mensaje'}</button>
+        <button id="psc17SkipBtn" style="padding:9px 14px;background:transparent;border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text-muted);font-size:var(--text-sm);cursor:pointer;">${en ? 'Skip' : 'Omitir'}</button>
       </div>
     </div>
   `;
   document.body.appendChild(overlay);
-  // Close on backdrop click
-  overlay.addEventListener('click', e => { if (e.target === overlay) overlay.remove(); });
+  // Close-path wiring — every close path also fires the onClose callback.
+  const _closePromptAnd = () => {
+    overlay.remove();
+    _fireOnClose();
+  };
+  overlay.addEventListener('click', e => { if (e.target === overlay) _closePromptAnd(); });
+  document.getElementById('psc17SkipBtn')?.addEventListener('click', _closePromptAnd);
+  document.getElementById('psc17CopyBtn')?.addEventListener('click', function() {
+    const ta = document.getElementById('psc17ShareText');
+    const done = () => {
+      this.textContent = en ? '✓ Copied!' : '✓ Copiado!';
+      this.style.background = 'var(--color-success)';
+      setTimeout(_closePromptAnd, 1200);
+    };
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(ta.value).then(done).catch(() => { ta.select(); document.execCommand('copy'); done.call(this); });
+    } else {
+      ta.select(); document.execCommand('copy'); done.call(this);
+    }
+  });
 }
 if (typeof window !== 'undefined') window.showPsc17Prompt = showPsc17Prompt;
 
