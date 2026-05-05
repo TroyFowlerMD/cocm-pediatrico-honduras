@@ -648,8 +648,8 @@ function showPsc17Prompt(patientName, patientId) {
   const firstName = String(patientName || '').trim().split(/\s+/)[0] || (en ? 'this patient' : 'este paciente');
   const psc17Url = 'https://registry.cocm-camasca.org/psc17.html';
   const shareMsg = en
-    ? `Hello — please help us by completing this short questionnaire about ${firstName}. It helps us determine the best care for them.\n\nPSC-17:\n${psc17Url}`
-    : `Hola — por favor ayúdenos completando este breve cuestionario sobre ${firstName}. Nos ayuda a determinar la mejor atención para su hijo/a.\n\nPSC-17:\n${psc17Url}`;
+    ? `Hello — please help us by completing this short questionnaire about ${firstName}. It helps us determine the best care for them.\n\nPSC-17:\n${psc17Url}\n\nOnce completed, please copy the results and send them back to us.`
+    : `Hola — por favor ayúdenos completando este breve cuestionario sobre ${firstName}. Nos ayuda a determinar la mejor atención para su hijo/a.\n\nPSC-17:\n${psc17Url}\n\nUna vez completado, por favor copie los resultados y envíenoslos de vuelta.`;
 
   // Build modal
   const overlay = document.createElement('div');
@@ -1366,7 +1366,7 @@ function renderPatientRow(p, lang, opts={}) {
   const deltaClass = delta == null ? 'score-delta-flat' : delta < 0 ? 'score-delta-down' : delta > 0 ? 'score-delta-up' : 'score-delta-flat';
   const deltaStr = delta == null ? '—' : (delta > 0 ? `+${delta}` : `${delta}`);
 
-  const condChips = (p.Conditions||'').split(',').map(s=>s.trim()).filter(Boolean).map(c => {
+  const condChips = (p.Conditions||'').split(',').map(s=>s.trim()).filter(Boolean).filter(c => c.toLowerCase() !== 'on').map(c => {
     const d = STATE.conditions[c];
     const lbl = d ? (lang==='en'?d.en:d.es) : c;
     return `<span class="cond-chip">${lbl}</span>`;
