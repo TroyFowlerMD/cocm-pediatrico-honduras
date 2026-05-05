@@ -1364,6 +1364,11 @@ async function submitVisit() {
   closeVisitModal();
   render();
 }
+if (typeof window !== 'undefined') {
+  window.openVisitModal  = openVisitModal;
+  window.closeVisitModal = closeVisitModal;
+  window.submitVisit     = submitVisit;
+}
 
 // ── Med modal ──────────────────────────────────────────────────
 
