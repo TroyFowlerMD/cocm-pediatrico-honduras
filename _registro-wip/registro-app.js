@@ -427,7 +427,7 @@ function addNpMedRow() {
         <label class="np-label">${en?'Medication':'Medicamento'} <span style="color:var(--color-error);">*</span></label>
         <select class="npMedSel" style="${inputSt}">
           <option value="">—</option>
-          ${MED_FORMULARY.map(m => `<option value="${m}">${m}</option>`).join('')}
+          ${(window.MED_FORMULARY || MED_FORMULARY).map(m => `<option value="${m}">${m}</option>`).join('')}
           <option value="__other__">${en?'Other (specify)':'Otro (especificar)'}</option>
         </select>
         <input type="text" class="npMedOther" placeholder="${en?'Specify medication':'Especificar medicamento'}" style="display:none;margin-top:6px;${inputSt}"/>
@@ -443,7 +443,7 @@ function addNpMedRow() {
         <label class="np-label">${en?'Frequency':'Frecuencia'}</label>
         <select class="npMedFreq" style="${inputSt}">
           <option value="">—</option>
-          ${MED_FREQ_PRESETS.map(p => `<option value="${p.v}">${en?p.en:p.es}</option>`).join('')}
+          ${(window.MED_FREQ_PRESETS || MED_FREQ_PRESETS).map(p => `<option value="${p.v}">${en?p.en:p.es}</option>`).join('')}
         </select>
         <label style="display:flex;gap:8px;align-items:center;margin-top:6px;font-size:var(--text-sm);cursor:pointer;">
           <input type="checkbox" class="npMedPRN" style="width:15px;height:15px;"/>
@@ -510,7 +510,7 @@ async function submitNewPatient(skipDupCheck=false) {
 
   // Collect fields (detail section may or may not be rendered)
   const primaryCond = document.getElementById('npPrimaryCond')?.value || '';
-  let conds = [...document.querySelectorAll('#npConds input:checked')].map(c => c.value);
+  let conds = [...document.querySelectorAll('#npConds input[type="checkbox"]:not(#npCondOtherCb):checked')].map(c => c.value);
   const _npCondOtherCb = document.getElementById('npCondOtherCb');
   const _npCondOtherText = (document.getElementById('npCondOtherText')?.value || '').trim();
   if (_npCondOtherCb?.checked && _npCondOtherText) conds.push(_npCondOtherText);
@@ -1404,6 +1404,10 @@ function renderPatientRow(p, lang, opts={}) {
   if (suggestStable) flags.push(`<span class="flag-suggest-stable" title="${t('flag_suggest_stable_tooltip')}">${t('flag_suggest_stable')}</span>`);
   if (needsBaseline) flags.push(`<span class="flag-needs-baseline" title="${t('flag_needs_baseline_tooltip')}">${t('flag_needs_baseline')}</span>`);
   if (needsUpdate)   flags.push(`<span class="flag-needs-update" title="${t('flag_needs_update_tooltip')}">${t('flag_needs_update')}</span>`);
+  const _hasTodo = (() => {
+    try { return JSON.parse(p.Todo_Items || '[]').filter(x => x && x.id).length > 0; } catch(_) { return false; }
+  })();
+  if (_hasTodo) flags.push(`<span class="flag-todo" title="${lang==='en'?'Active to-do items':'Hay pendientes activos'}">📋 ${lang==='en'?'To-do':'Pendiente'}</span>`);
   if (notImp) flags.push(`<span class="flag-notimp">${t('flag_not_improv')}</span>`);
   if (p._daysSinceLastVisit > lapsedThresh && p._daysSinceLastVisit < 9999) {
     const active = String(p.Status||'');
