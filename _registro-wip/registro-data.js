@@ -152,7 +152,7 @@ const REG_HEADERS = {
   // break layout or derived flags.
   Pacientes: ["Patient_ID","Patient_Name","Initials","DOB","Age","Sex","Therapist","Conditions","Primary_Condition","Primary_Condition_Verified","Tools","Enrollment_Date","Status","Priority","Safety_Flag","Safety_Flag_Ack_By","Safety_Flag_Ack_At","Notes","Last_Psych_Consult_Date","Last_BHCM_Contact_Date","Last_BHCM_Contact_Note","Last_BHCM_Contact_By","Review_Flag","Review_Flag_Note","Baseline_Tool","Baseline_Score","Baseline_Date","Brigade_Flag","Brigade_Reason","Todo_Items","Created_By","Created_At","Updated_By","Updated_At","Schema_Version"],
   Visitas:   ["Visit_ID","Patient_ID","Visit_Date","Therapist","Tool","Score","Baseline_Score","Subscale_Scores","SI_Positive","Not_Improving_Flag","Visit_Note","Entry_Type","Created_By","Created_At","Updated_By","Updated_At","Schema_Version"],
-  Medicamentos: ["Med_ID","Patient_ID","Date","Medication","Dose","Frequency","Action","Prescriber","Reason","Notes","Created_By","Created_At","Schema_Version"],
+  Medicamentos: ["Med_ID","Patient_ID","Date","Medication","Dose","Frequency","Action","Prescriber","Reason","Notes","Created_By","Created_At","Schema_Version","Is_External","External_Provider","Start_Date"],
   Config:    ["Category","Key","Value","Display_ES","Display_EN","Active","Notes"],
   Auditoria: ["Audit_ID","Timestamp","User","Action","Tab","Row_ID","Field","Old_Value","New_Value"],
   Sugerencias: ["Suggestion_ID","Timestamp","Submitter","Category","Priority","Description","Attachment_URL","Status","Resolution_Notes","Resolved_By","Resolved_At"],
