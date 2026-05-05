@@ -237,6 +237,7 @@ function render() {
         <button class="${isTruthyFlag(p.Brigade_Flag) ? 'brigade-active' : 'ghost'}" onclick="openBrigadeModal()" title="${getLang()==='en' ? 'Flag for next brigade visit' : 'Marcar para próxima brigada'}">${isTruthyFlag(p.Brigade_Flag) ? '🚩' : '🏳'} ${getLang()==='en' ? 'Brigade' : 'Brigada'}</button>
         <button class="ghost" onclick="toggleStatus()">${t('action_change_status')}</button>
         <button class="ghost" onclick="openEditPatientModal()" title="${getLang()==='en' ? 'Edit demographics, conditions, or monitored tools' : 'Editar datos demográficos, condiciones o herramientas monitoreadas'}">✏️ ${getLang()==='en' ? 'Edit patient' : 'Editar paciente'}</button>
+        <button class="ghost" onclick="location.href='registro-sugerencias.html'" style="border-color:var(--color-primary);color:var(--color-primary);">💬 ${getLang()==='en' ? 'Suggestions / Report a problem' : 'Sugerencias / Reportar problema'}</button>
         <!-- brigade indicator shown in the banner above; row flag shown on registry -->
       </div>
     </div>
@@ -925,6 +926,10 @@ function renderMeds(lang) {
     const metaLine = (startedLbl || loggedLbl)
       ? `<div style="grid-column:1 / -1;display:flex;gap:10px;flex-wrap:wrap;margin-top:2px;">${startedLbl}${loggedLbl}</div>`
       : '';
+    const medActionBtns = `<div style="grid-column:1 / -1;display:flex;gap:6px;justify-content:flex-end;margin-top:4px;">
+      <button class="ghost" style="padding:3px 10px;font-size:var(--text-xs);" onclick="openEditMedModal('${escapeHtml(m.Med_ID)}')" title="${en?'Edit':'Editar'}">✏️ ${en?'Edit':'Editar'}</button>
+      <button class="ghost" style="padding:3px 10px;font-size:var(--text-xs);color:var(--color-error);border-color:var(--color-error);" onclick="confirmDeleteMed('${escapeHtml(m.Med_ID)}')" title="${en?'Delete':'Eliminar'}">🗑 ${en?'Delete':'Eliminar'}</button>
+    </div>`;
     return `
     <div class="med-row">
       <div class="mdate">${m.Date}</div>
@@ -933,6 +938,7 @@ function renderMeds(lang) {
       <div class="mpresc" style="grid-column:span 2;">${escapeHtml(m.Reason||'')}${m.Reason && m.Prescriber ? ' · ' : ''}${escapeHtml(m.Prescriber||'')}</div>
       ${metaLine}
       ${notesLine}
+      ${medActionBtns}
     </div>
     `;
   }).join('');
@@ -1544,6 +1550,210 @@ async function submitMed() {
   PSTATE.meds.unshift(row);
   closeMedModal();
   render();
+}
+if (typeof window !== 'undefined') {
+  window.openMedModal  = openMedModal;
+  window.closeMedModal = closeMedModal;
+  window.submitMed     = submitMed;
+}
+
+// ════════════════════════════════════════════════════════════════
+// MED DELETE
+// ════════════════════════════════════════════════════════════════
+async function confirmDeleteMed(medId) {
+  const en = getLang() === 'en';
+  const confirmed = await confirmDialog({
+    heading:     en ? 'Delete medication entry?' : '¿Eliminar medicamento?',
+    message:     en ? 'Are you sure you want to delete this medication entry? This cannot be undone.' : '¿Seguro que quieres eliminar esta entrada de medicamento? Esta acción no se puede deshacer.',
+    okLabel:     en ? 'Yes, delete' : 'Sí, eliminar',
+    cancelLabel: en ? 'Cancel'      : 'Cancelar',
+  });
+  if (!confirmed) return;
+  try {
+    const result = await deleteRow('Medicamentos', medId);
+    if (result && (result.status === 'ok' || result.ok)) {
+      PSTATE.meds = PSTATE.meds.filter(m => m.Med_ID !== medId);
+      showToast(en ? 'Medication entry deleted.' : 'Medicamento eliminado.', { variant: 'success' });
+      render();
+    } else {
+      showToast((en ? 'Delete failed: ' : 'Error al eliminar: ') + (result?.message || 'unknown'), { variant: 'error' });
+    }
+  } catch(e) {
+    showToast((en ? 'Delete failed: ' : 'Error al eliminar: ') + e.message, { variant: 'error' });
+  }
+}
+if (typeof window !== 'undefined') window.confirmDeleteMed = confirmDeleteMed;
+
+// ════════════════════════════════════════════════════════════════
+// MED EDIT
+// ════════════════════════════════════════════════════════════════
+function openEditMedModal(medId) {
+  const saveBtn = document.getElementById('editMedSaveBtn');
+  if (saveBtn) { saveBtn.disabled = false; saveBtn.textContent = getLang()==='en' ? 'Save' : 'Guardar'; }
+  const m = (PSTATE.meds || []).find(x => x.Med_ID === medId);
+  if (!m) { showToast(getLang()==='en'?'Medication not found':'Medicamento no encontrado', { variant:'warn' }); return; }
+  const en = getLang() === 'en';
+  const inputSt = 'width:100%;padding:8px;background:var(--color-surface-2);border:1px solid var(--color-border);border-radius:var(--radius-md);color:var(--color-text);';
+
+  let host = document.getElementById('editMedModal');
+  if (!host) {
+    host = document.createElement('div');
+    host.id = 'editMedModal';
+    host.className = 'modal-backdrop';
+    host.style.display = 'none';
+    host.innerHTML = `
+      <div class="modal" style="max-width:640px;">
+        <div class="modal-header">
+          <h3>${en?'Edit medication':'Editar medicamento'}</h3>
+          <button class="modal-close" onclick="closeEditMedModal()">×</button>
+        </div>
+        <div class="modal-body" id="editMedForm"></div>
+        <div class="modal-footer">
+          <button class="ghost" onclick="closeEditMedModal()">${en?'Cancel':'Cancelar'}</button>
+          <button class="primary" id="editMedSaveBtn" onclick="submitEditMed()">${en?'Save':'Guardar'}</button>
+        </div>
+      </div>`;
+    document.body.appendChild(host);
+  }
+
+  const formulary = window.MED_FORMULARY || [];
+  const medIsOther = m.Medication && !formulary.includes(m.Medication);
+  const formularyOpts = formulary.map(f =>
+    `<option value="${escapeHtml(f)}" ${f===m.Medication&&!medIsOther?'selected':''}>${escapeHtml(f)}</option>`
+  ).join('');
+  const freqPresets = window.MED_FREQ_PRESETS || [];
+  const freqBase = (m.Frequency||'').replace(' + PRN','').replace('+PRN','').trim();
+  const isPRN = (m.Frequency||'').includes('PRN');
+  const freqOpts = freqPresets.map(p =>
+    `<option value="${escapeHtml(p.v)}" ${p.v===freqBase?'selected':''}>${escapeHtml(en?p.en:p.es)}</option>`
+  ).join('');
+
+  document.getElementById('editMedForm').innerHTML = `
+    <input type="hidden" id="emMedId" value="${escapeHtml(medId)}"/>
+    <div style="background:oklch(from var(--color-primary) l c h / 0.06);border:1px solid oklch(from var(--color-primary) l c h / 0.25);border-radius:var(--radius-md);padding:var(--space-2) var(--space-3);margin-bottom:var(--space-3);font-size:var(--text-xs);color:var(--color-text-muted);">
+      ${en ? 'Changes are logged to the audit trail.' : 'Los cambios se registran en el historial de auditoría.'}
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3);">
+      <div>
+        <label class="np-label">${en?'Date':'Fecha'}</label>
+        <input type="date" id="emDate" value="${escapeHtml(m.Date||'')}" style="${inputSt}"/>
+      </div>
+      <div>
+        <label class="np-label">${t('label_action')}</label>
+        <select id="emAction" style="${inputSt}">
+          <option value="START"    ${m.Action==='START'   ?'selected':''}>${t('med_start')}</option>
+          <option value="INCREASE" ${m.Action==='INCREASE'?'selected':''}>${t('med_increase')}</option>
+          <option value="DECREASE" ${m.Action==='DECREASE'?'selected':''}>${t('med_decrease')}</option>
+          <option value="CONTINUE" ${m.Action==='CONTINUE'?'selected':''}>${t('med_continue')}</option>
+          <option value="HOLD"     ${m.Action==='HOLD'    ?'selected':''}>${t('med_hold')}</option>
+          <option value="STOP"     ${m.Action==='STOP'    ?'selected':''}>${t('med_stop')}</option>
+        </select>
+      </div>
+      <div>
+        <label class="np-label">${t('label_medication')} <span style="color:var(--color-error);">*</span></label>
+        <select id="emMedSel" style="${inputSt}" onchange="document.getElementById('emMedOther').style.display=this.value==='__other__'?'block':'none'">
+          <option value="">—</option>
+          ${formularyOpts}
+          <option value="__other__" ${medIsOther?'selected':''}>${en?'Other (specify)':'Otro (especificar)'}</option>
+        </select>
+        <input type="text" id="emMedOther" value="${escapeHtml(medIsOther?m.Medication:'')}" placeholder="${en?'Specify medication':'Especificar medicamento'}" style="${medIsOther?'':'display:none;'}margin-top:6px;${inputSt}"/>
+      </div>
+      <div>
+        <label class="np-label">${t('label_dose')}</label>
+        <div style="position:relative;">
+          <input type="number" id="emDose" value="${escapeHtml(String(m.Dose||'').replace(' mg',''))}" placeholder="20" step="0.5" min="0" style="${inputSt}padding-right:42px;"/>
+          <span style="position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--color-text-muted);font-size:var(--text-sm);pointer-events:none;">mg</span>
+        </div>
+      </div>
+      <div>
+        <label class="np-label">${t('label_frequency')}</label>
+        <select id="emFreqSel" style="${inputSt}">
+          <option value="">—</option>
+          ${freqOpts}
+        </select>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding-top:24px;">
+        <input type="checkbox" id="emPRN" ${isPRN?'checked':''} style="width:16px;height:16px;cursor:pointer;"/>
+        <label for="emPRN" style="font-size:var(--text-sm);cursor:pointer;">PRN</label>
+      </div>
+      <div>
+        <label class="np-label">${en?'Prescriber':'Prescriptor'}</label>
+        <input type="text" id="emPresc" value="${escapeHtml(m.Prescriber||'')}" style="${inputSt}"/>
+      </div>
+      <div>
+        <label class="np-label">${en?'Start date':'Fecha de inicio'}</label>
+        <input type="date" id="emStartDate" value="${escapeHtml(m.Start_Date||'')}" style="${inputSt}"/>
+      </div>
+      <div style="grid-column:1/-1;">
+        <label class="np-label">${en?'Reason':'Razón'}</label>
+        <input type="text" id="emReason" value="${escapeHtml(m.Reason||'')}" style="${inputSt}"/>
+      </div>
+      <div style="grid-column:1/-1;">
+        <label class="np-label">${t('label_notes')}</label>
+        <textarea id="emNotes" rows="2" style="${inputSt}">${escapeHtml(m.Notes||'')}</textarea>
+      </div>
+    </div>
+  `;
+  host.style.display = 'flex';
+}
+
+function closeEditMedModal() {
+  const m = document.getElementById('editMedModal');
+  if (m) m.style.display = 'none';
+}
+
+async function submitEditMed() {
+  const btn = document.getElementById('editMedSaveBtn');
+  if (btn && btn.disabled) return;
+  const en = getLang() === 'en';
+  const medId = (document.getElementById('emMedId')?.value || '').trim();
+  if (!medId) return;
+
+  const medSelEl = document.getElementById('emMedSel');
+  let med = medSelEl?.value === '__other__'
+    ? (document.getElementById('emMedOther')?.value || '').trim()
+    : (medSelEl?.value || '').trim();
+  if (!med) { showToast(t('err_med_required'), { variant: 'warn' }); return; }
+
+  const doseRaw = (document.getElementById('emDose')?.value || '').trim();
+  const doseStr = doseRaw ? `${doseRaw} mg` : '';
+  const freqBase = document.getElementById('emFreqSel')?.value || '';
+  const isPRN    = !!document.getElementById('emPRN')?.checked;
+  let freq = freqBase;
+  if (isPRN) freq = freq ? freq + ' + PRN' : 'PRN';
+
+  const updates = {
+    Date:       document.getElementById('emDate')?.value || '',
+    Action:     document.getElementById('emAction')?.value || '',
+    Medication: med,
+    Dose:       doseStr,
+    Frequency:  freq,
+    Prescriber: (document.getElementById('emPresc')?.value || '').trim(),
+    Start_Date: document.getElementById('emStartDate')?.value || '',
+    Reason:     (document.getElementById('emReason')?.value || '').trim(),
+    Notes:      (document.getElementById('emNotes')?.value || '').trim(),
+    Updated_By: PSTATE.user || 'unknown',
+    Updated_At: new Date().toISOString(),
+  };
+
+  if (btn) { btn.disabled = true; btn.textContent = en?'Saving…':'Guardando…'; }
+  const reenable = () => { if (btn) { btn.disabled = false; btn.textContent = en?'Save':'Guardar'; } };
+  try {
+    await updateRow('Medicamentos', medId, updates);
+    const idx = PSTATE.meds.findIndex(x => x.Med_ID === medId);
+    if (idx >= 0) PSTATE.meds[idx] = { ...PSTATE.meds[idx], ...updates };
+    showToast(en ? 'Medication updated.' : 'Medicamento actualizado.', { variant: 'success' });
+    closeEditMedModal();
+    render();
+  } catch(e) {
+    showToast(t('generic_error', { msg: e.message }), { variant: 'error' });
+    reenable();
+  }
+}
+if (typeof window !== 'undefined') {
+  window.openEditMedModal  = openEditMedModal;
+  window.closeEditMedModal = closeEditMedModal;
+  window.submitEditMed     = submitEditMed;
 }
 
 function escapeHtml(s) { return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
