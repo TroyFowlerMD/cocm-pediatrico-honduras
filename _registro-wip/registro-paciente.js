@@ -926,9 +926,9 @@ function renderMeds(lang) {
     const metaLine = (startedLbl || loggedLbl)
       ? `<div style="grid-column:1 / -1;display:flex;gap:10px;flex-wrap:wrap;margin-top:2px;">${startedLbl}${loggedLbl}</div>`
       : '';
-    const medActionBtns = `<div style="grid-column:1 / -1;display:flex;gap:6px;justify-content:flex-end;margin-top:4px;">
-      <button class="ghost" style="padding:3px 10px;font-size:var(--text-xs);" onclick="openEditMedModal('${escapeHtml(m.Med_ID)}')" title="${en?'Edit':'Editar'}">✏️ ${en?'Edit':'Editar'}</button>
-      <button class="ghost" style="padding:3px 10px;font-size:var(--text-xs);color:var(--color-error);border-color:var(--color-error);" onclick="confirmDeleteMed('${escapeHtml(m.Med_ID)}')" title="${en?'Delete':'Eliminar'}">🗑 ${en?'Delete':'Eliminar'}</button>
+    const medActionBtns = `<div class="med-actions">
+      <button type="button" class="ghost" onclick="openEditMedModal('${escapeHtml(m.Med_ID)}')" title="${en?'Edit':'Editar'}" aria-label="${en?'Edit':'Editar'}">✏️</button>
+      <button type="button" class="ghost" style="color:var(--color-error);border-color:color-mix(in srgb, var(--color-error) 35%, transparent);" onclick="confirmDeleteMed('${escapeHtml(m.Med_ID)}')" title="${en?'Delete':'Eliminar'}" aria-label="${en?'Delete':'Eliminar'}">🗑</button>
     </div>`;
     return `
     <div class="med-row">
@@ -1086,6 +1086,7 @@ async function setStatus(newStatus) {
 
 // ── Visit modal ────────────────────────────────────────────────
 function openVisitModal() {
+  try {
   // Guard: if patient hasn't finished loading, abort silently rather than
   // throwing inside the .Tools access (which would leave the click with no
   // visible effect).
@@ -1097,13 +1098,14 @@ function openVisitModal() {
   if (typeof closeLogChooser === 'function') closeLogChooser();
   const patientTools = (PSTATE.patient.Tools||'').split(',').map(s=>s.trim()).filter(Boolean);
   // Sticky tool: prefer most recently used tool for this patient
-  const lastUsedTool = PSTATE.visits[0]?.Tool;
+  const lastUsedTool = PSTATE.visits && PSTATE.visits[0] ? PSTATE.visits[0].Tool : '';
+  const toolsMap = (PSTATE.tools && typeof PSTATE.tools === 'object') ? PSTATE.tools : {};
   const defaultTool = lastUsedTool && patientTools.includes(lastUsedTool)
     ? lastUsedTool
-    : patientTools[0] || Object.keys(PSTATE.tools)[0] || '';
+    : patientTools[0] || Object.keys(toolsMap)[0] || '';
 
   // Build tool options: patient's tools first (with recent one preselected), then others
-  const otherTools = Object.keys(PSTATE.tools).filter(tk => !patientTools.includes(tk));
+  const otherTools = Object.keys(toolsMap).filter(tk => !patientTools.includes(tk));
   const toolOptions = [
     ...patientTools.map(tk => ({ v: tk, l: tk, preferred: true })),
     ...otherTools.map(tk => ({ v: tk, l: tk + ' *', preferred: false })),
@@ -1163,8 +1165,21 @@ function openVisitModal() {
   `;
   // Add first row with defaultTool preselected
   addVisitToolRow(defaultTool);
-  document.getElementById('visitModal').style.display = 'flex';
+  const vm = document.getElementById('visitModal');
+  if (!vm) {
+    if (typeof showToast === 'function') showToast('Visit modal element missing in DOM. Please reload the page.', { variant: 'error' });
+    return;
+  }
+  vm.style.display = 'flex';
   setTimeout(() => document.querySelector('.vScoreInp')?.focus(), 50);
+  } catch (err) {
+    console.error('[openVisitModal] failed:', err);
+    if (typeof showToast === 'function') {
+      showToast((getLang()==='en' ? 'Could not open visit dialog: ' : 'No se pudo abrir el diálogo de visita: ') + (err && err.message ? err.message : err), { variant: 'error' });
+    } else {
+      alert('Visit dialog error: ' + (err && err.message ? err.message : err));
+    }
+  }
 }
 
 function addVisitToolRow(preselect) {

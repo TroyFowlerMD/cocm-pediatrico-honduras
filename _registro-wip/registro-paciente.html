@@ -71,7 +71,7 @@
     .trend-card .trend-sub { font-size: 10.5px !important; }
     .visit-row { font-size: 12px !important; padding: 4px 0 !important; }
     .visit-row .vdate, .visit-row .vtool, .visit-row .vtier { font-size: 10.5px !important; }
-    .med-row { font-size: 12px !important; padding: 2px 0 !important; gap: 6px !important; }
+    .med-row { font-size: 12px !important; padding: 2px 36px 2px 0 !important; gap: 6px !important; }
     .med-row .mdate, .med-row .maction, .med-row .mpresc, .med-row .mnotes { font-size: 10.5px !important; }
     .prompt-card { font-size: 12px !important; padding: 8px 12px !important; margin-bottom: 6px !important; }
     .prompt-card button { font-size: 11px !important; padding: 3px 8px !important; }
@@ -268,10 +268,11 @@
 
     .med-row {
       display: grid; grid-template-columns: 90px 1fr 70px 1fr 90px;
-      gap: var(--space-2); padding: 2px 0;
+      gap: var(--space-2); padding: 2px 36px 2px 0;
       border-bottom: 1px solid var(--color-divider);
       font-size: var(--text-sm);
       align-items: baseline;
+      position: relative;
     }
     .med-row:last-child { border: none; }
     .med-row .mdate { color: var(--color-text-muted); font-family: ui-monospace, monospace; font-size: var(--text-xs); }
@@ -279,6 +280,15 @@
     .med-row .maction { font-size: var(--text-xs); text-transform: uppercase; font-weight: 700; color: var(--color-primary); }
     .med-row .mpresc { font-size: var(--text-xs); color: var(--color-text-muted); }
     .med-row .mnotes { font-size: var(--text-xs); color: var(--color-text-muted); font-style: italic; margin-top: 1px; }
+    /* Action buttons (edit / delete) for a med row — vertically centered on the right */
+    .med-row .med-actions {
+      position: absolute; right: 0; top: 50%; transform: translateY(-50%);
+      display: flex; gap: 4px; align-items: center;
+    }
+    .med-row .med-actions button {
+      padding: 1px 6px; font-size: 10px; line-height: 1.2; border-radius: var(--radius-sm);
+      min-height: 0; height: auto;
+    }
 
     .prompt-card {
       background: oklch(from var(--color-primary) l c h / 0.06);
